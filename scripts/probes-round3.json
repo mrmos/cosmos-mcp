@@ -1,0 +1,3478 @@
+[
+  {
+    "label": "cluster.create",
+    "query": "mutation Probe { cluster { create { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.update",
+    "query": "mutation Probe { cluster { update { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.edit",
+    "query": "mutation Probe { cluster { edit { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.delete",
+    "query": "mutation Probe { cluster { delete { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.remove",
+    "query": "mutation Probe { cluster { remove { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.add",
+    "query": "mutation Probe { cluster { add { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.set",
+    "query": "mutation Probe { cluster { set { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.record",
+    "query": "mutation Probe { cluster { record { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.follow",
+    "query": "mutation Probe { cluster { follow { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.unfollow",
+    "query": "mutation Probe { cluster { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.block",
+    "query": "mutation Probe { cluster { block { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.unblock",
+    "query": "mutation Probe { cluster { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.mute",
+    "query": "mutation Probe { cluster { mute { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.report",
+    "query": "mutation Probe { cluster { report { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.hide",
+    "query": "mutation Probe { cluster { hide { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.like",
+    "query": "mutation Probe { cluster { like { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.dislike",
+    "query": "mutation Probe { cluster { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.undislike",
+    "query": "mutation Probe { cluster { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.save",
+    "query": "mutation Probe { cluster { save { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.invite",
+    "query": "mutation Probe { cluster { invite { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.accept",
+    "query": "mutation Probe { cluster { accept { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.decline",
+    "query": "mutation Probe { cluster { decline { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.start",
+    "query": "mutation Probe { cluster { start { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.cancel",
+    "query": "mutation Probe { cluster { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.upload",
+    "query": "mutation Probe { cluster { upload { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.view",
+    "query": "mutation Probe { cluster { view { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.reset",
+    "query": "mutation Probe { cluster { reset { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.refresh",
+    "query": "mutation Probe { cluster { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.sync",
+    "query": "mutation Probe { cluster { sync { zzzProbe } } }"
+  },
+  {
+    "label": "element.create",
+    "query": "mutation Probe { element { create { zzzProbe } } }"
+  },
+  {
+    "label": "element.update",
+    "query": "mutation Probe { element { update { zzzProbe } } }"
+  },
+  {
+    "label": "element.edit",
+    "query": "mutation Probe { element { edit { zzzProbe } } }"
+  },
+  {
+    "label": "element.delete",
+    "query": "mutation Probe { element { delete { zzzProbe } } }"
+  },
+  {
+    "label": "element.remove",
+    "query": "mutation Probe { element { remove { zzzProbe } } }"
+  },
+  {
+    "label": "element.add",
+    "query": "mutation Probe { element { add { zzzProbe } } }"
+  },
+  {
+    "label": "element.set",
+    "query": "mutation Probe { element { set { zzzProbe } } }"
+  },
+  {
+    "label": "element.record",
+    "query": "mutation Probe { element { record { zzzProbe } } }"
+  },
+  {
+    "label": "element.follow",
+    "query": "mutation Probe { element { follow { zzzProbe } } }"
+  },
+  {
+    "label": "element.unfollow",
+    "query": "mutation Probe { element { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "element.block",
+    "query": "mutation Probe { element { block { zzzProbe } } }"
+  },
+  {
+    "label": "element.unblock",
+    "query": "mutation Probe { element { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "element.mute",
+    "query": "mutation Probe { element { mute { zzzProbe } } }"
+  },
+  {
+    "label": "element.report",
+    "query": "mutation Probe { element { report { zzzProbe } } }"
+  },
+  {
+    "label": "element.hide",
+    "query": "mutation Probe { element { hide { zzzProbe } } }"
+  },
+  {
+    "label": "element.like",
+    "query": "mutation Probe { element { like { zzzProbe } } }"
+  },
+  {
+    "label": "element.dislike",
+    "query": "mutation Probe { element { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.undislike",
+    "query": "mutation Probe { element { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.save",
+    "query": "mutation Probe { element { save { zzzProbe } } }"
+  },
+  {
+    "label": "element.invite",
+    "query": "mutation Probe { element { invite { zzzProbe } } }"
+  },
+  {
+    "label": "element.accept",
+    "query": "mutation Probe { element { accept { zzzProbe } } }"
+  },
+  {
+    "label": "element.decline",
+    "query": "mutation Probe { element { decline { zzzProbe } } }"
+  },
+  {
+    "label": "element.start",
+    "query": "mutation Probe { element { start { zzzProbe } } }"
+  },
+  {
+    "label": "element.cancel",
+    "query": "mutation Probe { element { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "element.upload",
+    "query": "mutation Probe { element { upload { zzzProbe } } }"
+  },
+  {
+    "label": "element.view",
+    "query": "mutation Probe { element { view { zzzProbe } } }"
+  },
+  {
+    "label": "element.reset",
+    "query": "mutation Probe { element { reset { zzzProbe } } }"
+  },
+  {
+    "label": "element.refresh",
+    "query": "mutation Probe { element { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "element.sync",
+    "query": "mutation Probe { element { sync { zzzProbe } } }"
+  },
+  {
+    "label": "user.create",
+    "query": "mutation Probe { user { create { zzzProbe } } }"
+  },
+  {
+    "label": "user.update",
+    "query": "mutation Probe { user { update { zzzProbe } } }"
+  },
+  {
+    "label": "user.edit",
+    "query": "mutation Probe { user { edit { zzzProbe } } }"
+  },
+  {
+    "label": "user.delete",
+    "query": "mutation Probe { user { delete { zzzProbe } } }"
+  },
+  {
+    "label": "user.remove",
+    "query": "mutation Probe { user { remove { zzzProbe } } }"
+  },
+  {
+    "label": "user.add",
+    "query": "mutation Probe { user { add { zzzProbe } } }"
+  },
+  {
+    "label": "user.set",
+    "query": "mutation Probe { user { set { zzzProbe } } }"
+  },
+  {
+    "label": "user.record",
+    "query": "mutation Probe { user { record { zzzProbe } } }"
+  },
+  {
+    "label": "user.follow",
+    "query": "mutation Probe { user { follow { zzzProbe } } }"
+  },
+  {
+    "label": "user.unfollow",
+    "query": "mutation Probe { user { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "user.block",
+    "query": "mutation Probe { user { block { zzzProbe } } }"
+  },
+  {
+    "label": "user.unblock",
+    "query": "mutation Probe { user { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "user.mute",
+    "query": "mutation Probe { user { mute { zzzProbe } } }"
+  },
+  {
+    "label": "user.report",
+    "query": "mutation Probe { user { report { zzzProbe } } }"
+  },
+  {
+    "label": "user.hide",
+    "query": "mutation Probe { user { hide { zzzProbe } } }"
+  },
+  {
+    "label": "user.like",
+    "query": "mutation Probe { user { like { zzzProbe } } }"
+  },
+  {
+    "label": "user.dislike",
+    "query": "mutation Probe { user { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "user.undislike",
+    "query": "mutation Probe { user { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "user.save",
+    "query": "mutation Probe { user { save { zzzProbe } } }"
+  },
+  {
+    "label": "user.invite",
+    "query": "mutation Probe { user { invite { zzzProbe } } }"
+  },
+  {
+    "label": "user.accept",
+    "query": "mutation Probe { user { accept { zzzProbe } } }"
+  },
+  {
+    "label": "user.decline",
+    "query": "mutation Probe { user { decline { zzzProbe } } }"
+  },
+  {
+    "label": "user.start",
+    "query": "mutation Probe { user { start { zzzProbe } } }"
+  },
+  {
+    "label": "user.cancel",
+    "query": "mutation Probe { user { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "user.upload",
+    "query": "mutation Probe { user { upload { zzzProbe } } }"
+  },
+  {
+    "label": "user.view",
+    "query": "mutation Probe { user { view { zzzProbe } } }"
+  },
+  {
+    "label": "user.reset",
+    "query": "mutation Probe { user { reset { zzzProbe } } }"
+  },
+  {
+    "label": "user.refresh",
+    "query": "mutation Probe { user { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "user.sync",
+    "query": "mutation Probe { user { sync { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.create",
+    "query": "mutation Probe { userFollow { create { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.update",
+    "query": "mutation Probe { userFollow { update { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.edit",
+    "query": "mutation Probe { userFollow { edit { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.delete",
+    "query": "mutation Probe { userFollow { delete { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.remove",
+    "query": "mutation Probe { userFollow { remove { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.add",
+    "query": "mutation Probe { userFollow { add { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.set",
+    "query": "mutation Probe { userFollow { set { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.record",
+    "query": "mutation Probe { userFollow { record { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.follow",
+    "query": "mutation Probe { userFollow { follow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.unfollow",
+    "query": "mutation Probe { userFollow { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.block",
+    "query": "mutation Probe { userFollow { block { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.unblock",
+    "query": "mutation Probe { userFollow { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.mute",
+    "query": "mutation Probe { userFollow { mute { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.report",
+    "query": "mutation Probe { userFollow { report { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.hide",
+    "query": "mutation Probe { userFollow { hide { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.like",
+    "query": "mutation Probe { userFollow { like { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.dislike",
+    "query": "mutation Probe { userFollow { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.undislike",
+    "query": "mutation Probe { userFollow { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.save",
+    "query": "mutation Probe { userFollow { save { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.invite",
+    "query": "mutation Probe { userFollow { invite { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.accept",
+    "query": "mutation Probe { userFollow { accept { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.decline",
+    "query": "mutation Probe { userFollow { decline { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.start",
+    "query": "mutation Probe { userFollow { start { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.cancel",
+    "query": "mutation Probe { userFollow { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.upload",
+    "query": "mutation Probe { userFollow { upload { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.view",
+    "query": "mutation Probe { userFollow { view { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.reset",
+    "query": "mutation Probe { userFollow { reset { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.refresh",
+    "query": "mutation Probe { userFollow { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.sync",
+    "query": "mutation Probe { userFollow { sync { zzzProbe } } }"
+  },
+  {
+    "label": "activity.create",
+    "query": "mutation Probe { activity { create { zzzProbe } } }"
+  },
+  {
+    "label": "activity.update",
+    "query": "mutation Probe { activity { update { zzzProbe } } }"
+  },
+  {
+    "label": "activity.edit",
+    "query": "mutation Probe { activity { edit { zzzProbe } } }"
+  },
+  {
+    "label": "activity.delete",
+    "query": "mutation Probe { activity { delete { zzzProbe } } }"
+  },
+  {
+    "label": "activity.remove",
+    "query": "mutation Probe { activity { remove { zzzProbe } } }"
+  },
+  {
+    "label": "activity.add",
+    "query": "mutation Probe { activity { add { zzzProbe } } }"
+  },
+  {
+    "label": "activity.set",
+    "query": "mutation Probe { activity { set { zzzProbe } } }"
+  },
+  {
+    "label": "activity.record",
+    "query": "mutation Probe { activity { record { zzzProbe } } }"
+  },
+  {
+    "label": "activity.follow",
+    "query": "mutation Probe { activity { follow { zzzProbe } } }"
+  },
+  {
+    "label": "activity.unfollow",
+    "query": "mutation Probe { activity { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "activity.block",
+    "query": "mutation Probe { activity { block { zzzProbe } } }"
+  },
+  {
+    "label": "activity.unblock",
+    "query": "mutation Probe { activity { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "activity.mute",
+    "query": "mutation Probe { activity { mute { zzzProbe } } }"
+  },
+  {
+    "label": "activity.report",
+    "query": "mutation Probe { activity { report { zzzProbe } } }"
+  },
+  {
+    "label": "activity.hide",
+    "query": "mutation Probe { activity { hide { zzzProbe } } }"
+  },
+  {
+    "label": "activity.like",
+    "query": "mutation Probe { activity { like { zzzProbe } } }"
+  },
+  {
+    "label": "activity.dislike",
+    "query": "mutation Probe { activity { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "activity.undislike",
+    "query": "mutation Probe { activity { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "activity.save",
+    "query": "mutation Probe { activity { save { zzzProbe } } }"
+  },
+  {
+    "label": "activity.invite",
+    "query": "mutation Probe { activity { invite { zzzProbe } } }"
+  },
+  {
+    "label": "activity.accept",
+    "query": "mutation Probe { activity { accept { zzzProbe } } }"
+  },
+  {
+    "label": "activity.decline",
+    "query": "mutation Probe { activity { decline { zzzProbe } } }"
+  },
+  {
+    "label": "activity.start",
+    "query": "mutation Probe { activity { start { zzzProbe } } }"
+  },
+  {
+    "label": "activity.cancel",
+    "query": "mutation Probe { activity { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "activity.upload",
+    "query": "mutation Probe { activity { upload { zzzProbe } } }"
+  },
+  {
+    "label": "activity.view",
+    "query": "mutation Probe { activity { view { zzzProbe } } }"
+  },
+  {
+    "label": "activity.reset",
+    "query": "mutation Probe { activity { reset { zzzProbe } } }"
+  },
+  {
+    "label": "activity.refresh",
+    "query": "mutation Probe { activity { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "activity.sync",
+    "query": "mutation Probe { activity { sync { zzzProbe } } }"
+  },
+  {
+    "label": "import.create",
+    "query": "mutation Probe { import { create { zzzProbe } } }"
+  },
+  {
+    "label": "import.update",
+    "query": "mutation Probe { import { update { zzzProbe } } }"
+  },
+  {
+    "label": "import.edit",
+    "query": "mutation Probe { import { edit { zzzProbe } } }"
+  },
+  {
+    "label": "import.delete",
+    "query": "mutation Probe { import { delete { zzzProbe } } }"
+  },
+  {
+    "label": "import.remove",
+    "query": "mutation Probe { import { remove { zzzProbe } } }"
+  },
+  {
+    "label": "import.add",
+    "query": "mutation Probe { import { add { zzzProbe } } }"
+  },
+  {
+    "label": "import.set",
+    "query": "mutation Probe { import { set { zzzProbe } } }"
+  },
+  {
+    "label": "import.record",
+    "query": "mutation Probe { import { record { zzzProbe } } }"
+  },
+  {
+    "label": "import.follow",
+    "query": "mutation Probe { import { follow { zzzProbe } } }"
+  },
+  {
+    "label": "import.unfollow",
+    "query": "mutation Probe { import { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "import.block",
+    "query": "mutation Probe { import { block { zzzProbe } } }"
+  },
+  {
+    "label": "import.unblock",
+    "query": "mutation Probe { import { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "import.mute",
+    "query": "mutation Probe { import { mute { zzzProbe } } }"
+  },
+  {
+    "label": "import.report",
+    "query": "mutation Probe { import { report { zzzProbe } } }"
+  },
+  {
+    "label": "import.hide",
+    "query": "mutation Probe { import { hide { zzzProbe } } }"
+  },
+  {
+    "label": "import.like",
+    "query": "mutation Probe { import { like { zzzProbe } } }"
+  },
+  {
+    "label": "import.dislike",
+    "query": "mutation Probe { import { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "import.undislike",
+    "query": "mutation Probe { import { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "import.save",
+    "query": "mutation Probe { import { save { zzzProbe } } }"
+  },
+  {
+    "label": "import.invite",
+    "query": "mutation Probe { import { invite { zzzProbe } } }"
+  },
+  {
+    "label": "import.accept",
+    "query": "mutation Probe { import { accept { zzzProbe } } }"
+  },
+  {
+    "label": "import.decline",
+    "query": "mutation Probe { import { decline { zzzProbe } } }"
+  },
+  {
+    "label": "import.start",
+    "query": "mutation Probe { import { start { zzzProbe } } }"
+  },
+  {
+    "label": "import.cancel",
+    "query": "mutation Probe { import { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "import.upload",
+    "query": "mutation Probe { import { upload { zzzProbe } } }"
+  },
+  {
+    "label": "import.view",
+    "query": "mutation Probe { import { view { zzzProbe } } }"
+  },
+  {
+    "label": "import.reset",
+    "query": "mutation Probe { import { reset { zzzProbe } } }"
+  },
+  {
+    "label": "import.refresh",
+    "query": "mutation Probe { import { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "import.sync",
+    "query": "mutation Probe { import { sync { zzzProbe } } }"
+  },
+  {
+    "label": "export.create",
+    "query": "mutation Probe { export { create { zzzProbe } } }"
+  },
+  {
+    "label": "export.update",
+    "query": "mutation Probe { export { update { zzzProbe } } }"
+  },
+  {
+    "label": "export.edit",
+    "query": "mutation Probe { export { edit { zzzProbe } } }"
+  },
+  {
+    "label": "export.delete",
+    "query": "mutation Probe { export { delete { zzzProbe } } }"
+  },
+  {
+    "label": "export.remove",
+    "query": "mutation Probe { export { remove { zzzProbe } } }"
+  },
+  {
+    "label": "export.add",
+    "query": "mutation Probe { export { add { zzzProbe } } }"
+  },
+  {
+    "label": "export.set",
+    "query": "mutation Probe { export { set { zzzProbe } } }"
+  },
+  {
+    "label": "export.record",
+    "query": "mutation Probe { export { record { zzzProbe } } }"
+  },
+  {
+    "label": "export.follow",
+    "query": "mutation Probe { export { follow { zzzProbe } } }"
+  },
+  {
+    "label": "export.unfollow",
+    "query": "mutation Probe { export { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "export.block",
+    "query": "mutation Probe { export { block { zzzProbe } } }"
+  },
+  {
+    "label": "export.unblock",
+    "query": "mutation Probe { export { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "export.mute",
+    "query": "mutation Probe { export { mute { zzzProbe } } }"
+  },
+  {
+    "label": "export.report",
+    "query": "mutation Probe { export { report { zzzProbe } } }"
+  },
+  {
+    "label": "export.hide",
+    "query": "mutation Probe { export { hide { zzzProbe } } }"
+  },
+  {
+    "label": "export.like",
+    "query": "mutation Probe { export { like { zzzProbe } } }"
+  },
+  {
+    "label": "export.dislike",
+    "query": "mutation Probe { export { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "export.undislike",
+    "query": "mutation Probe { export { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "export.save",
+    "query": "mutation Probe { export { save { zzzProbe } } }"
+  },
+  {
+    "label": "export.invite",
+    "query": "mutation Probe { export { invite { zzzProbe } } }"
+  },
+  {
+    "label": "export.accept",
+    "query": "mutation Probe { export { accept { zzzProbe } } }"
+  },
+  {
+    "label": "export.decline",
+    "query": "mutation Probe { export { decline { zzzProbe } } }"
+  },
+  {
+    "label": "export.start",
+    "query": "mutation Probe { export { start { zzzProbe } } }"
+  },
+  {
+    "label": "export.cancel",
+    "query": "mutation Probe { export { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "export.upload",
+    "query": "mutation Probe { export { upload { zzzProbe } } }"
+  },
+  {
+    "label": "export.view",
+    "query": "mutation Probe { export { view { zzzProbe } } }"
+  },
+  {
+    "label": "export.reset",
+    "query": "mutation Probe { export { reset { zzzProbe } } }"
+  },
+  {
+    "label": "export.refresh",
+    "query": "mutation Probe { export { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "export.sync",
+    "query": "mutation Probe { export { sync { zzzProbe } } }"
+  },
+  {
+    "label": "feed.create",
+    "query": "mutation Probe { feed { create { zzzProbe } } }"
+  },
+  {
+    "label": "feed.update",
+    "query": "mutation Probe { feed { update { zzzProbe } } }"
+  },
+  {
+    "label": "feed.edit",
+    "query": "mutation Probe { feed { edit { zzzProbe } } }"
+  },
+  {
+    "label": "feed.delete",
+    "query": "mutation Probe { feed { delete { zzzProbe } } }"
+  },
+  {
+    "label": "feed.remove",
+    "query": "mutation Probe { feed { remove { zzzProbe } } }"
+  },
+  {
+    "label": "feed.add",
+    "query": "mutation Probe { feed { add { zzzProbe } } }"
+  },
+  {
+    "label": "feed.set",
+    "query": "mutation Probe { feed { set { zzzProbe } } }"
+  },
+  {
+    "label": "feed.record",
+    "query": "mutation Probe { feed { record { zzzProbe } } }"
+  },
+  {
+    "label": "feed.follow",
+    "query": "mutation Probe { feed { follow { zzzProbe } } }"
+  },
+  {
+    "label": "feed.unfollow",
+    "query": "mutation Probe { feed { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "feed.block",
+    "query": "mutation Probe { feed { block { zzzProbe } } }"
+  },
+  {
+    "label": "feed.unblock",
+    "query": "mutation Probe { feed { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "feed.mute",
+    "query": "mutation Probe { feed { mute { zzzProbe } } }"
+  },
+  {
+    "label": "feed.report",
+    "query": "mutation Probe { feed { report { zzzProbe } } }"
+  },
+  {
+    "label": "feed.hide",
+    "query": "mutation Probe { feed { hide { zzzProbe } } }"
+  },
+  {
+    "label": "feed.like",
+    "query": "mutation Probe { feed { like { zzzProbe } } }"
+  },
+  {
+    "label": "feed.dislike",
+    "query": "mutation Probe { feed { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "feed.undislike",
+    "query": "mutation Probe { feed { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "feed.save",
+    "query": "mutation Probe { feed { save { zzzProbe } } }"
+  },
+  {
+    "label": "feed.invite",
+    "query": "mutation Probe { feed { invite { zzzProbe } } }"
+  },
+  {
+    "label": "feed.accept",
+    "query": "mutation Probe { feed { accept { zzzProbe } } }"
+  },
+  {
+    "label": "feed.decline",
+    "query": "mutation Probe { feed { decline { zzzProbe } } }"
+  },
+  {
+    "label": "feed.start",
+    "query": "mutation Probe { feed { start { zzzProbe } } }"
+  },
+  {
+    "label": "feed.cancel",
+    "query": "mutation Probe { feed { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "feed.upload",
+    "query": "mutation Probe { feed { upload { zzzProbe } } }"
+  },
+  {
+    "label": "feed.view",
+    "query": "mutation Probe { feed { view { zzzProbe } } }"
+  },
+  {
+    "label": "feed.reset",
+    "query": "mutation Probe { feed { reset { zzzProbe } } }"
+  },
+  {
+    "label": "feed.refresh",
+    "query": "mutation Probe { feed { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "feed.sync",
+    "query": "mutation Probe { feed { sync { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.create",
+    "query": "mutation Probe { forYou { create { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.update",
+    "query": "mutation Probe { forYou { update { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.edit",
+    "query": "mutation Probe { forYou { edit { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.delete",
+    "query": "mutation Probe { forYou { delete { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.remove",
+    "query": "mutation Probe { forYou { remove { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.add",
+    "query": "mutation Probe { forYou { add { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.set",
+    "query": "mutation Probe { forYou { set { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.record",
+    "query": "mutation Probe { forYou { record { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.follow",
+    "query": "mutation Probe { forYou { follow { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.unfollow",
+    "query": "mutation Probe { forYou { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.block",
+    "query": "mutation Probe { forYou { block { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.unblock",
+    "query": "mutation Probe { forYou { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.mute",
+    "query": "mutation Probe { forYou { mute { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.report",
+    "query": "mutation Probe { forYou { report { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.hide",
+    "query": "mutation Probe { forYou { hide { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.like",
+    "query": "mutation Probe { forYou { like { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.dislike",
+    "query": "mutation Probe { forYou { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.undislike",
+    "query": "mutation Probe { forYou { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.save",
+    "query": "mutation Probe { forYou { save { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.invite",
+    "query": "mutation Probe { forYou { invite { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.accept",
+    "query": "mutation Probe { forYou { accept { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.decline",
+    "query": "mutation Probe { forYou { decline { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.start",
+    "query": "mutation Probe { forYou { start { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.cancel",
+    "query": "mutation Probe { forYou { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.upload",
+    "query": "mutation Probe { forYou { upload { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.view",
+    "query": "mutation Probe { forYou { view { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.reset",
+    "query": "mutation Probe { forYou { reset { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.refresh",
+    "query": "mutation Probe { forYou { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "forYou.sync",
+    "query": "mutation Probe { forYou { sync { zzzProbe } } }"
+  },
+  {
+    "label": "tag.create",
+    "query": "mutation Probe { tag { create { zzzProbe } } }"
+  },
+  {
+    "label": "tag.update",
+    "query": "mutation Probe { tag { update { zzzProbe } } }"
+  },
+  {
+    "label": "tag.edit",
+    "query": "mutation Probe { tag { edit { zzzProbe } } }"
+  },
+  {
+    "label": "tag.delete",
+    "query": "mutation Probe { tag { delete { zzzProbe } } }"
+  },
+  {
+    "label": "tag.remove",
+    "query": "mutation Probe { tag { remove { zzzProbe } } }"
+  },
+  {
+    "label": "tag.add",
+    "query": "mutation Probe { tag { add { zzzProbe } } }"
+  },
+  {
+    "label": "tag.set",
+    "query": "mutation Probe { tag { set { zzzProbe } } }"
+  },
+  {
+    "label": "tag.record",
+    "query": "mutation Probe { tag { record { zzzProbe } } }"
+  },
+  {
+    "label": "tag.follow",
+    "query": "mutation Probe { tag { follow { zzzProbe } } }"
+  },
+  {
+    "label": "tag.unfollow",
+    "query": "mutation Probe { tag { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "tag.block",
+    "query": "mutation Probe { tag { block { zzzProbe } } }"
+  },
+  {
+    "label": "tag.unblock",
+    "query": "mutation Probe { tag { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "tag.mute",
+    "query": "mutation Probe { tag { mute { zzzProbe } } }"
+  },
+  {
+    "label": "tag.report",
+    "query": "mutation Probe { tag { report { zzzProbe } } }"
+  },
+  {
+    "label": "tag.hide",
+    "query": "mutation Probe { tag { hide { zzzProbe } } }"
+  },
+  {
+    "label": "tag.like",
+    "query": "mutation Probe { tag { like { zzzProbe } } }"
+  },
+  {
+    "label": "tag.dislike",
+    "query": "mutation Probe { tag { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "tag.undislike",
+    "query": "mutation Probe { tag { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "tag.save",
+    "query": "mutation Probe { tag { save { zzzProbe } } }"
+  },
+  {
+    "label": "tag.invite",
+    "query": "mutation Probe { tag { invite { zzzProbe } } }"
+  },
+  {
+    "label": "tag.accept",
+    "query": "mutation Probe { tag { accept { zzzProbe } } }"
+  },
+  {
+    "label": "tag.decline",
+    "query": "mutation Probe { tag { decline { zzzProbe } } }"
+  },
+  {
+    "label": "tag.start",
+    "query": "mutation Probe { tag { start { zzzProbe } } }"
+  },
+  {
+    "label": "tag.cancel",
+    "query": "mutation Probe { tag { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "tag.upload",
+    "query": "mutation Probe { tag { upload { zzzProbe } } }"
+  },
+  {
+    "label": "tag.view",
+    "query": "mutation Probe { tag { view { zzzProbe } } }"
+  },
+  {
+    "label": "tag.reset",
+    "query": "mutation Probe { tag { reset { zzzProbe } } }"
+  },
+  {
+    "label": "tag.refresh",
+    "query": "mutation Probe { tag { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "tag.sync",
+    "query": "mutation Probe { tag { sync { zzzProbe } } }"
+  },
+  {
+    "label": "category.create",
+    "query": "mutation Probe { category { create { zzzProbe } } }"
+  },
+  {
+    "label": "category.update",
+    "query": "mutation Probe { category { update { zzzProbe } } }"
+  },
+  {
+    "label": "category.edit",
+    "query": "mutation Probe { category { edit { zzzProbe } } }"
+  },
+  {
+    "label": "category.delete",
+    "query": "mutation Probe { category { delete { zzzProbe } } }"
+  },
+  {
+    "label": "category.remove",
+    "query": "mutation Probe { category { remove { zzzProbe } } }"
+  },
+  {
+    "label": "category.add",
+    "query": "mutation Probe { category { add { zzzProbe } } }"
+  },
+  {
+    "label": "category.set",
+    "query": "mutation Probe { category { set { zzzProbe } } }"
+  },
+  {
+    "label": "category.record",
+    "query": "mutation Probe { category { record { zzzProbe } } }"
+  },
+  {
+    "label": "category.follow",
+    "query": "mutation Probe { category { follow { zzzProbe } } }"
+  },
+  {
+    "label": "category.unfollow",
+    "query": "mutation Probe { category { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "category.block",
+    "query": "mutation Probe { category { block { zzzProbe } } }"
+  },
+  {
+    "label": "category.unblock",
+    "query": "mutation Probe { category { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "category.mute",
+    "query": "mutation Probe { category { mute { zzzProbe } } }"
+  },
+  {
+    "label": "category.report",
+    "query": "mutation Probe { category { report { zzzProbe } } }"
+  },
+  {
+    "label": "category.hide",
+    "query": "mutation Probe { category { hide { zzzProbe } } }"
+  },
+  {
+    "label": "category.like",
+    "query": "mutation Probe { category { like { zzzProbe } } }"
+  },
+  {
+    "label": "category.dislike",
+    "query": "mutation Probe { category { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "category.undislike",
+    "query": "mutation Probe { category { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "category.save",
+    "query": "mutation Probe { category { save { zzzProbe } } }"
+  },
+  {
+    "label": "category.invite",
+    "query": "mutation Probe { category { invite { zzzProbe } } }"
+  },
+  {
+    "label": "category.accept",
+    "query": "mutation Probe { category { accept { zzzProbe } } }"
+  },
+  {
+    "label": "category.decline",
+    "query": "mutation Probe { category { decline { zzzProbe } } }"
+  },
+  {
+    "label": "category.start",
+    "query": "mutation Probe { category { start { zzzProbe } } }"
+  },
+  {
+    "label": "category.cancel",
+    "query": "mutation Probe { category { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "category.upload",
+    "query": "mutation Probe { category { upload { zzzProbe } } }"
+  },
+  {
+    "label": "category.view",
+    "query": "mutation Probe { category { view { zzzProbe } } }"
+  },
+  {
+    "label": "category.reset",
+    "query": "mutation Probe { category { reset { zzzProbe } } }"
+  },
+  {
+    "label": "category.refresh",
+    "query": "mutation Probe { category { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "category.sync",
+    "query": "mutation Probe { category { sync { zzzProbe } } }"
+  },
+  {
+    "label": "auth.create",
+    "query": "mutation Probe { auth { create { zzzProbe } } }"
+  },
+  {
+    "label": "auth.update",
+    "query": "mutation Probe { auth { update { zzzProbe } } }"
+  },
+  {
+    "label": "auth.edit",
+    "query": "mutation Probe { auth { edit { zzzProbe } } }"
+  },
+  {
+    "label": "auth.delete",
+    "query": "mutation Probe { auth { delete { zzzProbe } } }"
+  },
+  {
+    "label": "auth.remove",
+    "query": "mutation Probe { auth { remove { zzzProbe } } }"
+  },
+  {
+    "label": "auth.add",
+    "query": "mutation Probe { auth { add { zzzProbe } } }"
+  },
+  {
+    "label": "auth.set",
+    "query": "mutation Probe { auth { set { zzzProbe } } }"
+  },
+  {
+    "label": "auth.record",
+    "query": "mutation Probe { auth { record { zzzProbe } } }"
+  },
+  {
+    "label": "auth.follow",
+    "query": "mutation Probe { auth { follow { zzzProbe } } }"
+  },
+  {
+    "label": "auth.unfollow",
+    "query": "mutation Probe { auth { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "auth.block",
+    "query": "mutation Probe { auth { block { zzzProbe } } }"
+  },
+  {
+    "label": "auth.unblock",
+    "query": "mutation Probe { auth { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "auth.mute",
+    "query": "mutation Probe { auth { mute { zzzProbe } } }"
+  },
+  {
+    "label": "auth.report",
+    "query": "mutation Probe { auth { report { zzzProbe } } }"
+  },
+  {
+    "label": "auth.hide",
+    "query": "mutation Probe { auth { hide { zzzProbe } } }"
+  },
+  {
+    "label": "auth.like",
+    "query": "mutation Probe { auth { like { zzzProbe } } }"
+  },
+  {
+    "label": "auth.dislike",
+    "query": "mutation Probe { auth { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "auth.undislike",
+    "query": "mutation Probe { auth { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "auth.save",
+    "query": "mutation Probe { auth { save { zzzProbe } } }"
+  },
+  {
+    "label": "auth.invite",
+    "query": "mutation Probe { auth { invite { zzzProbe } } }"
+  },
+  {
+    "label": "auth.accept",
+    "query": "mutation Probe { auth { accept { zzzProbe } } }"
+  },
+  {
+    "label": "auth.decline",
+    "query": "mutation Probe { auth { decline { zzzProbe } } }"
+  },
+  {
+    "label": "auth.start",
+    "query": "mutation Probe { auth { start { zzzProbe } } }"
+  },
+  {
+    "label": "auth.cancel",
+    "query": "mutation Probe { auth { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "auth.upload",
+    "query": "mutation Probe { auth { upload { zzzProbe } } }"
+  },
+  {
+    "label": "auth.view",
+    "query": "mutation Probe { auth { view { zzzProbe } } }"
+  },
+  {
+    "label": "auth.reset",
+    "query": "mutation Probe { auth { reset { zzzProbe } } }"
+  },
+  {
+    "label": "auth.refresh",
+    "query": "mutation Probe { auth { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "auth.sync",
+    "query": "mutation Probe { auth { sync { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.create",
+    "query": "mutation Probe { verifiedProfile { create { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.update",
+    "query": "mutation Probe { verifiedProfile { update { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.edit",
+    "query": "mutation Probe { verifiedProfile { edit { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.delete",
+    "query": "mutation Probe { verifiedProfile { delete { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.remove",
+    "query": "mutation Probe { verifiedProfile { remove { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.add",
+    "query": "mutation Probe { verifiedProfile { add { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.set",
+    "query": "mutation Probe { verifiedProfile { set { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.record",
+    "query": "mutation Probe { verifiedProfile { record { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.follow",
+    "query": "mutation Probe { verifiedProfile { follow { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.unfollow",
+    "query": "mutation Probe { verifiedProfile { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.block",
+    "query": "mutation Probe { verifiedProfile { block { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.unblock",
+    "query": "mutation Probe { verifiedProfile { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.mute",
+    "query": "mutation Probe { verifiedProfile { mute { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.report",
+    "query": "mutation Probe { verifiedProfile { report { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.hide",
+    "query": "mutation Probe { verifiedProfile { hide { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.like",
+    "query": "mutation Probe { verifiedProfile { like { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.dislike",
+    "query": "mutation Probe { verifiedProfile { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.undislike",
+    "query": "mutation Probe { verifiedProfile { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.save",
+    "query": "mutation Probe { verifiedProfile { save { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.invite",
+    "query": "mutation Probe { verifiedProfile { invite { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.accept",
+    "query": "mutation Probe { verifiedProfile { accept { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.decline",
+    "query": "mutation Probe { verifiedProfile { decline { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.start",
+    "query": "mutation Probe { verifiedProfile { start { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.cancel",
+    "query": "mutation Probe { verifiedProfile { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.upload",
+    "query": "mutation Probe { verifiedProfile { upload { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.view",
+    "query": "mutation Probe { verifiedProfile { view { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.reset",
+    "query": "mutation Probe { verifiedProfile { reset { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.refresh",
+    "query": "mutation Probe { verifiedProfile { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "verifiedProfile.sync",
+    "query": "mutation Probe { verifiedProfile { sync { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.create",
+    "query": "mutation Probe { inviteCode { create { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.update",
+    "query": "mutation Probe { inviteCode { update { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.edit",
+    "query": "mutation Probe { inviteCode { edit { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.delete",
+    "query": "mutation Probe { inviteCode { delete { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.remove",
+    "query": "mutation Probe { inviteCode { remove { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.add",
+    "query": "mutation Probe { inviteCode { add { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.set",
+    "query": "mutation Probe { inviteCode { set { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.record",
+    "query": "mutation Probe { inviteCode { record { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.follow",
+    "query": "mutation Probe { inviteCode { follow { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.unfollow",
+    "query": "mutation Probe { inviteCode { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.block",
+    "query": "mutation Probe { inviteCode { block { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.unblock",
+    "query": "mutation Probe { inviteCode { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.mute",
+    "query": "mutation Probe { inviteCode { mute { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.report",
+    "query": "mutation Probe { inviteCode { report { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.hide",
+    "query": "mutation Probe { inviteCode { hide { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.like",
+    "query": "mutation Probe { inviteCode { like { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.dislike",
+    "query": "mutation Probe { inviteCode { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.undislike",
+    "query": "mutation Probe { inviteCode { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.save",
+    "query": "mutation Probe { inviteCode { save { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.invite",
+    "query": "mutation Probe { inviteCode { invite { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.accept",
+    "query": "mutation Probe { inviteCode { accept { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.decline",
+    "query": "mutation Probe { inviteCode { decline { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.start",
+    "query": "mutation Probe { inviteCode { start { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.cancel",
+    "query": "mutation Probe { inviteCode { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.upload",
+    "query": "mutation Probe { inviteCode { upload { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.view",
+    "query": "mutation Probe { inviteCode { view { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.reset",
+    "query": "mutation Probe { inviteCode { reset { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.refresh",
+    "query": "mutation Probe { inviteCode { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "inviteCode.sync",
+    "query": "mutation Probe { inviteCode { sync { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.create",
+    "query": "mutation Probe { subscription { create { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.update",
+    "query": "mutation Probe { subscription { update { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.edit",
+    "query": "mutation Probe { subscription { edit { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.delete",
+    "query": "mutation Probe { subscription { delete { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.remove",
+    "query": "mutation Probe { subscription { remove { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.add",
+    "query": "mutation Probe { subscription { add { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.set",
+    "query": "mutation Probe { subscription { set { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.record",
+    "query": "mutation Probe { subscription { record { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.follow",
+    "query": "mutation Probe { subscription { follow { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.unfollow",
+    "query": "mutation Probe { subscription { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.block",
+    "query": "mutation Probe { subscription { block { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.unblock",
+    "query": "mutation Probe { subscription { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.mute",
+    "query": "mutation Probe { subscription { mute { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.report",
+    "query": "mutation Probe { subscription { report { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.hide",
+    "query": "mutation Probe { subscription { hide { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.like",
+    "query": "mutation Probe { subscription { like { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.dislike",
+    "query": "mutation Probe { subscription { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.undislike",
+    "query": "mutation Probe { subscription { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.save",
+    "query": "mutation Probe { subscription { save { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.invite",
+    "query": "mutation Probe { subscription { invite { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.accept",
+    "query": "mutation Probe { subscription { accept { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.decline",
+    "query": "mutation Probe { subscription { decline { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.start",
+    "query": "mutation Probe { subscription { start { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.cancel",
+    "query": "mutation Probe { subscription { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.upload",
+    "query": "mutation Probe { subscription { upload { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.view",
+    "query": "mutation Probe { subscription { view { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.reset",
+    "query": "mutation Probe { subscription { reset { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.refresh",
+    "query": "mutation Probe { subscription { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "subscription.sync",
+    "query": "mutation Probe { subscription { sync { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.create",
+    "query": "mutation Probe { waitlist { create { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.update",
+    "query": "mutation Probe { waitlist { update { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.edit",
+    "query": "mutation Probe { waitlist { edit { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.delete",
+    "query": "mutation Probe { waitlist { delete { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.remove",
+    "query": "mutation Probe { waitlist { remove { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.add",
+    "query": "mutation Probe { waitlist { add { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.set",
+    "query": "mutation Probe { waitlist { set { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.record",
+    "query": "mutation Probe { waitlist { record { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.follow",
+    "query": "mutation Probe { waitlist { follow { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.unfollow",
+    "query": "mutation Probe { waitlist { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.block",
+    "query": "mutation Probe { waitlist { block { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.unblock",
+    "query": "mutation Probe { waitlist { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.mute",
+    "query": "mutation Probe { waitlist { mute { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.report",
+    "query": "mutation Probe { waitlist { report { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.hide",
+    "query": "mutation Probe { waitlist { hide { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.like",
+    "query": "mutation Probe { waitlist { like { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.dislike",
+    "query": "mutation Probe { waitlist { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.undislike",
+    "query": "mutation Probe { waitlist { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.save",
+    "query": "mutation Probe { waitlist { save { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.invite",
+    "query": "mutation Probe { waitlist { invite { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.accept",
+    "query": "mutation Probe { waitlist { accept { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.decline",
+    "query": "mutation Probe { waitlist { decline { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.start",
+    "query": "mutation Probe { waitlist { start { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.cancel",
+    "query": "mutation Probe { waitlist { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.upload",
+    "query": "mutation Probe { waitlist { upload { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.view",
+    "query": "mutation Probe { waitlist { view { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.reset",
+    "query": "mutation Probe { waitlist { reset { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.refresh",
+    "query": "mutation Probe { waitlist { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "waitlist.sync",
+    "query": "mutation Probe { waitlist { sync { zzzProbe } } }"
+  },
+  {
+    "label": "payment.create",
+    "query": "mutation Probe { payment { create { zzzProbe } } }"
+  },
+  {
+    "label": "payment.update",
+    "query": "mutation Probe { payment { update { zzzProbe } } }"
+  },
+  {
+    "label": "payment.edit",
+    "query": "mutation Probe { payment { edit { zzzProbe } } }"
+  },
+  {
+    "label": "payment.delete",
+    "query": "mutation Probe { payment { delete { zzzProbe } } }"
+  },
+  {
+    "label": "payment.remove",
+    "query": "mutation Probe { payment { remove { zzzProbe } } }"
+  },
+  {
+    "label": "payment.add",
+    "query": "mutation Probe { payment { add { zzzProbe } } }"
+  },
+  {
+    "label": "payment.set",
+    "query": "mutation Probe { payment { set { zzzProbe } } }"
+  },
+  {
+    "label": "payment.record",
+    "query": "mutation Probe { payment { record { zzzProbe } } }"
+  },
+  {
+    "label": "payment.follow",
+    "query": "mutation Probe { payment { follow { zzzProbe } } }"
+  },
+  {
+    "label": "payment.unfollow",
+    "query": "mutation Probe { payment { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "payment.block",
+    "query": "mutation Probe { payment { block { zzzProbe } } }"
+  },
+  {
+    "label": "payment.unblock",
+    "query": "mutation Probe { payment { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "payment.mute",
+    "query": "mutation Probe { payment { mute { zzzProbe } } }"
+  },
+  {
+    "label": "payment.report",
+    "query": "mutation Probe { payment { report { zzzProbe } } }"
+  },
+  {
+    "label": "payment.hide",
+    "query": "mutation Probe { payment { hide { zzzProbe } } }"
+  },
+  {
+    "label": "payment.like",
+    "query": "mutation Probe { payment { like { zzzProbe } } }"
+  },
+  {
+    "label": "payment.dislike",
+    "query": "mutation Probe { payment { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "payment.undislike",
+    "query": "mutation Probe { payment { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "payment.save",
+    "query": "mutation Probe { payment { save { zzzProbe } } }"
+  },
+  {
+    "label": "payment.invite",
+    "query": "mutation Probe { payment { invite { zzzProbe } } }"
+  },
+  {
+    "label": "payment.accept",
+    "query": "mutation Probe { payment { accept { zzzProbe } } }"
+  },
+  {
+    "label": "payment.decline",
+    "query": "mutation Probe { payment { decline { zzzProbe } } }"
+  },
+  {
+    "label": "payment.start",
+    "query": "mutation Probe { payment { start { zzzProbe } } }"
+  },
+  {
+    "label": "payment.cancel",
+    "query": "mutation Probe { payment { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "payment.upload",
+    "query": "mutation Probe { payment { upload { zzzProbe } } }"
+  },
+  {
+    "label": "payment.view",
+    "query": "mutation Probe { payment { view { zzzProbe } } }"
+  },
+  {
+    "label": "payment.reset",
+    "query": "mutation Probe { payment { reset { zzzProbe } } }"
+  },
+  {
+    "label": "payment.refresh",
+    "query": "mutation Probe { payment { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "payment.sync",
+    "query": "mutation Probe { payment { sync { zzzProbe } } }"
+  },
+  {
+    "label": "admin.create",
+    "query": "mutation Probe { admin { create { zzzProbe } } }"
+  },
+  {
+    "label": "admin.update",
+    "query": "mutation Probe { admin { update { zzzProbe } } }"
+  },
+  {
+    "label": "admin.edit",
+    "query": "mutation Probe { admin { edit { zzzProbe } } }"
+  },
+  {
+    "label": "admin.delete",
+    "query": "mutation Probe { admin { delete { zzzProbe } } }"
+  },
+  {
+    "label": "admin.remove",
+    "query": "mutation Probe { admin { remove { zzzProbe } } }"
+  },
+  {
+    "label": "admin.add",
+    "query": "mutation Probe { admin { add { zzzProbe } } }"
+  },
+  {
+    "label": "admin.set",
+    "query": "mutation Probe { admin { set { zzzProbe } } }"
+  },
+  {
+    "label": "admin.record",
+    "query": "mutation Probe { admin { record { zzzProbe } } }"
+  },
+  {
+    "label": "admin.follow",
+    "query": "mutation Probe { admin { follow { zzzProbe } } }"
+  },
+  {
+    "label": "admin.unfollow",
+    "query": "mutation Probe { admin { unfollow { zzzProbe } } }"
+  },
+  {
+    "label": "admin.block",
+    "query": "mutation Probe { admin { block { zzzProbe } } }"
+  },
+  {
+    "label": "admin.unblock",
+    "query": "mutation Probe { admin { unblock { zzzProbe } } }"
+  },
+  {
+    "label": "admin.mute",
+    "query": "mutation Probe { admin { mute { zzzProbe } } }"
+  },
+  {
+    "label": "admin.report",
+    "query": "mutation Probe { admin { report { zzzProbe } } }"
+  },
+  {
+    "label": "admin.hide",
+    "query": "mutation Probe { admin { hide { zzzProbe } } }"
+  },
+  {
+    "label": "admin.like",
+    "query": "mutation Probe { admin { like { zzzProbe } } }"
+  },
+  {
+    "label": "admin.dislike",
+    "query": "mutation Probe { admin { dislike { zzzProbe } } }"
+  },
+  {
+    "label": "admin.undislike",
+    "query": "mutation Probe { admin { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "admin.save",
+    "query": "mutation Probe { admin { save { zzzProbe } } }"
+  },
+  {
+    "label": "admin.invite",
+    "query": "mutation Probe { admin { invite { zzzProbe } } }"
+  },
+  {
+    "label": "admin.accept",
+    "query": "mutation Probe { admin { accept { zzzProbe } } }"
+  },
+  {
+    "label": "admin.decline",
+    "query": "mutation Probe { admin { decline { zzzProbe } } }"
+  },
+  {
+    "label": "admin.start",
+    "query": "mutation Probe { admin { start { zzzProbe } } }"
+  },
+  {
+    "label": "admin.cancel",
+    "query": "mutation Probe { admin { cancel { zzzProbe } } }"
+  },
+  {
+    "label": "admin.upload",
+    "query": "mutation Probe { admin { upload { zzzProbe } } }"
+  },
+  {
+    "label": "admin.view",
+    "query": "mutation Probe { admin { view { zzzProbe } } }"
+  },
+  {
+    "label": "admin.reset",
+    "query": "mutation Probe { admin { reset { zzzProbe } } }"
+  },
+  {
+    "label": "admin.refresh",
+    "query": "mutation Probe { admin { refresh { zzzProbe } } }"
+  },
+  {
+    "label": "admin.sync",
+    "query": "mutation Probe { admin { sync { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.deleteCluster",
+    "query": "mutation Probe { cluster { deleteCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.deleteClusters",
+    "query": "mutation Probe { cluster { deleteClusters { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.deleteCollaborator",
+    "query": "mutation Probe { cluster { deleteCollaborator { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.deleteCollaborators",
+    "query": "mutation Probe { cluster { deleteCollaborators { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.disconnectElementsFromCluster",
+    "query": "mutation Probe { cluster { disconnectElementsFromCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.reorderElement",
+    "query": "mutation Probe { cluster { reorderElement { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.reorderElements",
+    "query": "mutation Probe { cluster { reorderElements { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.reportCluster",
+    "query": "mutation Probe { cluster { reportCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.acceptCollaboration",
+    "query": "mutation Probe { cluster { acceptCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.leaveCollaboration",
+    "query": "mutation Probe { cluster { leaveCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.declineCollaboration",
+    "query": "mutation Probe { cluster { declineCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.rejectCollaboration",
+    "query": "mutation Probe { cluster { rejectCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.createInviteLink",
+    "query": "mutation Probe { cluster { createInviteLink { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.deleteInviteLink",
+    "query": "mutation Probe { cluster { deleteInviteLink { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.createDuringOnboarding",
+    "query": "mutation Probe { cluster { createDuringOnboarding { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updateCollaboration",
+    "query": "mutation Probe { cluster { updateCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.addCollaboration",
+    "query": "mutation Probe { cluster { addCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.removeCollaboration",
+    "query": "mutation Probe { cluster { removeCollaboration { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.collaborate",
+    "query": "mutation Probe { cluster { collaborate { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updateCover",
+    "query": "mutation Probe { cluster { updateCover { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setCoverElement",
+    "query": "mutation Probe { cluster { setCoverElement { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updateCoverImage",
+    "query": "mutation Probe { cluster { updateCoverImage { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.changeCoverImage",
+    "query": "mutation Probe { cluster { changeCoverImage { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.pinToUserProfile",
+    "query": "mutation Probe { cluster { pinToUserProfile { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.pinCluster",
+    "query": "mutation Probe { cluster { pinCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.unpinCluster",
+    "query": "mutation Probe { cluster { unpinCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setPinned",
+    "query": "mutation Probe { cluster { setPinned { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.pinned",
+    "query": "mutation Probe { cluster { pinned { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updatePinnedClusters",
+    "query": "mutation Probe { cluster { updatePinnedClusters { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.reorderPinnedClusters",
+    "query": "mutation Probe { cluster { reorderPinnedClusters { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setPinnedClusters",
+    "query": "mutation Probe { cluster { setPinnedClusters { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.moveElements",
+    "query": "mutation Probe { cluster { moveElements { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.moveElementsToCluster",
+    "query": "mutation Probe { cluster { moveElementsToCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.transferElements",
+    "query": "mutation Probe { cluster { transferElements { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.createSub",
+    "query": "mutation Probe { cluster { createSub { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.addSub",
+    "query": "mutation Probe { cluster { addSub { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.createChild",
+    "query": "mutation Probe { cluster { createChild { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.convertToSubcluster",
+    "query": "mutation Probe { cluster { convertToSubcluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.makeSubcluster",
+    "query": "mutation Probe { cluster { makeSubcluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setSubcluster",
+    "query": "mutation Probe { cluster { setSubcluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.attachToParent",
+    "query": "mutation Probe { cluster { attachToParent { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.detachFromParent",
+    "query": "mutation Probe { cluster { detachFromParent { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.duplicateCluster",
+    "query": "mutation Probe { cluster { duplicateCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.copyCluster",
+    "query": "mutation Probe { cluster { copyCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.cloneCluster",
+    "query": "mutation Probe { cluster { cloneCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.forkCluster",
+    "query": "mutation Probe { cluster { forkCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.exportCluster",
+    "query": "mutation Probe { cluster { exportCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.requestExport",
+    "query": "mutation Probe { cluster { requestExport { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.createExport",
+    "query": "mutation Probe { cluster { createExport { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.joinCluster",
+    "query": "mutation Probe { cluster { joinCluster { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.requestAccess",
+    "query": "mutation Probe { cluster { requestAccess { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.grantAccess",
+    "query": "mutation Probe { cluster { grantAccess { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.revokeAccess",
+    "query": "mutation Probe { cluster { revokeAccess { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updatePrivacy",
+    "query": "mutation Probe { cluster { updatePrivacy { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.togglePrivacy",
+    "query": "mutation Probe { cluster { togglePrivacy { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.publish",
+    "query": "mutation Probe { cluster { publish { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.unpublish",
+    "query": "mutation Probe { cluster { unpublish { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.addToOnboarding",
+    "query": "mutation Probe { cluster { addToOnboarding { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.removeFromOnboarding",
+    "query": "mutation Probe { cluster { removeFromOnboarding { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setCategory",
+    "query": "mutation Probe { cluster { setCategory { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setCategories",
+    "query": "mutation Probe { cluster { setCategories { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.recordEvent",
+    "query": "mutation Probe { cluster { recordEvent { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.recordView",
+    "query": "mutation Probe { cluster { recordView { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.trackEvent",
+    "query": "mutation Probe { cluster { trackEvent { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.canary",
+    "query": "mutation Probe { cluster { canary { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.userRule",
+    "query": "mutation Probe { cluster { userRule { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.sortElements",
+    "query": "mutation Probe { cluster { sortElements { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.orderElements",
+    "query": "mutation Probe { cluster { orderElements { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.arrange",
+    "query": "mutation Probe { cluster { arrange { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.layout",
+    "query": "mutation Probe { cluster { layout { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.saveCanvas",
+    "query": "mutation Probe { cluster { saveCanvas { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.updateCanvas",
+    "query": "mutation Probe { cluster { updateCanvas { zzzProbe } } }"
+  },
+  {
+    "label": "cluster.setCanvas",
+    "query": "mutation Probe { cluster { setCanvas { zzzProbe } } }"
+  },
+  {
+    "label": "element.deleteElements",
+    "query": "mutation Probe { element { deleteElements { zzzProbe } } }"
+  },
+  {
+    "label": "element.deleteElement",
+    "query": "mutation Probe { element { deleteElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.removeElements",
+    "query": "mutation Probe { element { removeElements { zzzProbe } } }"
+  },
+  {
+    "label": "element.destroyElements",
+    "query": "mutation Probe { element { destroyElements { zzzProbe } } }"
+  },
+  {
+    "label": "element.updateCaption",
+    "query": "mutation Probe { element { updateCaption { zzzProbe } } }"
+  },
+  {
+    "label": "element.clearCaption",
+    "query": "mutation Probe { element { clearCaption { zzzProbe } } }"
+  },
+  {
+    "label": "element.setCaption",
+    "query": "mutation Probe { element { setCaption { zzzProbe } } }"
+  },
+  {
+    "label": "element.editCaption",
+    "query": "mutation Probe { element { editCaption { zzzProbe } } }"
+  },
+  {
+    "label": "element.undislike",
+    "query": "mutation Probe { element { undislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.unDislike",
+    "query": "mutation Probe { element { unDislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.removeDislike",
+    "query": "mutation Probe { element { removeDislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.clearDislike",
+    "query": "mutation Probe { element { clearDislike { zzzProbe } } }"
+  },
+  {
+    "label": "element.disconnectElementsFromCluster",
+    "query": "mutation Probe { element { disconnectElementsFromCluster { zzzProbe } } }"
+  },
+  {
+    "label": "element.connectElementsToClusters",
+    "query": "mutation Probe { element { connectElementsToClusters { zzzProbe } } }"
+  },
+  {
+    "label": "element.createElements",
+    "query": "mutation Probe { element { createElements { zzzProbe } } }"
+  },
+  {
+    "label": "element.createMany",
+    "query": "mutation Probe { element { createMany { zzzProbe } } }"
+  },
+  {
+    "label": "element.createBatch",
+    "query": "mutation Probe { element { createBatch { zzzProbe } } }"
+  },
+  {
+    "label": "element.batchCreate",
+    "query": "mutation Probe { element { batchCreate { zzzProbe } } }"
+  },
+  {
+    "label": "element.createFromFile",
+    "query": "mutation Probe { element { createFromFile { zzzProbe } } }"
+  },
+  {
+    "label": "element.createFromUpload",
+    "query": "mutation Probe { element { createFromUpload { zzzProbe } } }"
+  },
+  {
+    "label": "element.createUpload",
+    "query": "mutation Probe { element { createUpload { zzzProbe } } }"
+  },
+  {
+    "label": "element.requestUpload",
+    "query": "mutation Probe { element { requestUpload { zzzProbe } } }"
+  },
+  {
+    "label": "element.getUploadUrl",
+    "query": "mutation Probe { element { getUploadUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.createUploadUrl",
+    "query": "mutation Probe { element { createUploadUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.presign",
+    "query": "mutation Probe { element { presign { zzzProbe } } }"
+  },
+  {
+    "label": "element.presignedUrl",
+    "query": "mutation Probe { element { presignedUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.createFromLink",
+    "query": "mutation Probe { element { createFromLink { zzzProbe } } }"
+  },
+  {
+    "label": "element.addLink",
+    "query": "mutation Probe { element { addLink { zzzProbe } } }"
+  },
+  {
+    "label": "element.scrape",
+    "query": "mutation Probe { element { scrape { zzzProbe } } }"
+  },
+  {
+    "label": "element.fetchUrl",
+    "query": "mutation Probe { element { fetchUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.resolveUrl",
+    "query": "mutation Probe { element { resolveUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.createFromImage",
+    "query": "mutation Probe { element { createFromImage { zzzProbe } } }"
+  },
+  {
+    "label": "element.createFromImageUrl",
+    "query": "mutation Probe { element { createFromImageUrl { zzzProbe } } }"
+  },
+  {
+    "label": "element.createImageElement",
+    "query": "mutation Probe { element { createImageElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.setTags",
+    "query": "mutation Probe { element { setTags { zzzProbe } } }"
+  },
+  {
+    "label": "element.updateTags",
+    "query": "mutation Probe { element { updateTags { zzzProbe } } }"
+  },
+  {
+    "label": "element.addTags",
+    "query": "mutation Probe { element { addTags { zzzProbe } } }"
+  },
+  {
+    "label": "element.removeTags",
+    "query": "mutation Probe { element { removeTags { zzzProbe } } }"
+  },
+  {
+    "label": "element.moveToCluster",
+    "query": "mutation Probe { element { moveToCluster { zzzProbe } } }"
+  },
+  {
+    "label": "element.moveElements",
+    "query": "mutation Probe { element { moveElements { zzzProbe } } }"
+  },
+  {
+    "label": "element.reorder",
+    "query": "mutation Probe { element { reorder { zzzProbe } } }"
+  },
+  {
+    "label": "element.reorderElement",
+    "query": "mutation Probe { element { reorderElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.markAsViewed",
+    "query": "mutation Probe { element { markAsViewed { zzzProbe } } }"
+  },
+  {
+    "label": "element.recordView",
+    "query": "mutation Probe { element { recordView { zzzProbe } } }"
+  },
+  {
+    "label": "element.trackView",
+    "query": "mutation Probe { element { trackView { zzzProbe } } }"
+  },
+  {
+    "label": "element.recordEvent",
+    "query": "mutation Probe { element { recordEvent { zzzProbe } } }"
+  },
+  {
+    "label": "element.reportElement",
+    "query": "mutation Probe { element { reportElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.flagElement",
+    "query": "mutation Probe { element { flagElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.hideElement",
+    "query": "mutation Probe { element { hideElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.notInterested",
+    "query": "mutation Probe { element { notInterested { zzzProbe } } }"
+  },
+  {
+    "label": "element.updateElement",
+    "query": "mutation Probe { element { updateElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.editElement",
+    "query": "mutation Probe { element { editElement { zzzProbe } } }"
+  },
+  {
+    "label": "element.patch",
+    "query": "mutation Probe { element { patch { zzzProbe } } }"
+  },
+  {
+    "label": "element.setNsfw",
+    "query": "mutation Probe { element { setNsfw { zzzProbe } } }"
+  },
+  {
+    "label": "element.setNotSafeForWork",
+    "query": "mutation Probe { element { setNotSafeForWork { zzzProbe } } }"
+  },
+  {
+    "label": "element.group",
+    "query": "mutation Probe { element { group { zzzProbe } } }"
+  },
+  {
+    "label": "element.ungroup",
+    "query": "mutation Probe { element { ungroup { zzzProbe } } }"
+  },
+  {
+    "label": "element.merge",
+    "query": "mutation Probe { element { merge { zzzProbe } } }"
+  },
+  {
+    "label": "element.split",
+    "query": "mutation Probe { element { split { zzzProbe } } }"
+  },
+  {
+    "label": "element.removeFromFeatured",
+    "query": "mutation Probe { element { removeFromFeatured { zzzProbe } } }"
+  },
+  {
+    "label": "element.addToFeatured",
+    "query": "mutation Probe { element { addToFeatured { zzzProbe } } }"
+  },
+  {
+    "label": "user.followUser",
+    "query": "mutation Probe { user { followUser { zzzProbe } } }"
+  },
+  {
+    "label": "user.unfollowUser",
+    "query": "mutation Probe { user { unfollowUser { zzzProbe } } }"
+  },
+  {
+    "label": "user.createFollow",
+    "query": "mutation Probe { user { createFollow { zzzProbe } } }"
+  },
+  {
+    "label": "user.deleteFollow",
+    "query": "mutation Probe { user { deleteFollow { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateProfile",
+    "query": "mutation Probe { user { updateProfile { zzzProbe } } }"
+  },
+  {
+    "label": "user.editProfile",
+    "query": "mutation Probe { user { editProfile { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateUser",
+    "query": "mutation Probe { user { updateUser { zzzProbe } } }"
+  },
+  {
+    "label": "user.setBio",
+    "query": "mutation Probe { user { setBio { zzzProbe } } }"
+  },
+  {
+    "label": "user.setAvatar",
+    "query": "mutation Probe { user { setAvatar { zzzProbe } } }"
+  },
+  {
+    "label": "user.uploadAvatar",
+    "query": "mutation Probe { user { uploadAvatar { zzzProbe } } }"
+  },
+  {
+    "label": "user.setUsername",
+    "query": "mutation Probe { user { setUsername { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateUsername",
+    "query": "mutation Probe { user { updateUsername { zzzProbe } } }"
+  },
+  {
+    "label": "user.changeUsername",
+    "query": "mutation Probe { user { changeUsername { zzzProbe } } }"
+  },
+  {
+    "label": "user.deleteAccount",
+    "query": "mutation Probe { user { deleteAccount { zzzProbe } } }"
+  },
+  {
+    "label": "user.deleteUser",
+    "query": "mutation Probe { user { deleteUser { zzzProbe } } }"
+  },
+  {
+    "label": "user.ban",
+    "query": "mutation Probe { user { ban { zzzProbe } } }"
+  },
+  {
+    "label": "user.unban",
+    "query": "mutation Probe { user { unban { zzzProbe } } }"
+  },
+  {
+    "label": "user.verify",
+    "query": "mutation Probe { user { verify { zzzProbe } } }"
+  },
+  {
+    "label": "user.unverify",
+    "query": "mutation Probe { user { unverify { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateSettings",
+    "query": "mutation Probe { user { updateSettings { zzzProbe } } }"
+  },
+  {
+    "label": "user.setSettings",
+    "query": "mutation Probe { user { setSettings { zzzProbe } } }"
+  },
+  {
+    "label": "user.updatePreferences",
+    "query": "mutation Probe { user { updatePreferences { zzzProbe } } }"
+  },
+  {
+    "label": "user.setPreferences",
+    "query": "mutation Probe { user { setPreferences { zzzProbe } } }"
+  },
+  {
+    "label": "user.completeOnboarding",
+    "query": "mutation Probe { user { completeOnboarding { zzzProbe } } }"
+  },
+  {
+    "label": "user.onboard",
+    "query": "mutation Probe { user { onboard { zzzProbe } } }"
+  },
+  {
+    "label": "user.markOnboarded",
+    "query": "mutation Probe { user { markOnboarded { zzzProbe } } }"
+  },
+  {
+    "label": "user.setOnboardingStep",
+    "query": "mutation Probe { user { setOnboardingStep { zzzProbe } } }"
+  },
+  {
+    "label": "user.acceptTerms",
+    "query": "mutation Probe { user { acceptTerms { zzzProbe } } }"
+  },
+  {
+    "label": "user.setEmail",
+    "query": "mutation Probe { user { setEmail { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateEmail",
+    "query": "mutation Probe { user { updateEmail { zzzProbe } } }"
+  },
+  {
+    "label": "user.setPassword",
+    "query": "mutation Probe { user { setPassword { zzzProbe } } }"
+  },
+  {
+    "label": "user.changePassword",
+    "query": "mutation Probe { user { changePassword { zzzProbe } } }"
+  },
+  {
+    "label": "user.recordEvent",
+    "query": "mutation Probe { user { recordEvent { zzzProbe } } }"
+  },
+  {
+    "label": "user.setCategories",
+    "query": "mutation Probe { user { setCategories { zzzProbe } } }"
+  },
+  {
+    "label": "user.setInterests",
+    "query": "mutation Probe { user { setInterests { zzzProbe } } }"
+  },
+  {
+    "label": "user.updateInterests",
+    "query": "mutation Probe { user { updateInterests { zzzProbe } } }"
+  },
+  {
+    "label": "user.addToFeatured",
+    "query": "mutation Probe { user { addToFeatured { zzzProbe } } }"
+  },
+  {
+    "label": "user.removeFromFeatured",
+    "query": "mutation Probe { user { removeFromFeatured { zzzProbe } } }"
+  },
+  {
+    "label": "user.feature",
+    "query": "mutation Probe { user { feature { zzzProbe } } }"
+  },
+  {
+    "label": "user.unfeature",
+    "query": "mutation Probe { user { unfeature { zzzProbe } } }"
+  },
+  {
+    "label": "user.signIn",
+    "query": "mutation Probe { user { signIn { zzzProbe } } }"
+  },
+  {
+    "label": "user.signUp",
+    "query": "mutation Probe { user { signUp { zzzProbe } } }"
+  },
+  {
+    "label": "user.signOut",
+    "query": "mutation Probe { user { signOut { zzzProbe } } }"
+  },
+  {
+    "label": "user.logout",
+    "query": "mutation Probe { user { logout { zzzProbe } } }"
+  },
+  {
+    "label": "user.login",
+    "query": "mutation Probe { user { login { zzzProbe } } }"
+  },
+  {
+    "label": "user.register",
+    "query": "mutation Probe { user { register { zzzProbe } } }"
+  },
+  {
+    "label": "user.requestDeletion",
+    "query": "mutation Probe { user { requestDeletion { zzzProbe } } }"
+  },
+  {
+    "label": "user.restore",
+    "query": "mutation Probe { user { restore { zzzProbe } } }"
+  },
+  {
+    "label": "user.setPrivate",
+    "query": "mutation Probe { user { setPrivate { zzzProbe } } }"
+  },
+  {
+    "label": "user.setPublic",
+    "query": "mutation Probe { user { setPublic { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.followUser",
+    "query": "mutation Probe { userFollow { followUser { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.unfollowUser",
+    "query": "mutation Probe { userFollow { unfollowUser { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.createFollow",
+    "query": "mutation Probe { userFollow { createFollow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.deleteFollow",
+    "query": "mutation Probe { userFollow { deleteFollow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.toggleFollow",
+    "query": "mutation Probe { userFollow { toggleFollow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.batchFollow",
+    "query": "mutation Probe { userFollow { batchFollow { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.followMany",
+    "query": "mutation Probe { userFollow { followMany { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.followUsers",
+    "query": "mutation Probe { userFollow { followUsers { zzzProbe } } }"
+  },
+  {
+    "label": "userFollow.unfollowUsers",
+    "query": "mutation Probe { userFollow { unfollowUsers { zzzProbe } } }"
+  },
+  {
+    "label": "import.importFromUrl",
+    "query": "mutation Probe { import { importFromUrl { zzzProbe } } }"
+  },
+  {
+    "label": "import.importUrl",
+    "query": "mutation Probe { import { importUrl { zzzProbe } } }"
+  },
+  {
+    "label": "import.fromUrl",
+    "query": "mutation Probe { import { fromUrl { zzzProbe } } }"
+  },
+  {
+    "label": "import.createFromUrl",
+    "query": "mutation Probe { import { createFromUrl { zzzProbe } } }"
+  },
+  {
+    "label": "import.createImport",
+    "query": "mutation Probe { import { createImport { zzzProbe } } }"
+  },
+  {
+    "label": "import.startImport",
+    "query": "mutation Probe { import { startImport { zzzProbe } } }"
+  },
+  {
+    "label": "import.arena",
+    "query": "mutation Probe { import { arena { zzzProbe } } }"
+  },
+  {
+    "label": "import.arenaChannel",
+    "query": "mutation Probe { import { arenaChannel { zzzProbe } } }"
+  },
+  {
+    "label": "import.importArenaChannel",
+    "query": "mutation Probe { import { importArenaChannel { zzzProbe } } }"
+  },
+  {
+    "label": "import.fromArena",
+    "query": "mutation Probe { import { fromArena { zzzProbe } } }"
+  },
+  {
+    "label": "import.pinterest",
+    "query": "mutation Probe { import { pinterest { zzzProbe } } }"
+  },
+  {
+    "label": "import.importPinterest",
+    "query": "mutation Probe { import { importPinterest { zzzProbe } } }"
+  },
+  {
+    "label": "import.instagram",
+    "query": "mutation Probe { import { instagram { zzzProbe } } }"
+  },
+  {
+    "label": "import.figma",
+    "query": "mutation Probe { import { figma { zzzProbe } } }"
+  },
+  {
+    "label": "import.browserExtension",
+    "query": "mutation Probe { import { browserExtension { zzzProbe } } }"
+  },
+  {
+    "label": "import.importElements",
+    "query": "mutation Probe { import { importElements { zzzProbe } } }"
+  },
+  {
+    "label": "import.importFile",
+    "query": "mutation Probe { import { importFile { zzzProbe } } }"
+  },
+  {
+    "label": "import.uploadFile",
+    "query": "mutation Probe { import { uploadFile { zzzProbe } } }"
+  },
+  {
+    "label": "import.csv",
+    "query": "mutation Probe { import { csv { zzzProbe } } }"
+  },
+  {
+    "label": "import.bookmarks",
+    "query": "mutation Probe { import { bookmarks { zzzProbe } } }"
+  },
+  {
+    "label": "import.createArenaImport",
+    "query": "mutation Probe { import { createArenaImport { zzzProbe } } }"
+  },
+  {
+    "label": "import.status",
+    "query": "mutation Probe { import { status { zzzProbe } } }"
+  },
+  {
+    "label": "import.retry",
+    "query": "mutation Probe { import { retry { zzzProbe } } }"
+  },
+  {
+    "label": "export.createExport",
+    "query": "mutation Probe { export { createExport { zzzProbe } } }"
+  },
+  {
+    "label": "export.exportCluster",
+    "query": "mutation Probe { export { exportCluster { zzzProbe } } }"
+  },
+  {
+    "label": "export.requestExport",
+    "query": "mutation Probe { export { requestExport { zzzProbe } } }"
+  },
+  {
+    "label": "export.startExport",
+    "query": "mutation Probe { export { startExport { zzzProbe } } }"
+  },
+  {
+    "label": "export.pdf",
+    "query": "mutation Probe { export { pdf { zzzProbe } } }"
+  },
+  {
+    "label": "export.zip",
+    "query": "mutation Probe { export { zip { zzzProbe } } }"
+  },
+  {
+    "label": "export.download",
+    "query": "mutation Probe { export { download { zzzProbe } } }"
+  },
+  {
+    "label": "export.createClusterExport",
+    "query": "mutation Probe { export { createClusterExport { zzzProbe } } }"
+  },
+  {
+    "label": "me.id",
+    "query": "query Probe { me { id } }"
+  },
+  {
+    "label": "me.username",
+    "query": "query Probe { me { username } }"
+  },
+  {
+    "label": "me.email",
+    "query": "query Probe { me { email } }"
+  },
+  {
+    "label": "me.fullName",
+    "query": "query Probe { me { fullName } }"
+  },
+  {
+    "label": "me.name",
+    "query": "query Probe { me { name } }"
+  },
+  {
+    "label": "me.bio",
+    "query": "query Probe { me { bio } }"
+  },
+  {
+    "label": "me.avatarUrl",
+    "query": "query Probe { me { avatarUrl } }"
+  },
+  {
+    "label": "me.avatar",
+    "query": "query Probe { me { avatar } }"
+  },
+  {
+    "label": "me.isPremium",
+    "query": "query Probe { me { isPremium } }"
+  },
+  {
+    "label": "me.isVerifiedProfile",
+    "query": "query Probe { me { isVerifiedProfile } }"
+  },
+  {
+    "label": "me.isBanned",
+    "query": "query Probe { me { isBanned } }"
+  },
+  {
+    "label": "me.isAdmin",
+    "query": "query Probe { me { isAdmin } }"
+  },
+  {
+    "label": "me.isFeatured",
+    "query": "query Probe { me { isFeatured } }"
+  },
+  {
+    "label": "me.createdAt",
+    "query": "query Probe { me { createdAt } }"
+  },
+  {
+    "label": "me.updatedAt",
+    "query": "query Probe { me { updatedAt } }"
+  },
+  {
+    "label": "me.location",
+    "query": "query Probe { me { location } }"
+  },
+  {
+    "label": "me.website",
+    "query": "query Probe { me { website } }"
+  },
+  {
+    "label": "me.url",
+    "query": "query Probe { me { url } }"
+  },
+  {
+    "label": "me.links",
+    "query": "query Probe { me { links } }"
+  },
+  {
+    "label": "me.followersCount",
+    "query": "query Probe { me { followersCount } }"
+  },
+  {
+    "label": "me.followingCount",
+    "query": "query Probe { me { followingCount } }"
+  },
+  {
+    "label": "me.numberOfElements",
+    "query": "query Probe { me { numberOfElements } }"
+  },
+  {
+    "label": "me.numberOfClusters",
+    "query": "query Probe { me { numberOfClusters } }"
+  },
+  {
+    "label": "me.elementsCount",
+    "query": "query Probe { me { elementsCount } }"
+  },
+  {
+    "label": "me.clustersCount",
+    "query": "query Probe { me { clustersCount } }"
+  },
+  {
+    "label": "me.onboarded",
+    "query": "query Probe { me { onboarded } }"
+  },
+  {
+    "label": "me.onboardingCompleted",
+    "query": "query Probe { me { onboardingCompleted } }"
+  },
+  {
+    "label": "me.onboardingStep",
+    "query": "query Probe { me { onboardingStep } }"
+  },
+  {
+    "label": "me.hasCompletedOnboarding",
+    "query": "query Probe { me { hasCompletedOnboarding } }"
+  },
+  {
+    "label": "me.phoneNumber",
+    "query": "query Probe { me { phoneNumber } }"
+  },
+  {
+    "label": "me.hasPassword",
+    "query": "query Probe { me { hasPassword } }"
+  },
+  {
+    "label": "me.emailVerified",
+    "query": "query Probe { me { emailVerified } }"
+  },
+  {
+    "label": "me.isEmailVerified",
+    "query": "query Probe { me { isEmailVerified } }"
+  },
+  {
+    "label": "me.referralCode",
+    "query": "query Probe { me { referralCode } }"
+  },
+  {
+    "label": "me.invitesLeft",
+    "query": "query Probe { me { invitesLeft } }"
+  },
+  {
+    "label": "me.slug",
+    "query": "query Probe { me { slug } }"
+  },
+  {
+    "label": "me.role",
+    "query": "query Probe { me { role } }"
+  },
+  {
+    "label": "me.roles",
+    "query": "query Probe { me { roles } }"
+  },
+  {
+    "label": "me.plan",
+    "query": "query Probe { me { plan } }"
+  },
+  {
+    "label": "me.planName",
+    "query": "query Probe { me { planName } }"
+  },
+  {
+    "label": "me.isPro",
+    "query": "query Probe { me { isPro } }"
+  },
+  {
+    "label": "me.isPrivate",
+    "query": "query Probe { me { isPrivate } }"
+  },
+  {
+    "label": "me.notificationsEnabled",
+    "query": "query Probe { me { notificationsEnabled } }"
+  },
+  {
+    "label": "me.language",
+    "query": "query Probe { me { language } }"
+  },
+  {
+    "label": "me.timezone",
+    "query": "query Probe { me { timezone } }"
+  },
+  {
+    "label": "me.lastActiveAt",
+    "query": "query Probe { me { lastActiveAt } }"
+  },
+  {
+    "label": "me.isFollowed",
+    "query": "query Probe { me { isFollowed } }"
+  },
+  {
+    "label": "me.coverImageUrl",
+    "query": "query Probe { me { coverImageUrl } }"
+  },
+  {
+    "label": "me.instagramUsername",
+    "query": "query Probe { me { instagramUsername } }"
+  },
+  {
+    "label": "me.twitterUsername",
+    "query": "query Probe { me { twitterUsername } }"
+  },
+  {
+    "label": "me.clusters",
+    "query": "query Probe { me { clusters { zzzProbe } } }"
+  },
+  {
+    "label": "me.publicElementsCluster",
+    "query": "query Probe { me { publicElementsCluster { zzzProbe } } }"
+  },
+  {
+    "label": "me.verifiedProfile",
+    "query": "query Probe { me { verifiedProfile { zzzProbe } } }"
+  },
+  {
+    "label": "me.organizations",
+    "query": "query Probe { me { organizations { zzzProbe } } }"
+  },
+  {
+    "label": "me.categories",
+    "query": "query Probe { me { categories { zzzProbe } } }"
+  },
+  {
+    "label": "me.elements",
+    "query": "query Probe { me { elements { zzzProbe } } }"
+  },
+  {
+    "label": "me.library",
+    "query": "query Probe { me { library { zzzProbe } } }"
+  },
+  {
+    "label": "me.pinnedClusters",
+    "query": "query Probe { me { pinnedClusters { zzzProbe } } }"
+  },
+  {
+    "label": "me.collaborations",
+    "query": "query Probe { me { collaborations { zzzProbe } } }"
+  },
+  {
+    "label": "me.followedClusters",
+    "query": "query Probe { me { followedClusters { zzzProbe } } }"
+  },
+  {
+    "label": "me.settings",
+    "query": "query Probe { me { settings { zzzProbe } } }"
+  },
+  {
+    "label": "me.preferences",
+    "query": "query Probe { me { preferences { zzzProbe } } }"
+  },
+  {
+    "label": "me.subscription",
+    "query": "query Probe { me { subscription { zzzProbe } } }"
+  },
+  {
+    "label": "me.profile",
+    "query": "query Probe { me { profile { zzzProbe } } }"
+  },
+  {
+    "label": "me.avatar",
+    "query": "query Probe { me { avatar { zzzProbe } } }"
+  },
+  {
+    "label": "me.coverImage",
+    "query": "query Probe { me { coverImage { zzzProbe } } }"
+  },
+  {
+    "label": "me.stats",
+    "query": "query Probe { me { stats { zzzProbe } } }"
+  },
+  {
+    "label": "me.counts",
+    "query": "query Probe { me { counts { zzzProbe } } }"
+  },
+  {
+    "label": "me.features",
+    "query": "query Probe { me { features { zzzProbe } } }"
+  },
+  {
+    "label": "me.flags",
+    "query": "query Probe { me { flags { zzzProbe } } }"
+  },
+  {
+    "label": "me.shop",
+    "query": "query Probe { me { shop { zzzProbe } } }"
+  },
+  {
+    "label": "me.interests",
+    "query": "query Probe { me { interests { zzzProbe } } }"
+  },
+  {
+    "label": "me.tags",
+    "query": "query Probe { me { tags { zzzProbe } } }"
+  },
+  {
+    "label": "me.invites",
+    "query": "query Probe { me { invites { zzzProbe } } }"
+  },
+  {
+    "label": "me.inviteCodes",
+    "query": "query Probe { me { inviteCodes { zzzProbe } } }"
+  },
+  {
+    "label": "me.imports",
+    "query": "query Probe { me { imports { zzzProbe } } }"
+  },
+  {
+    "label": "me.notifications",
+    "query": "query Probe { me { notifications { zzzProbe } } }"
+  },
+  {
+    "label": "me.activity",
+    "query": "query Probe { me { activity { zzzProbe } } }"
+  },
+  {
+    "label": "me.feed",
+    "query": "query Probe { me { feed { zzzProbe } } }"
+  },
+  {
+    "label": "me.publicProfile",
+    "query": "query Probe { me { publicProfile { zzzProbe } } }"
+  },
+  {
+    "label": "me.forYouConfiguration",
+    "query": "query Probe { me { forYouConfiguration { zzzProbe } } }"
+  },
+  {
+    "label": "Query.searchClusters",
+    "query": "query Probe { searchClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchUsers",
+    "query": "query Probe { searchUsers { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchProfiles",
+    "query": "query Probe { searchProfiles { zzzProbe } }"
+  },
+  {
+    "label": "Query.userSuggestions",
+    "query": "query Probe { userSuggestions { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterFollowers",
+    "query": "query Probe { clusterFollowers { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterCollaborators",
+    "query": "query Probe { clusterCollaborators { zzzProbe } }"
+  },
+  {
+    "label": "Query.collaborations",
+    "query": "query Probe { collaborations { zzzProbe } }"
+  },
+  {
+    "label": "Query.pinnedClusters",
+    "query": "query Probe { pinnedClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.userPinnedClusters",
+    "query": "query Probe { userPinnedClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.profileClusters",
+    "query": "query Probe { profileClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.arenaChannels",
+    "query": "query Probe { arenaChannels { zzzProbe } }"
+  },
+  {
+    "label": "Query.activeImports",
+    "query": "query Probe { activeImports { zzzProbe } }"
+  },
+  {
+    "label": "Query.imports",
+    "query": "query Probe { imports { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterExports",
+    "query": "query Probe { clusterExports { zzzProbe } }"
+  },
+  {
+    "label": "Query.topics",
+    "query": "query Probe { topics { zzzProbe } }"
+  },
+  {
+    "label": "Query.topic",
+    "query": "query Probe { topic { zzzProbe } }"
+  },
+  {
+    "label": "Query.topicElements",
+    "query": "query Probe { topicElements { zzzProbe } }"
+  },
+  {
+    "label": "Query.categoryElements",
+    "query": "query Probe { categoryElements { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementTags",
+    "query": "query Probe { elementTags { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterTags",
+    "query": "query Probe { clusterTags { zzzProbe } }"
+  },
+  {
+    "label": "Query.popularTags",
+    "query": "query Probe { popularTags { zzzProbe } }"
+  },
+  {
+    "label": "Query.trendingClusters",
+    "query": "query Probe { trendingClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.recommendedClusters",
+    "query": "query Probe { recommendedClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterRecommendations",
+    "query": "query Probe { clusterRecommendations { zzzProbe } }"
+  },
+  {
+    "label": "Query.connectableClusters",
+    "query": "query Probe { connectableClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.areSavedToLibrary",
+    "query": "query Probe { areSavedToLibrary { zzzProbe } }"
+  },
+  {
+    "label": "Query.quickConnectRecommendation",
+    "query": "query Probe { quickConnectRecommendation { zzzProbe } }"
+  },
+  {
+    "label": "Query.globalSearchHistory",
+    "query": "query Probe { globalSearchHistory { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementTopConnections",
+    "query": "query Probe { elementTopConnections { zzzProbe } }"
+  },
+  {
+    "label": "Query.similarElementsV2",
+    "query": "query Probe { similarElementsV2 { zzzProbe } }"
+  },
+  {
+    "label": "Query.allElementsV2",
+    "query": "query Probe { allElementsV2 { zzzProbe } }"
+  },
+  {
+    "label": "Query.compositeFollowingFeed",
+    "query": "query Probe { compositeFollowingFeed { zzzProbe } }"
+  },
+  {
+    "label": "Query.activityFeed",
+    "query": "query Probe { activityFeed { zzzProbe } }"
+  },
+  {
+    "label": "Query.forYouUserConfiguration",
+    "query": "query Probe { forYouUserConfiguration { zzzProbe } }"
+  },
+  {
+    "label": "Query.loader",
+    "query": "query Probe { loader { zzzProbe } }"
+  },
+  {
+    "label": "Query.userFollowSuggestions",
+    "query": "query Probe { userFollowSuggestions { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementConnections",
+    "query": "query Probe { elementConnections { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementClusters",
+    "query": "query Probe { elementClusters { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementSocialGraph",
+    "query": "query Probe { elementSocialGraph { zzzProbe } }"
+  },
+  {
+    "label": "Query.profileCounts",
+    "query": "query Probe { profileCounts { zzzProbe } }"
+  },
+  {
+    "label": "Query.subcluster",
+    "query": "query Probe { subcluster { zzzProbe } }"
+  },
+  {
+    "label": "Query.subclusters",
+    "query": "query Probe { subclusters { zzzProbe } }"
+  }
+]

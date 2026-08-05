@@ -1,0 +1,522 @@
+[
+  {
+    "label": "element.editElementText input #1",
+    "query": "mutation Probe { element { editElementText(input: {elementId: true, elementIds: true, userId: true, text: true, title: true, caption: true, content: true, body: true, ownerOrgId: true}) { __typename } } }"
+  },
+  {
+    "label": "element.editElementUrl input #1",
+    "query": "mutation Probe { element { editElementUrl(input: {elementId: true, elementIds: true, userId: true, url: true, sourceUrl: true, link: true, ownerOrgId: true}) { __typename } } }"
+  },
+  {
+    "label": "element.removeUserTag input #1",
+    "query": "mutation Probe { element { removeUserTag(input: {elementId: true, userId: true, tagId: true, taggedUserId: true, assignerId: true, removerId: true}) { __typename } } }"
+  },
+  {
+    "label": "element.reportMany input #1",
+    "query": "mutation Probe { element { reportMany(input: {ids: true, elementIds: true, userId: true, reporterId: true, reason: true, reportReason: true, type: true, reportType: true, details: true, comment: true}) { __typename } } }"
+  },
+  {
+    "label": "element.report input #1",
+    "query": "mutation Probe { element { report(input: {id: true, elementId: true, userId: true, reporterId: true, reason: true, reportReason: true, type: true, reportType: true, details: true, comment: true, message: true, description: true, category: true}) { __typename } } }"
+  },
+  {
+    "label": "element.group input #1",
+    "query": "mutation Probe { element { group(input: {elementId: true, elementIds: true, userId: true, groupId: true, targetElementId: true, parentElementId: true, clusterId: true, mediaIds: true}) { __typename } } }"
+  },
+  {
+    "label": "element.setCover input #1",
+    "query": "mutation Probe { element { setCover(input: {elementId: true, mediaId: true, userId: true, url: true, coverUrl: true, thumbnailUrl: true, time: true, timestamp: true, frame: true}) { __typename } } }"
+  },
+  {
+    "label": "element.addTag input #1",
+    "query": "mutation Probe { element { addTag(input: {elementId: true, assignerId: true, tagId: true, userId: true, name: true, value: true, label: true, taggedUserId: true, text: true}) { __typename } } }"
+  },
+  {
+    "label": "element.create input #1",
+    "query": "mutation Probe { element { create(input: {userId: true, url: true, sourceUrl: true, text: true, clusterId: true, ownerOrgId: true, caption: true, title: true, description: true, name: true, notSafeForWork: true, aiGenerated: true, width: true, height: true, mediaId: true, fileId: true, uploadId: true, blurHash: true, mimeType: true, kind: true, elementType: true, contentType: true}) { __typename } } }"
+  },
+  {
+    "label": "element.create input #2",
+    "query": "mutation Probe { element { create(input: {slateId: true, userInteractionSource: true, actionScreen: true, analyticsProperties: true, elementAnalyticsProperties: true, tags: true, tagIds: true, position: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.inviteCollaborators input #1",
+    "query": "mutation Probe { cluster { inviteCollaborators(input: {clusterId: true, userId: true, userIds: true, emails: true, email: true, invites: true, invitations: true, collaborators: true, inviterId: true, usernames: true, recipients: true, members: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.deleteCollaborators input #1",
+    "query": "mutation Probe { cluster { deleteCollaborators(input: {clusterId: true, userIds: true, userId: true, collaboratorIds: true, requesterId: true, removerId: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.reportCluster input #1",
+    "query": "mutation Probe { cluster { reportCluster(input: {clusterId: true, id: true, userId: true, reporterId: true, reason: true, reportReason: true, type: true, reportType: true, details: true, comment: true, message: true, description: true, category: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.createInviteLink input #1",
+    "query": "mutation Probe { cluster { createInviteLink(input: {clusterId: true, userId: true, role: true, permission: true, expiresAt: true, expiresIn: true, maxUses: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.inviteCollaborator input #1",
+    "query": "mutation Probe { cluster { inviteCollaborator(input: {clusterId: true, userId: true, email: true, username: true, role: true, permission: true, inviterId: true, message: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.reorderElement input #1",
+    "query": "mutation Probe { cluster { reorderElement(input: {clusterId: true, elementId: true, userId: true, position: true, index: true, order: true, targetIndex: true, newIndex: true, afterElementId: true, beforeElementId: true, previousElementId: true, nextElementId: true, rank: true, toIndex: true, fromIndex: true, sortOrder: true, destinationIndex: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.create input #1",
+    "query": "mutation Probe { cluster { create(input: {userId: true, name: true, description: true, isPrivate: true, ownerOrgId: true, parentClusterId: true, elementIds: true, coverImageElementId: true, slug: true, categoryId: true, categoryIds: true, isPinnedToUserProfile: true, userInteractionSource: true, actionScreen: true, slateId: true}) { __typename } } }"
+  },
+  {
+    "label": "export.exportCluster input #1",
+    "query": "mutation Probe { export { exportCluster(input: {clusterId: true, userId: true, format: true, type: true, fileType: true, includeSubclusters: true, quality: true, resolution: true, ownerOrgId: true}) { __typename } } }"
+  },
+  {
+    "label": "import.request input #1",
+    "query": "mutation Probe { import { request(input: {sourceUrl: true, userId: true, clusterId: true, ownerOrgId: true, type: true, source: true, channelSlug: true, arenaUsername: true, importSource: true, provider: true, name: true}) { __typename } } }"
+  },
+  {
+    "label": "import.requestFromUrls input #1",
+    "query": "mutation Probe { import { requestFromUrls(input: {sourceUrls: true, userId: true, clusterId: true, ownerOrgId: true, type: true, source: true, channelSlug: true, arenaUsername: true, importSource: true, provider: true, name: true, userInteractionSource: true, actionScreen: true, slateId: true}) { __typename } } }"
+  },
+  {
+    "label": "userFollow.create input #1",
+    "query": "mutation Probe { userFollow { create(input: {followerId: true, followeeId: true, userInteractionSource: true, actionScreen: true, slateId: true, userId: true, targetUserId: true, ownerOrgId: true}) { __typename } } }"
+  },
+  {
+    "label": "user.updateProfile input #1",
+    "query": "mutation Probe { user { updateProfile(input: {userId: true, fullName: true, firstName: true, lastName: true, bio: true, email: true, websiteUrl: true, ownerOrgId: true, avatarUrl: true, username: true, instagramUsername: true, twitterUsername: true, location: true, coverImageUrl: true, isPrivate: true, categoryIds: true, phoneNumber: true, avatarMediaId: true, avatar: true, notSafeForWork: true}) { __typename } } }"
+  },
+  {
+    "label": "activity.markAllAsRead input #1",
+    "query": "mutation Probe { activity { markAllAsRead(input: {ownerId: true, userId: true, activityIds: true, ids: true}) { __typename } } }"
+  },
+  {
+    "label": "Query.clusters args #1",
+    "query": "query Probe { clusters(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusters args #2",
+    "query": "query Probe { clusters(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.users args #1",
+    "query": "query Probe { users(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.users args #2",
+    "query": "query Probe { users(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elements args #1",
+    "query": "query Probe { elements(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elements args #2",
+    "query": "query Probe { elements(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredClusters args #1",
+    "query": "query Probe { featuredClusters(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredClusters args #2",
+    "query": "query Probe { featuredClusters(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.topicClusters args #1",
+    "query": "query Probe { topicClusters(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.topicClusters args #2",
+    "query": "query Probe { topicClusters(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterSuggestions args #1",
+    "query": "query Probe { clusterSuggestions(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterSuggestions args #2",
+    "query": "query Probe { clusterSuggestions(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.collaborationInvite args #1",
+    "query": "query Probe { collaborationInvite(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.collaborationInvite args #2",
+    "query": "query Probe { collaborationInvite(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searches args #1",
+    "query": "query Probe { searches(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searches args #2",
+    "query": "query Probe { searches(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredElements args #1",
+    "query": "query Probe { featuredElements(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredElements args #2",
+    "query": "query Probe { featuredElements(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredProfiles args #1",
+    "query": "query Probe { featuredProfiles(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredProfiles args #2",
+    "query": "query Probe { featuredProfiles(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.latestElements args #1",
+    "query": "query Probe { latestElements(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.latestElements args #2",
+    "query": "query Probe { latestElements(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.userElements args #1",
+    "query": "query Probe { userElements(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.userElements args #2",
+    "query": "query Probe { userElements(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementConnections args #1",
+    "query": "query Probe { elementConnections(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementConnections args #2",
+    "query": "query Probe { elementConnections(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.activityFeed args #1",
+    "query": "query Probe { activityFeed(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.activityFeed args #2",
+    "query": "query Probe { activityFeed(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.followingFeed args #1",
+    "query": "query Probe { followingFeed(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.followingFeed args #2",
+    "query": "query Probe { followingFeed(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterCanvas args #1",
+    "query": "query Probe { clusterCanvas(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterCanvas args #2",
+    "query": "query Probe { clusterCanvas(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.categories args #1",
+    "query": "query Probe { categories(filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.categories args #2",
+    "query": "query Probe { categories(searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchClusters args #1",
+    "query": "query Probe { searchClusters(searchTerm: \"x\", filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchClusters args #2",
+    "query": "query Probe { searchClusters(searchTerm: \"x\", searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.search args #1",
+    "query": "query Probe { search(searchTerm: \"x\", filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.search args #2",
+    "query": "query Probe { search(searchTerm: \"x\", searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchElements args #1",
+    "query": "query Probe { searchElements(searchTerm: \"x\", filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searchElements args #2",
+    "query": "query Probe { searchElements(searchTerm: \"x\", searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterElements args #1",
+    "query": "query Probe { clusterElements(clusterId: 1, filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterElements args #2",
+    "query": "query Probe { clusterElements(clusterId: 1, searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.userClusters args #1",
+    "query": "query Probe { userClusters(userId: 1, filters: true, meta: true, order: true, pageSize: true, pageCursor: true, first: true, after: true, limit: true, offset: true, categoryId: true, categorySlug: true, slug: true, ids: true, userIds: true, clusterIds: true, isPrivate: true, ownerOrgId: true, code: true, inviteCode: true, term: true, query: true, q: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.userClusters args #2",
+    "query": "query Probe { userClusters(userId: 1, searchTerm: true, userId: true, isLoggedIn: true, topic: true, topicId: true, excludeIds: true, seed: true, count: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.numberOfFollowedClusters (existence)",
+    "query": "query Probe { numberOfFollowedClusters }"
+  },
+  {
+    "label": "SearchResult.clusters",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.users",
+    "query": "query Probe { search(searchTerm: \"x\") { users { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.elements",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.profiles",
+    "query": "query Probe { search(searchTerm: \"x\") { profiles { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.members",
+    "query": "query Probe { search(searchTerm: \"x\") { members { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.tags",
+    "query": "query Probe { search(searchTerm: \"x\") { tags { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.topics",
+    "query": "query Probe { search(searchTerm: \"x\") { topics { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.items",
+    "query": "query Probe { search(searchTerm: \"x\") { items { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.meta",
+    "query": "query Probe { search(searchTerm: \"x\") { meta { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.clusterList",
+    "query": "query Probe { search(searchTerm: \"x\") { clusterList { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.userList",
+    "query": "query Probe { search(searchTerm: \"x\") { userList { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.elementList",
+    "query": "query Probe { search(searchTerm: \"x\") { elementList { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.total",
+    "query": "query Probe { search(searchTerm: \"x\") { total { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.count",
+    "query": "query Probe { search(searchTerm: \"x\") { count { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.items",
+    "query": "query Probe { searches { items { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.meta",
+    "query": "query Probe { searches { meta { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.recent",
+    "query": "query Probe { searches { recent { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.suggested",
+    "query": "query Probe { searches { suggested { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.history",
+    "query": "query Probe { searches { history { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.popular",
+    "query": "query Probe { searches { popular { zzzProbe } } }"
+  },
+  {
+    "label": "Searches.trending",
+    "query": "query Probe { searches { trending { zzzProbe } } }"
+  },
+  {
+    "label": "me.firstName",
+    "query": "query Probe { me { firstName } }"
+  },
+  {
+    "label": "me.birthDate",
+    "query": "query Probe { me { birthDate } }"
+  },
+  {
+    "label": "me.dateOfBirth",
+    "query": "query Probe { me { dateOfBirth } }"
+  },
+  {
+    "label": "me.gender",
+    "query": "query Probe { me { gender } }"
+  },
+  {
+    "label": "me.country",
+    "query": "query Probe { me { country } }"
+  },
+  {
+    "label": "me.city",
+    "query": "query Probe { me { city } }"
+  },
+  {
+    "label": "me.instagramUsername",
+    "query": "query Probe { me { instagramUsername } }"
+  },
+  {
+    "label": "me.twitterUsername",
+    "query": "query Probe { me { twitterUsername } }"
+  },
+  {
+    "label": "me.isOnboarded",
+    "query": "query Probe { me { isOnboarded } }"
+  },
+  {
+    "label": "me.signupSource",
+    "query": "query Probe { me { signupSource } }"
+  },
+  {
+    "label": "me.stripeCustomerId",
+    "query": "query Probe { me { stripeCustomerId } }"
+  },
+  {
+    "label": "me.premiumUntil",
+    "query": "query Probe { me { premiumUntil } }"
+  },
+  {
+    "label": "me.premiumSince",
+    "query": "query Probe { me { premiumSince } }"
+  },
+  {
+    "label": "me.trialEndsAt",
+    "query": "query Probe { me { trialEndsAt } }"
+  },
+  {
+    "label": "me.isTrialing",
+    "query": "query Probe { me { isTrialing } }"
+  },
+  {
+    "label": "me.numberOfClusters",
+    "query": "query Probe { me { numberOfClusters } }"
+  },
+  {
+    "label": "me.numberOfPublicElements",
+    "query": "query Probe { me { numberOfPublicElements } }"
+  },
+  {
+    "label": "me.elementCount",
+    "query": "query Probe { me { elementCount } }"
+  },
+  {
+    "label": "me.clusterCount",
+    "query": "query Probe { me { clusterCount } }"
+  },
+  {
+    "label": "me.followerCount",
+    "query": "query Probe { me { followerCount } }"
+  },
+  {
+    "label": "me.followeeCount",
+    "query": "query Probe { me { followeeCount } }"
+  },
+  {
+    "label": "me.isStaff",
+    "query": "query Probe { me { isStaff } }"
+  },
+  {
+    "label": "me.isModerator",
+    "query": "query Probe { me { isModerator } }"
+  },
+  {
+    "label": "me.deletedAt",
+    "query": "query Probe { me { deletedAt } }"
+  },
+  {
+    "label": "me.bannedAt",
+    "query": "query Probe { me { bannedAt } }"
+  },
+  {
+    "label": "me.lastSeenAt",
+    "query": "query Probe { me { lastSeenAt } }"
+  },
+  {
+    "label": "me.profileUrl",
+    "query": "query Probe { me { profileUrl } }"
+  },
+  {
+    "label": "me.shareUrl",
+    "query": "query Probe { me { shareUrl } }"
+  },
+  {
+    "label": "me.notSafeForWorkPreference",
+    "query": "query Probe { me { notSafeForWorkPreference } }"
+  },
+  {
+    "label": "me.nsfwPreference",
+    "query": "query Probe { me { nsfwPreference } }"
+  },
+  {
+    "label": "me.showNsfw",
+    "query": "query Probe { me { showNsfw } }"
+  },
+  {
+    "label": "me.theme",
+    "query": "query Probe { me { theme } }"
+  },
+  {
+    "label": "me.publicProfile",
+    "query": "query Probe { me { publicProfile { zzzProbe } } }"
+  },
+  {
+    "label": "me.userPublicProfile",
+    "query": "query Probe { me { userPublicProfile { zzzProbe } } }"
+  },
+  {
+    "label": "me.profile",
+    "query": "query Probe { me { profile { zzzProbe } } }"
+  },
+  {
+    "label": "me.publicElementsCluster",
+    "query": "query Probe { me { publicElementsCluster { zzzProbe } } }"
+  },
+  {
+    "label": "me.defaultCluster",
+    "query": "query Probe { me { defaultCluster { zzzProbe } } }"
+  },
+  {
+    "label": "me.shop",
+    "query": "query Probe { me { shop { zzzProbe } } }"
+  },
+  {
+    "label": "me.org",
+    "query": "query Probe { me { org { zzzProbe } } }"
+  },
+  {
+    "label": "me.organization",
+    "query": "query Probe { me { organization { zzzProbe } } }"
+  },
+  {
+    "label": "me.onboarding",
+    "query": "query Probe { me { onboarding { zzzProbe } } }"
+  }
+]

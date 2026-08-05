@@ -1,0 +1,486 @@
+[
+  {
+    "label": "cluster.inviteCollaborators input #1",
+    "query": "mutation Probe { cluster { inviteCollaborators(input: {clusterId: true, collaboratorEmails: true, invitees: true, emailAddresses: true, userEmails: true, collaboratorsToInvite: true, data: true, items: true, list: true, collaborators: true, invites: true, emails: true, userIds: true, usernames: true, inviterId: true, userId: true, members: true, invitations: true, recipients: true, targets: true, people: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.reorderElement input #1",
+    "query": "mutation Probe { cluster { reorderElement(input: {clusterId: true, elementId: true, newPosition: true, sortIndex: true, toPosition: true, precedingElementId: true, succeedingElementId: true, orderIndex: true, place: true, direction: true, moveTo: true, insertAfter: true, insertBefore: true, position: true, index: true, order: true, targetIndex: true, userId: true, afterElementId: true, beforeElementId: true, rank: true}) { __typename } } }"
+  },
+  {
+    "label": "element.group input #1",
+    "query": "mutation Probe { element { group(input: {elementId: true, groupWithElementId: true, targetId: true, mediaIds: true, elementIdsToGroup: true, targetElementId: true, withElementId: true, otherElementId: true, secondaryElementId: true, childElementIds: true, elementIds: true, userId: true, mediaId: true, sourceElementId: true}) { __typename } } }"
+  },
+  {
+    "label": "element.report input #1",
+    "query": "mutation Probe { element { report(input: {id: true, reason: true, reportReason: true, comment: true, userId: true, reporterId: true, elementId: true, note: true, text: true, explanation: true, reportType: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.reportCluster input #1",
+    "query": "mutation Probe { cluster { reportCluster(input: {clusterId: true, reason: true, reportReason: true, comment: true, userId: true, reporterId: true, note: true, text: true, explanation: true, reportType: true, id: true}) { __typename } } }"
+  },
+  {
+    "label": "cluster.createInviteLink input #1",
+    "query": "mutation Probe { cluster { createInviteLink(input: {clusterId: true, userId: true, creatorId: true, ownerId: true, role: true, permission: true, expiresAt: true, ttl: true, maxUses: true, regenerate: true, refresh: true}) { __typename } } }"
+  },
+  {
+    "label": "SearchResult.clusters args #1",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters(meta: true, filters: true, order: true, pageSize: true, pageCursor: true, limit: true, offset: true, first: true, after: true, userId: true, searchOrigin: true, contentType: true, color: true) { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.users args #1",
+    "query": "query Probe { search(searchTerm: \"x\") { users(meta: true, filters: true, order: true, pageSize: true, pageCursor: true, limit: true, offset: true, first: true, after: true, userId: true, searchOrigin: true, contentType: true, color: true) { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.elements args #1",
+    "query": "query Probe { search(searchTerm: \"x\") { elements(meta: true, filters: true, order: true, pageSize: true, pageCursor: true, limit: true, offset: true, first: true, after: true, userId: true, searchOrigin: true, contentType: true, color: true) { zzzProbe } } }"
+  },
+  {
+    "label": "SearchResult.clusters.items",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.clusters.meta",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { meta { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.clusters.nextPageCursor",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { nextPageCursor { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.clusters.count",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { count { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.clusters.total",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { total { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.users.items",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.users.meta",
+    "query": "query Probe { search(searchTerm: \"x\") { users { meta { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.users.nextPageCursor",
+    "query": "query Probe { search(searchTerm: \"x\") { users { nextPageCursor { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.users.count",
+    "query": "query Probe { search(searchTerm: \"x\") { users { count { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.users.total",
+    "query": "query Probe { search(searchTerm: \"x\") { users { total { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.elements.items",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { items { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.elements.meta",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { meta { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.elements.nextPageCursor",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { nextPageCursor { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.elements.count",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { count { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchResult.elements.total",
+    "query": "query Probe { search(searchTerm: \"x\") { elements { total { zzzProbe } } } }"
+  },
+  {
+    "label": "SearchUserList.items.id",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { id } } } }"
+  },
+  {
+    "label": "SearchUserList.items.name",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { name } } } }"
+  },
+  {
+    "label": "SearchUserList.items.slug",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { slug } } } }"
+  },
+  {
+    "label": "SearchUserList.items.username",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { username } } } }"
+  },
+  {
+    "label": "SearchUserList.items.fullName",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { fullName } } } }"
+  },
+  {
+    "label": "SearchUserList.items.avatarUrl",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { avatarUrl } } } }"
+  },
+  {
+    "label": "SearchUserList.items.__typename",
+    "query": "query Probe { search(searchTerm: \"x\") { users { items { __typename } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.id",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { id } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.name",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { name } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.slug",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { slug } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.description",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { description } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.isPrivate",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { isPrivate } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.owner",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { owner } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.coverImageUrl",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { coverImageUrl } } } }"
+  },
+  {
+    "label": "SearchClusterList.items.numberOfElements",
+    "query": "query Probe { search(searchTerm: \"x\") { clusters { items { numberOfElements } } } }"
+  },
+  {
+    "label": "Query.searchClusters args #1",
+    "query": "query Probe { searchClusters(searchTerm: \"x\", meta: true, filters: true, order: true, pageSize: true, pageCursor: true, limit: true, userId: true, searchOrigin: true, isPrivate: true, ownerId: true, excludeClusterIds: true, categoryId: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.search args #1",
+    "query": "query Probe { search(searchTerm: \"x\", meta: true, filters: true, order: true, pageSize: true, pageCursor: true, limit: true, userId: true, searchOrigin: true, isPrivate: true, ownerId: true, excludeClusterIds: true, categoryId: true) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusters bogus-arg",
+    "query": "query Probe { clusters(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.users bogus-arg",
+    "query": "query Probe { users(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elements bogus-arg",
+    "query": "query Probe { elements(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredClusters bogus-arg",
+    "query": "query Probe { featuredClusters(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.topicClusters bogus-arg",
+    "query": "query Probe { topicClusters(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterSuggestions bogus-arg",
+    "query": "query Probe { clusterSuggestions(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.searches bogus-arg",
+    "query": "query Probe { searches(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredElements bogus-arg",
+    "query": "query Probe { featuredElements(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.featuredProfiles bogus-arg",
+    "query": "query Probe { featuredProfiles(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.latestElements bogus-arg",
+    "query": "query Probe { latestElements(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.elementConnections bogus-arg",
+    "query": "query Probe { elementConnections(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.activityFeed bogus-arg",
+    "query": "query Probe { activityFeed(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.followingFeed bogus-arg",
+    "query": "query Probe { followingFeed(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.clusterCanvas bogus-arg",
+    "query": "query Probe { clusterCanvas(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.categories bogus-arg",
+    "query": "query Probe { categories(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.cluster bogus-arg",
+    "query": "query Probe { cluster(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.explore bogus-arg",
+    "query": "query Probe { explore(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.reflect bogus-arg",
+    "query": "query Probe { reflect(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "Query.userShop bogus-arg",
+    "query": "query Probe { userShop(zzzArg: 1) { zzzProbe } }"
+  },
+  {
+    "label": "me.birthday",
+    "query": "query Probe { me { birthday } }"
+  },
+  {
+    "label": "me.defaultHomeTab",
+    "query": "query Probe { me { defaultHomeTab } }"
+  },
+  {
+    "label": "me.isNotSafeForWorkAllowed",
+    "query": "query Probe { me { isNotSafeForWorkAllowed } }"
+  },
+  {
+    "label": "me.numberOfFollowedClusters",
+    "query": "query Probe { me { numberOfFollowedClusters } }"
+  },
+  {
+    "label": "me.isVerifiedProfile",
+    "query": "query Probe { me { isVerifiedProfile } }"
+  },
+  {
+    "label": "me.websiteUrl",
+    "query": "query Probe { me { websiteUrl } }"
+  },
+  {
+    "label": "me.createdAt",
+    "query": "query Probe { me { createdAt } }"
+  },
+  {
+    "label": "me.avatarUrl",
+    "query": "query Probe { me { avatarUrl } }"
+  },
+  {
+    "label": "me.isPremium",
+    "query": "query Probe { me { isPremium } }"
+  },
+  {
+    "label": "me.hasCompletedOnboarding",
+    "query": "query Probe { me { hasCompletedOnboarding } }"
+  },
+  {
+    "label": "me.emailConfirmed",
+    "query": "query Probe { me { emailConfirmed } }"
+  },
+  {
+    "label": "me.isFeatured",
+    "query": "query Probe { me { isFeatured } }"
+  },
+  {
+    "label": "me.isBanned",
+    "query": "query Probe { me { isBanned } }"
+  },
+  {
+    "label": "me.age",
+    "query": "query Probe { me { age } }"
+  },
+  {
+    "label": "me.bio",
+    "query": "query Probe { me { bio } }"
+  },
+  {
+    "label": "me.email",
+    "query": "query Probe { me { email } }"
+  },
+  {
+    "label": "me.fullName",
+    "query": "query Probe { me { fullName } }"
+  },
+  {
+    "label": "me.lastName",
+    "query": "query Probe { me { lastName } }"
+  },
+  {
+    "label": "me.firstName",
+    "query": "query Probe { me { firstName } }"
+  },
+  {
+    "label": "me.name",
+    "query": "query Probe { me { name } }"
+  },
+  {
+    "label": "me.username",
+    "query": "query Probe { me { username } }"
+  },
+  {
+    "label": "me.id",
+    "query": "query Probe { me { id } }"
+  },
+  {
+    "label": "me.phoneNumber",
+    "query": "query Probe { me { phoneNumber } }"
+  },
+  {
+    "label": "me.hasPassword",
+    "query": "query Probe { me { hasPassword } }"
+  },
+  {
+    "label": "me.shareUrl",
+    "query": "query Probe { me { shareUrl } }"
+  },
+  {
+    "label": "me.clusters (obj)",
+    "query": "query Probe { me { clusters { zzzProbe } } }"
+  },
+  {
+    "label": "me.elements (obj)",
+    "query": "query Probe { me { elements { zzzProbe } } }"
+  },
+  {
+    "label": "me.organizations (obj)",
+    "query": "query Probe { me { organizations { zzzProbe } } }"
+  },
+  {
+    "label": "me.verifiedProfile (obj)",
+    "query": "query Probe { me { verifiedProfile { zzzProbe } } }"
+  },
+  {
+    "label": "me.experiments (obj)",
+    "query": "query Probe { me { experiments { zzzProbe } } }"
+  },
+  {
+    "label": "me.featureFlags (obj)",
+    "query": "query Probe { me { featureFlags { zzzProbe } } }"
+  },
+  {
+    "label": "me.invoices (obj)",
+    "query": "query Probe { me { invoices { zzzProbe } } }"
+  },
+  {
+    "label": "me.subscription (obj)",
+    "query": "query Probe { me { subscription { zzzProbe } } }"
+  },
+  {
+    "label": "me.recentlyEditedCluster (obj)",
+    "query": "query Probe { me { recentlyEditedCluster { zzzProbe } } }"
+  },
+  {
+    "label": "me.forYouConfiguration (obj)",
+    "query": "query Probe { me { forYouConfiguration { zzzProbe } } }"
+  },
+  {
+    "label": "Cluster.id",
+    "query": "query Probe { cluster(id: 1) { id } }"
+  },
+  {
+    "label": "Cluster.name",
+    "query": "query Probe { cluster(id: 1) { name } }"
+  },
+  {
+    "label": "Cluster.slug",
+    "query": "query Probe { cluster(id: 1) { slug } }"
+  },
+  {
+    "label": "Cluster.description",
+    "query": "query Probe { cluster(id: 1) { description } }"
+  },
+  {
+    "label": "Cluster.isPrivate",
+    "query": "query Probe { cluster(id: 1) { isPrivate } }"
+  },
+  {
+    "label": "Cluster.ownerId",
+    "query": "query Probe { cluster(id: 1) { ownerId } }"
+  },
+  {
+    "label": "Cluster.owner",
+    "query": "query Probe { cluster(id: 1) { owner } }"
+  },
+  {
+    "label": "Cluster.coverImageUrl",
+    "query": "query Probe { cluster(id: 1) { coverImageUrl } }"
+  },
+  {
+    "label": "Cluster.coverImageElementId",
+    "query": "query Probe { cluster(id: 1) { coverImageElementId } }"
+  },
+  {
+    "label": "Cluster.numberOfElements",
+    "query": "query Probe { cluster(id: 1) { numberOfElements } }"
+  },
+  {
+    "label": "Cluster.isFollowed",
+    "query": "query Probe { cluster(id: 1) { isFollowed } }"
+  },
+  {
+    "label": "Cluster.isFeatured",
+    "query": "query Probe { cluster(id: 1) { isFeatured } }"
+  },
+  {
+    "label": "Cluster.parentClusterId",
+    "query": "query Probe { cluster(id: 1) { parentClusterId } }"
+  },
+  {
+    "label": "Cluster.subClusters",
+    "query": "query Probe { cluster(id: 1) { subClusters } }"
+  },
+  {
+    "label": "Cluster.collaborators",
+    "query": "query Probe { cluster(id: 1) { collaborators } }"
+  },
+  {
+    "label": "Cluster.collaboratorsCount",
+    "query": "query Probe { cluster(id: 1) { collaboratorsCount } }"
+  },
+  {
+    "label": "Cluster.elements",
+    "query": "query Probe { cluster(id: 1) { elements } }"
+  },
+  {
+    "label": "Cluster.followersCount",
+    "query": "query Probe { cluster(id: 1) { followersCount } }"
+  },
+  {
+    "label": "Cluster.createdAt",
+    "query": "query Probe { cluster(id: 1) { createdAt } }"
+  },
+  {
+    "label": "Cluster.updatedAt",
+    "query": "query Probe { cluster(id: 1) { updatedAt } }"
+  },
+  {
+    "label": "Cluster.url",
+    "query": "query Probe { cluster(id: 1) { url } }"
+  },
+  {
+    "label": "Cluster.shareUrl",
+    "query": "query Probe { cluster(id: 1) { shareUrl } }"
+  },
+  {
+    "label": "Cluster.canvas",
+    "query": "query Probe { cluster(id: 1) { canvas } }"
+  },
+  {
+    "label": "Cluster.tags",
+    "query": "query Probe { cluster(id: 1) { tags } }"
+  },
+  {
+    "label": "Cluster.categories",
+    "query": "query Probe { cluster(id: 1) { categories } }"
+  },
+  {
+    "label": "Cluster.isPinnedToUserProfile",
+    "query": "query Probe { cluster(id: 1) { isPinnedToUserProfile } }"
+  }
+]

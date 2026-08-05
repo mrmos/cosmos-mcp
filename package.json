@@ -1,0 +1,62 @@
+{
+  "name": "cosmos-mcp",
+  "version": "0.1.0",
+  "description": "Unofficial MCP server for cosmos.so. Search, browse and build visual moodboards with Claude, Cursor or any MCP client.",
+  "license": "MIT",
+  "author": "mrmos",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "bin": {
+    "cosmos-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrmos/cosmos-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrmos/cosmos-mcp/issues"
+  },
+  "homepage": "https://github.com/mrmos/cosmos-mcp#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "modelcontextprotocol",
+    "mcp-server",
+    "cosmos",
+    "cosmos.so",
+    "moodboard",
+    "design",
+    "inspiration",
+    "visual-search",
+    "ai",
+    "claude",
+    "llm"
+  ],
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "build": "bun build ./index.ts --target=node --outdir=dist --format=esm && chmod +x dist/index.js",
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run typecheck && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  }
+}
