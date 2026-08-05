@@ -9,6 +9,7 @@
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { readAuth } from "./auth-store";
 
 export interface CosmosConfig {
   /** GraphQL endpoint. Override only for testing against a mock. */
@@ -78,15 +79,25 @@ function parsePositiveInt(raw: string | undefined, label: string): number | unde
   return n;
 }
 
+/**
+ * Resolves configuration from three places, in order of precedence:
+ *
+ *   1. real environment variables — what an MCP client's `env` block sets
+ *   2. `.env` next to the package — convenient when you cloned the repo
+ *   3. `~/.config/cosmos-mcp/config.json` — written by `cosmos-mcp login`
+ *
+ * The third exists because `npx` users have no package directory to edit.
+ */
 export function loadConfig(processEnv: NodeJS.ProcessEnv = process.env): CosmosConfig {
   const fileEnv = loadDotEnv();
+  const stored = readAuth(processEnv);
   const read = (key: string): string | undefined => processEnv[key] ?? fileEnv[key];
 
   return {
     endpoint: read("COSMOS_ENDPOINT")?.trim() || DEFAULT_ENDPOINT,
-    cookie: read("COSMOS_COOKIE")?.trim() || undefined,
-    authorization: read("COSMOS_AUTHORIZATION")?.trim() || undefined,
-    userId: parsePositiveInt(read("COSMOS_USER_ID"), "COSMOS_USER_ID"),
+    cookie: read("COSMOS_COOKIE")?.trim() || stored.cookie || undefined,
+    authorization: read("COSMOS_AUTHORIZATION")?.trim() || stored.authorization || undefined,
+    userId: parsePositiveInt(read("COSMOS_USER_ID"), "COSMOS_USER_ID") ?? stored.userId,
     clientName: read("COSMOS_CLIENT_NAME")?.trim() || DEFAULT_CLIENT_NAME,
     userAgent: read("COSMOS_USER_AGENT")?.trim() || DEFAULT_USER_AGENT,
     timeoutMs: parsePositiveInt(read("COSMOS_TIMEOUT_MS"), "COSMOS_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS,

@@ -12,6 +12,15 @@ collections to your account.
 
 Search and browsing work with no setup. You add a cookie only when you want to save.
 
+[![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
+[![Add to Claude Code](https://img.shields.io/badge/Add%20to-Claude%20Code-D97757?logo=anthropic&logoColor=white)](#claude-code)
+
+One command for Claude Code:
+
+```bash
+claude mcp add cosmos -- npx -y cosmos-mcp
+```
+
 ## Unofficial. Not affiliated with Cosmos.
 
 This project is not affiliated with, endorsed by, or supported by Cosmos. Read this
@@ -171,10 +180,35 @@ A local clone reads `.env`, so you can leave `env` out of the client config enti
 Skip this section until you want to save something. Every tool without an **A** in the
 [Tools](#tools) tables works right now.
 
-Cosmos has no API keys. The web app authenticates with a session cookie, so that is what
-this server reuses.
+Cosmos has no API keys and no OAuth. The web app authenticates with a session cookie, so
+that is what this server reuses.
+
+### Sign in
+
+```bash
+npx cosmos-mcp login
+```
+
+It tells you how to copy the cookie, hides your input, checks the cookie against
+cosmos.so, and saves it only if it works. Then:
+
+```bash
+npx cosmos-mcp status    # which credential is in use, and whether it still works
+npx cosmos-mcp logout    # remove it
+```
+
+The credential goes in `~/.config/cosmos-mcp/config.json`, written owner-only. Nothing
+prints it back.
+
+You can pipe it instead, which suits a password manager:
+
+```bash
+pbpaste | npx cosmos-mcp login
+```
 
 ### Getting the cookie
+
+`login` prints these steps too.
 
 1. Open [cosmos.so](https://www.cosmos.so) in a browser and sign in.
 2. Open DevTools (`Cmd+Option+I` on macOS, `F12` on Windows and Linux).
@@ -184,10 +218,23 @@ this server reuses.
 6. Find **Request Headers**, then the `Cookie` header.
 7. Copy the **whole value**. It is a long `name=value; name=value; ...` string. Copy all
    of it, not one cookie out of it.
-8. Set `COSMOS_COOKIE` to that string.
 
-Check it worked by asking your agent to run `cosmos_whoami`. It should come back with
-your username.
+### Other ways to configure it
+
+`login` is the easy path. The server reads a credential from three places, and the first
+one that has it wins:
+
+1. The `COSMOS_COOKIE` environment variable, which is what an MCP client's `env` block
+   sets.
+2. A `.env` file next to the package. Useful when you cloned the repo.
+3. `~/.config/cosmos-mcp/config.json`, written by `login`.
+
+### Why not a password login?
+
+Cosmos does have a password login mutation, and this server deliberately does not use it.
+Two reasons. It would put your Cosmos password through a third-party tool, where a
+session cookie is narrower and you can revoke it by signing out. And Cosmos rate-limits
+login attempts, so scripted logins are the pattern its defences are built to catch.
 
 ### Handling the cookie
 

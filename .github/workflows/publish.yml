@@ -1,0 +1,67 @@
+name: Publish
+
+# Publishes to npm on a version tag, using npm trusted publishing (OIDC).
+#
+# There is no token to store. npm verifies the workflow's OIDC identity and
+# checks it against the trusted publisher configured on the package, which also
+# sidesteps the CLI's 2FA problem: a security-key-only account cannot answer the
+# one-time-password challenge `npm publish` expects on a laptop.
+#
+# One-time setup on npmjs.com, under the package's Settings > Trusted Publisher:
+#   repository:      mrmos/cosmos-mcp
+#   workflow:        publish.yml
+#   environment:     (leave blank)
+#
+# Then release with:
+#   npm version patch && git push --follow-tags
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for npm to verify this workflow's identity.
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # npm itself does the publishing; Bun runs the build and tests.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test
+
+      - name: Build
+        run: bun run build
+
+      - name: Check the built server answers an MCP handshake
+        run: |
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"0"}}}' \
+            | timeout 30 node dist/index.js > handshake.json || true
+          grep -q '"serverInfo"' handshake.json
+
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish
+        run: npm publish --provenance --access public

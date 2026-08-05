@@ -8,7 +8,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "bin": {
-    "cosmos-mcp": "./dist/index.js"
+    "cosmos-mcp": "dist/index.js"
   },
   "files": [
     "dist",
