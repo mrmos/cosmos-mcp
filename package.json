@@ -1,6 +1,6 @@
 {
   "name": "cosmos-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unofficial MCP server for cosmos.so. Search, browse and build visual moodboards with Claude, Cursor or any MCP client.",
   "license": "MIT",
   "author": "mrmos",

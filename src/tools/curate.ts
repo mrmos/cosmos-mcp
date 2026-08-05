@@ -684,6 +684,8 @@ Read-only, one request per page. Requires COSMOS_COOKIE — call cosmos_whoami f
       title: "Cosmos: create a cluster (board)",
       description: `Create a new empty cluster (board) owned by the signed-in user, then fill it with cosmos_save_elements.
 
+BUILDING A GOOD BOARD: alternate search and recommendations, about half and half. Seed with cosmos_search — check the candidates with cosmos_view_images first, captions mislead — then loop: a batch from cosmos_cluster_recommendations, a fresh batch from search, repeat. Recommendations curate far better than search, but run alone they echo and the board turns self-similar; search batches inject material the engine has not seen. Verify your seed really shows what the user asked for, since everything downstream inherits its direction.
+
 PRIVACY: \`isPrivate\` defaults to **true**, deliberately. A public cluster appears on the user's profile and in other people's feeds, which is not something to do by accident — only pass \`isPrivate: false\` when the user has actually asked for a public board.
 
 This WRITES: it creates a real board on the user's account and is not idempotent — calling it twice with the same name creates two boards. Check cosmos_list_my_clusters first if a suitable board may already exist.

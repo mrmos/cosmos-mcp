@@ -1802,9 +1802,23 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       title: "Recommended elements for a cluster",
       description:
         "Cosmos' own suggestions for what belongs in an existing collection, computed from everything " +
-        "already in it. The best way to expand a moodboard once it has a few images: it reads the whole " +
-        "board rather than a single seed, so it holds the direction better than cosmos_similar_elements " +
-        "on any one image. Requires COSMOS_COOKIE.",
+        "already in it. Use it as roughly HALF of any board you build, alternating with cosmos_search.\n\n" +
+        "It curates far better than search, which ranks by relevance and so returns each niche's " +
+        "most-saved images. But do not build a board from this alone: recommendations feeding on " +
+        "recommendations become an echo chamber, the board turns self-similar and visibly repeats, and " +
+        "it can drift off the brief entirely — a board seeded with a few glitchy images amplified into " +
+        "abstract glitch art.\n\n" +
+        "The working loop is: a batch from here, then a fresh batch from cosmos_search, and repeat. The " +
+        "search batches inject material this engine has not seen, which is what breaks the echo.\n\n" +
+        "CRITICAL for a NAMED subject (a console, a brand, a person, a place): this engine matches on " +
+        "visual feel and does not know what the words mean. Asked to extend a Sega Dreamcast board it " +
+        "returns other 90s consoles, retro TVs and anime — only ~25 of ~270 suggestions actually showed " +
+        "Dreamcast material. Check each result's caption before saving and keep only those that still " +
+        "name the subject or its world; spend the rest of the budget on search. For a MOOD brief " +
+        "(\"1980s neon\", \"live life to the fullest\") do the opposite — do not filter, lean on this " +
+        "tool, since feel is the whole point and there is no keyword to check.\n\n" +
+        "It reads the whole board rather than a single image, so it holds a direction better than " +
+        "cosmos_similar_elements. Requires a credential.",
       inputSchema: {
         clusterId: z.number().int().positive().describe("Cluster to get suggestions for."),
         previewWidth: previewWidthArg,

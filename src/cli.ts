@@ -14,18 +14,23 @@ import { clearAuth, configPath, readAuth, redact, writeAuth } from "./auth-store
 
 const out = (s = "") => process.stderr.write(s + "\n");
 
-const LOGIN_HELP = `How to get your cosmos.so cookie:
+const LOGIN_HELP = `How to get your cosmos.so credential:
 
   1. Open https://www.cosmos.so in a browser and sign in.
   2. Open DevTools (Cmd+Option+I on macOS, F12 elsewhere).
   3. Go to the Network tab and reload the page.
   4. Click any request to api.cosmos.so.
-  5. Under Request Headers, find "Cookie".
-  6. Copy the whole value, not one cookie out of it.
+  5. Under Request Headers, find "Authorization".
+  6. Copy the whole value. It starts with "Bearer ".
+
+Cosmos authenticates with that bearer token. The Cookie header on the same
+request is only AWS load-balancer routing and will not sign you in, so use
+Authorization. (If you must, a full Cookie header that carries a session is
+still accepted.)
 
 It is a credential: treat it like a password. It is stored with owner-only
-permissions and is never printed back. Sign out of that browser session to
-revoke it.`;
+permissions and is never printed back. The token expires on its own; sign out
+of that browser session to revoke it sooner.`;
 
 /** Reads one line from a TTY without echoing it. Falls back to piped stdin. */
 async function readSecret(prompt: string): Promise<string> {
@@ -64,37 +69,75 @@ async function readSecret(prompt: string): Promise<string> {
   });
 }
 
-function looksLikeCookieHeader(value: string): boolean {
-  return value.includes("=") && !value.startsWith("{") && !/\s/.test(value.split("=")[0] ?? " ");
+/** A JWT is three base64url segments joined by dots. */
+const JWT_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+export type Credential =
+  | { kind: "authorization"; authorization: string }
+  | { kind: "cookie"; cookie: string }
+  | { kind: "unknown" };
+
+/**
+ * Classifies a pasted secret. Cosmos authenticates with a bearer token in the
+ * Authorization header; the Cookie header on the same request is only AWS
+ * load-balancer stickiness (AWSALB/AWSALBCORS) and carries no identity, so a
+ * cookie is accepted only when it plausibly holds a session of its own.
+ */
+export function classifyCredential(raw: string): Credential {
+  const value = raw.trim();
+  if (value === "") return { kind: "unknown" };
+
+  // "Bearer eyJ…" or a bare JWT.
+  const bare = value.replace(/^Bearer\s+/i, "");
+  if (JWT_RE.test(bare)) return { kind: "authorization", authorization: `Bearer ${bare}` };
+  if (/^Bearer\s+\S/i.test(value)) return { kind: "authorization", authorization: value };
+
+  if (value.includes("=") && !value.startsWith("{")) {
+    // AWS load-balancer cookies alone never authenticate; refuse them early so
+    // the failure is a clear message rather than a rejected round trip.
+    const names = value.split(";").map((c) => c.split("=")[0]?.trim().toLowerCase());
+    const onlyLoadBalancer = names.every((n) => n === "awsalb" || n === "awsalbcors");
+    if (onlyLoadBalancer) return { kind: "unknown" };
+    return { kind: "cookie", cookie: value };
+  }
+
+  return { kind: "unknown" };
 }
 
 async function login(): Promise<number> {
   out(LOGIN_HELP);
   out();
 
-  let cookie: string;
+  let pasted: string;
   try {
-    cookie = await readSecret("Paste your Cookie header (input hidden), then press Enter: ");
+    pasted = await readSecret("Paste your Authorization header (input hidden), then press Enter: ");
   } catch {
     out("Cancelled.");
     return 1;
   }
 
-  if (!cookie) {
+  if (!pasted) {
     out("Nothing pasted. Run `cosmos-mcp login` again.");
     return 1;
   }
-  out(`Received ${cookie.length} characters.`);
+  out(`Received ${pasted.trim().length} characters.`);
 
-  if (!looksLikeCookieHeader(cookie)) {
+  const cred = classifyCredential(pasted);
+  if (cred.kind === "unknown") {
     out();
-    out('That does not look like a Cookie header. It should read "name=value; name=value; …".');
-    out("Copy the whole value of the Cookie request header, not a single cookie.");
+    out("That does not look like a Cosmos credential.");
+    out('Copy the whole "Authorization" request header — it begins with "Bearer ".');
+    out("The AWSALB cookies alone will not sign you in; they are only load-balancer routing.");
     return 1;
   }
 
-  out("Checking it against cosmos.so…");
-  const client = new CosmosClient({ ...loadConfig({}), cookie, authorization: undefined, userId: undefined });
+  out(`Checking your ${cred.kind === "authorization" ? "token" : "cookie"} against cosmos.so…`);
+  const client = new CosmosClient({
+    ...loadConfig({}),
+    cookie: cred.kind === "cookie" ? cred.cookie : undefined,
+    authorization: cred.kind === "authorization" ? cred.authorization : undefined,
+    userId: undefined,
+  });
 
   let viewer: { id: number; username: string | null } | null;
   try {
@@ -108,12 +151,16 @@ async function login(): Promise<number> {
 
   if (!viewer) {
     out();
-    out("cosmos.so rejected that cookie. Nothing was saved.");
-    out("The most common causes: you copied only one cookie, or the session has expired.");
+    out("cosmos.so rejected that credential. Nothing was saved.");
+    out("Most likely it has expired — grab a fresh Authorization header and try again.");
     return 1;
   }
 
-  const path = writeAuth({ cookie, userId: viewer.id, username: viewer.username ?? undefined });
+  const path = writeAuth({
+    ...(cred.kind === "authorization" ? { authorization: cred.authorization } : { cookie: cred.cookie }),
+    userId: viewer.id,
+    username: viewer.username ?? undefined,
+  });
   out();
   out(`Signed in as @${viewer.username ?? viewer.id}.`);
   out(`Saved to ${path} (owner-only permissions).`);
@@ -125,16 +172,18 @@ async function status(): Promise<number> {
   const config = loadConfig();
   const stored = readAuth();
 
-  const source = process.env.COSMOS_COOKIE
-    ? "COSMOS_COOKIE environment variable"
-    : stored.cookie
-      ? `${configPath()} (saved ${stored.savedAt ?? "at an unknown time"})`
-      : config.cookie
-        ? ".env next to the package"
-        : "nowhere — no credential configured";
+  const source =
+    process.env.COSMOS_AUTHORIZATION || process.env.COSMOS_COOKIE
+      ? "environment variable"
+      : stored.authorization || stored.cookie
+        ? `${configPath()} (saved ${stored.savedAt ?? "at an unknown time"})`
+        : config.authorization || config.cookie
+          ? ".env next to the package"
+          : "nowhere — no credential configured";
 
+  const kind = config.authorization ? "Bearer token" : config.cookie ? "Cookie" : "(none)";
   out(`Credential source: ${source}`);
-  out(`Cookie:            ${redact(config.cookie)}`);
+  out(`Credential:        ${kind} · ${redact(config.authorization ?? config.cookie)}`);
   out(`Endpoint:          ${config.endpoint}`);
 
   if (!config.cookie && !config.authorization) {
@@ -158,12 +207,13 @@ async function status(): Promise<number> {
 function logout(): number {
   const removed = clearAuth();
   out(removed ? `Removed ${configPath()}.` : "No stored credential to remove.");
-  if (process.env.COSMOS_COOKIE) {
+  const envVar = process.env.COSMOS_AUTHORIZATION ? "COSMOS_AUTHORIZATION" : process.env.COSMOS_COOKIE ? "COSMOS_COOKIE" : null;
+  if (envVar) {
     out();
-    out("Note: COSMOS_COOKIE is still set in your environment, so the server stays signed in.");
+    out(`Note: ${envVar} is still set in your environment, so the server stays signed in.`);
     out("Unset it, or remove it from your MCP client config, to fully sign out.");
   }
-  out("Signing out of that browser session on cosmos.so revokes the cookie itself.");
+  out("Signing out of that browser session on cosmos.so revokes the token itself.");
   return 0;
 }
 
@@ -171,7 +221,7 @@ function help(): number {
   out("cosmos-mcp — unofficial MCP server for cosmos.so");
   out();
   out("  cosmos-mcp           Run the MCP server on stdio. This is what MCP clients invoke.");
-  out("  cosmos-mcp login     Save a cosmos.so session cookie, after checking it works.");
+  out("  cosmos-mcp login     Save a cosmos.so credential, after checking it works.");
   out("  cosmos-mcp status    Show which credential is in use and whether it is still valid.");
   out("  cosmos-mcp logout    Remove the saved credential.");
   out();
