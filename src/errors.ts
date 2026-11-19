@@ -45,9 +45,11 @@ export class CosmosError extends Error {
 }
 
 const AUTH_HINT =
-  "Set COSMOS_COOKIE to the `Cookie` header from a signed-in cosmos.so browser " +
-  "session (DevTools > Network > any api.cosmos.so request > Request Headers). " +
-  "Browsing and search work without it; saving and collections do not.";
+  "Ask the user to run `npx cosmos-mcp login` in their own terminal, then retry" +
+  ": a running server picks up the saved credential without a restart. " +
+  "Alternatively set COSMOS_AUTHORIZATION to the whole `Authorization` request header " +
+  "(\"Bearer …\") from a signed-in cosmos.so browser session. Never ask the user to paste it into chat. " +
+  "Search and browsing work without signing in; saving and collections do not.";
 
 /** Maps a GraphQL error code plus HTTP status onto a `CosmosErrorKind`. */
 export function classify(code: string | undefined, status: number): CosmosErrorKind {

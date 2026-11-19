@@ -6,7 +6,7 @@
  * gap that made moodboarding awkward, "save this image I found to my board".
  *
  * Every tool here calls `requireViewer()` first, so a signed-out caller gets the
- * actionable "set COSMOS_COOKIE" message instead of a raw GraphQL failure.
+ * actionable "run cosmos-mcp login" message instead of a raw GraphQL failure.
  *
  * Two schema facts drive most of the code below and are easy to get wrong:
  *

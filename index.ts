@@ -3,9 +3,9 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { createServer } from "./src/server";
 import { runCli } from "./src/cli";
 
-const exitCode = await runCli(process.argv.slice(2));
+const exitCode = await runCli(process.argv.slice(2), Boolean(process.stdin.isTTY));
 
-// A subcommand ran. Only `undefined` means "start the server".
+// A subcommand ran. Only `null` means "start the server".
 if (exitCode !== null) {
   process.exit(exitCode);
 }

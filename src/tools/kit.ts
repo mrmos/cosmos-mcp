@@ -26,7 +26,7 @@ export function ok(summary: string, data: unknown): CallToolResult {
 
 /**
  * Failure result. Returns `isError` rather than throwing so the agent sees the
- * remediation text (how to set COSMOS_COOKIE, say) instead of a bare stack.
+ * remediation text (how to sign in, say) instead of a bare stack.
  */
 export function fail(error: unknown): CallToolResult {
   const message =

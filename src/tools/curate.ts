@@ -3,7 +3,7 @@
  * once you are signed in.
  *
  * Every tool here calls `requireViewer()` first so a signed-out caller gets the
- * actionable "set COSMOS_COOKIE" message instead of a raw GraphQL failure.
+ * actionable "run cosmos-mcp login" message instead of a raw GraphQL failure.
  *
  * Vocabulary: an *element* is a saved image/video/product; a *cluster* is a
  * board. An element can live in many clusters at once — Cosmos calls those
@@ -12,6 +12,7 @@
 
 import { z } from "zod";
 import { CLUSTER_CORE, ELEMENT_CORE } from "../graphql/fragments";
+import { CosmosError } from "../errors";
 import {
   cdnPreview,
   normalizeCluster,
@@ -627,7 +628,7 @@ Use it to resolve a board the user names in prose ("the kitchen renovation board
 
 Returns each cluster with its id, name, privacy, element count, cover image and cosmos.so URL, plus any subclusters (a board nested inside a board).
 
-Read-only, one request per page. Requires COSMOS_COOKIE — call cosmos_whoami first if unsure.`,
+Read-only, one request per page. Requires sign-in — call cosmos_whoami first if unsure.`,
       inputSchema: {
         search: z
           .string()
@@ -721,6 +722,13 @@ Returns the new cluster including its id (feed that to cosmos_save_elements) and
         },
       );
       const cluster = normalizeCluster(data.cluster?.create);
+      if (!cluster) {
+        throw new CosmosError(
+          `cosmos_create_cluster: cosmos.so did not return the new cluster, so it may or may not exist. ` +
+            `Check cosmos_list_my_clusters before creating it again.`,
+          { kind: "unknown", operation: "cosmos_create_cluster" },
+        );
+      }
       return ok(
         `Created ${isPrivate ? "private" : "PUBLIC"} cluster ${JSON.stringify(args.name)}.`,
         { cluster },

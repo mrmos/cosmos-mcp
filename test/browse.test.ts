@@ -753,6 +753,38 @@ describe("cosmos_similar_elements", () => {
     expect(p.note).toContain("single seed");
   });
 
+  test("one failing seed does not discard the other seeds' results", async () => {
+    const { run } = call(
+      "cosmos_similar_elements",
+      { elementIds: [7, 8], limit: 4 },
+      {
+        request: async (_op, _q, vars) => {
+          if ((vars.elementIds as number[])[0] === 8) throw new CosmosError("no such element", { kind: "not_found" });
+          return { similarElementsV2: elementList([10, 11]) };
+        },
+      },
+    );
+    const result = await run();
+    expect(result.isError).toBeUndefined();
+    const p = payloadOf(result);
+    expect(p.items.map((e: any) => e.id)).toEqual([10, 11]);
+    expect(p.failedSeeds).toEqual([{ elementId: 8, error: "no such element" }]);
+    expect(p.summary).toContain("1 of 2 seeds");
+  });
+
+  test("every seed failing is an error result", async () => {
+    const { run } = call(
+      "cosmos_similar_elements",
+      { elementIds: [7, 8] },
+      {
+        request: async () => {
+          throw new CosmosError("boom", { kind: "server" });
+        },
+      },
+    );
+    expect((await run()).isError).toBe(true);
+  });
+
   test("seeds never come back as their own results", async () => {
     const { run } = call(
       "cosmos_similar_elements",
@@ -1020,7 +1052,7 @@ describe("cosmos_list_user_clusters", () => {
     const p = payloadOf(result);
     expect(p.partial).toBe(true);
     expect(p.totalCount).toBe(21);
-    expect(p.note).toContain("COSMOS_COOKIE");
+    expect(p.note).toContain("cosmos-mcp login");
     expect(calls.map((c) => c.op)).toEqual(["CosmosMcpUserClusters", "CosmosMcpUserTopClusters"]);
   });
 

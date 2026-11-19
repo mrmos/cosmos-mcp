@@ -1,3 +1,4 @@
+import { statSync } from "node:fs";
 import type { CosmosConfig } from "../config";
 import { CosmosError, classify, describe, type CosmosGraphQLError } from "../errors";
 
@@ -10,6 +11,18 @@ const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 3;
 
 /**
+ * Lets a running server notice `cosmos-mcp login` without a client restart.
+ * `path` is the stored-credential file; `reload` rebuilds the config from
+ * scratch when that file changes.
+ */
+export interface CredentialWatch {
+  path: string;
+  reload: () => CosmosConfig;
+}
+
+const isMutation = (query: string) => /^\s*mutation\b/.test(query);
+
+/**
  * Thin GraphQL client for api.cosmos.so.
  *
  * The endpoint mirrors what cosmos-web sends, including the `?q=<operation>`
@@ -17,12 +30,36 @@ const MAX_ATTEMPTS = 3;
  * without it are treated as unknown clients.
  */
 export class CosmosClient {
-  readonly config: CosmosConfig;
-  private viewerId: number | null | undefined;
+  private currentConfig: CosmosConfig;
   private viewerPromise: Promise<Viewer | null> | undefined;
+  private readonly watch: CredentialWatch | undefined;
+  private watchedMtime: number;
 
-  constructor(config: CosmosConfig) {
-    this.config = config;
+  constructor(config: CosmosConfig, watch?: CredentialWatch) {
+    this.currentConfig = config;
+    this.watch = watch;
+    this.watchedMtime = watch ? mtimeOf(watch.path) : 0;
+  }
+
+  get config(): CosmosConfig {
+    this.syncStoredCredential();
+    return this.currentConfig;
+  }
+
+  /**
+   * Re-reads the config when the file `login`/`logout` writes has changed.
+   * A credential from the environment or `.env` outranks that file, so the
+   * check is skipped then: nothing written there could take effect.
+   */
+  private syncStoredCredential(): void {
+    if (!this.watch) return;
+    const source = this.currentConfig.credentialSource;
+    if (source === "environment" || source === "dotenv") return;
+    const mtime = mtimeOf(this.watch.path);
+    if (mtime === this.watchedMtime) return;
+    this.watchedMtime = mtime;
+    this.currentConfig = this.watch.reload();
+    this.viewerPromise = undefined;
   }
 
   /** True when a credential is configured. Says nothing about it still being valid. */
@@ -31,16 +68,17 @@ export class CosmosClient {
   }
 
   private headers(): Record<string, string> {
+    const config = this.currentConfig;
     const h: Record<string, string> = {
       "content-type": "application/json",
       accept: "application/graphql-response+json,application/json;q=0.9",
-      "x-client-name": this.config.clientName,
+      "x-client-name": config.clientName,
       origin: "https://www.cosmos.so",
       referer: "https://www.cosmos.so/",
-      "user-agent": this.config.userAgent,
+      "user-agent": config.userAgent,
     };
-    if (this.config.cookie) h.cookie = this.config.cookie;
-    if (this.config.authorization) h.authorization = this.config.authorization;
+    if (config.cookie) h.cookie = config.cookie;
+    if (config.authorization) h.authorization = config.authorization;
     return h;
   }
 
@@ -50,41 +88,64 @@ export class CosmosClient {
    *
    * Cosmos returns partial data with a non-empty `errors` array for fields the
    * viewer may not read (a private cluster inside a public list, say). When
-   * `data` is present we return it and let the caller decide.
+   * `data` still holds something usable we return it and let the caller
+   * decide. Two exceptions throw instead: a mutation with any error (a write
+   * that half-happened is not a success), and a query whose every top-level
+   * field came back null (there is nothing to decide with).
+   *
+   * Mutations are never retried after the request may have reached the
+   * server — a timeout or 5xx can follow a write that landed, and replaying it
+   * would save twice or report a successful delete as "not found". A 429 is
+   * the exception: the server refused it before doing anything.
    */
   async request<T>(operationName: string, query: string, variables: Record<string, unknown> = {}): Promise<T> {
-    const url = `${this.config.endpoint}?q=${encodeURIComponent(operationName)}`;
+    const config = this.config;
+    const url = `${config.endpoint}?q=${encodeURIComponent(operationName)}`;
     const body = JSON.stringify({ operationName, query, variables });
+    const write = isMutation(query);
+    const unsureWrite = write
+      ? " The write may or may not have been applied: check (for example with cosmos_get_cluster) before retrying."
+      : "";
 
     let lastError: CosmosError | undefined;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       let res: Response;
+      let text: string;
       try {
         res = await fetch(url, {
           method: "POST",
           headers: this.headers(),
           body,
-          signal: AbortSignal.timeout(this.config.timeoutMs),
+          signal: AbortSignal.timeout(config.timeoutMs),
         });
+        if (RETRYABLE_STATUS.has(res.status) && attempt < MAX_ATTEMPTS && (!write || res.status === 429)) {
+          await res.body?.cancel().catch(() => {});
+          await backoff(attempt);
+          continue;
+        }
+        // Inside the try: the timeout and connection resets can fire mid-body too.
+        text = await res.text();
       } catch (cause) {
-        lastError = new CosmosError(`${operationName}: request to cosmos.so failed (${String(cause)})`, {
+        lastError = new CosmosError(`${operationName}: request to cosmos.so failed (${String(cause)}).${unsureWrite}`, {
           kind: "network",
           operation: operationName,
           cause,
         });
-        if (attempt < MAX_ATTEMPTS) {
+        if (!write && attempt < MAX_ATTEMPTS) {
           await backoff(attempt);
           continue;
         }
         throw lastError;
       }
 
-      if (RETRYABLE_STATUS.has(res.status) && attempt < MAX_ATTEMPTS) {
-        await backoff(attempt);
-        continue;
+      if (write && res.status >= 500) {
+        throw new CosmosError(`${operationName}: cosmos.so returned HTTP ${res.status}.${unsureWrite}`, {
+          kind: "server",
+          status: res.status,
+          operation: operationName,
+        });
       }
 
-      const text = await res.text();
       let payload: GraphQLResponse<T>;
       try {
         payload = JSON.parse(text) as GraphQLResponse<T>;
@@ -96,7 +157,7 @@ export class CosmosClient {
       }
 
       const errors = payload.errors ?? [];
-      if (errors.length > 0 && (payload.data === undefined || payload.data === null)) {
+      if (errors.length > 0 && (write || nothingUsable(payload.data))) {
         const kind = classify(errors[0]?.extensions?.code as string | undefined, res.status);
         throw new CosmosError(describe(kind, errors, operationName), {
           kind,
@@ -126,19 +187,45 @@ export class CosmosClient {
    * tools can keep working instead of hard-failing.
    */
   async viewer(): Promise<Viewer | null> {
-    if (this.config.userId) return { id: this.config.userId, username: null };
+    const config = this.config;
+    if (!config.cookie && !config.authorization) return null;
+    if (config.userId) return { id: config.userId, username: config.username ?? null };
+    this.viewerPromise ??= this.verify().catch((err) => {
+      this.viewerPromise = undefined; // transient failure: allow a retry
+      throw err;
+    });
+    const viewer = await this.viewerPromise;
+    // Only a definite 401 is worth remembering. A 403 can be a WAF or load
+    // balancer having a moment, and caching it would sign the server out until
+    // restart.
+    if (!viewer && !this.lastVerifyUnauthenticated) this.viewerPromise = undefined;
+    return viewer;
+  }
+
+  private lastVerifyUnauthenticated = false;
+
+  /**
+   * Asks cosmos.so who the credential belongs to, always over the network —
+   * unlike `viewer()`, it does not trust a stored or configured user id.
+   * Null means the credential was rejected; anything else that goes wrong
+   * (network, 5xx, rate limit) throws, so callers can tell the two apart.
+   */
+  async verify(): Promise<Viewer | null> {
     if (!this.hasCredentials) return null;
-    this.viewerPromise ??= this.request<{ me: { id: number; username: string } }>(
-      "CosmosMcpViewer",
-      "query CosmosMcpViewer { me { id username } }",
-    )
-      .then((d) => ({ id: d.me.id, username: d.me.username }))
-      .catch((err) => {
-        if (err instanceof CosmosError && (err.kind === "unauthenticated" || err.kind === "forbidden")) return null;
-        this.viewerPromise = undefined; // transient failure: allow a retry
-        throw err;
-      });
-    return this.viewerPromise;
+    try {
+      const d = await this.request<{ me: { id: number; username: string } | null }>(
+        "CosmosMcpViewer",
+        "query CosmosMcpViewer { me { id username } }",
+      );
+      this.lastVerifyUnauthenticated = !d.me;
+      return d.me ? { id: d.me.id, username: d.me.username } : null;
+    } catch (err) {
+      if (err instanceof CosmosError && (err.kind === "unauthenticated" || err.kind === "forbidden")) {
+        this.lastVerifyUnauthenticated = err.kind === "unauthenticated";
+        return null;
+      }
+      throw err;
+    }
   }
 
   /** Like `viewer()`, but throws the actionable auth error when unavailable. */
@@ -172,6 +259,22 @@ export interface Viewer {
   id: number;
   /** Null when the id came from COSMOS_USER_ID rather than a `me` lookup. */
   username: string | null;
+}
+
+function mtimeOf(path: string): number {
+  try {
+    return statSync(path).mtimeMs;
+  } catch {
+    return 0; // missing: logout removed it, or login has not run yet
+  }
+}
+
+/** True when there is no data, or every top-level field in it is null. */
+function nothingUsable(data: unknown): boolean {
+  if (data === undefined || data === null) return true;
+  if (typeof data !== "object") return false;
+  const values = Object.values(data as Record<string, unknown>);
+  return values.length > 0 && values.every((v) => v === null);
 }
 
 function backoff(attempt: number): Promise<void> {

@@ -14,8 +14,10 @@ Search and browsing need no setup. You add a token only when you want to save.
 One command for Claude Code:
 
 ```bash
-claude mcp add cosmos -- npx -y cosmos-mcp
+claude mcp add cosmos -s user -- npx -y cosmos-mcp
 ```
+
+Then ask: *"Show me 8 images of warm brutalist interiors from Cosmos."* No account needed.
 
 ## Unofficial. Not affiliated with Cosmos.
 
@@ -50,10 +52,10 @@ It suits three jobs:
 For Claude Code:
 
 ```bash
-claude mcp add cosmos -- npx -y cosmos-mcp
+claude mcp add cosmos -s user -- npx -y cosmos-mcp
 ```
 
-Add `-e COSMOS_AUTHORIZATION="Bearer paste_your_token_here"` to enable the write tools, or run `npx cosmos-mcp login` later (see [Authentication](#authentication)).
+`-s user` makes it available in every project. Without it, Claude Code adds the server to the current project only.
 
 Every other client uses the same JSON config:
 
@@ -62,10 +64,7 @@ Every other client uses the same JSON config:
   "mcpServers": {
     "cosmos": {
       "command": "npx",
-      "args": ["-y", "cosmos-mcp"],
-      "env": {
-        "COSMOS_AUTHORIZATION": "Bearer paste_your_token_here"
-      }
+      "args": ["-y", "cosmos-mcp"]
     }
   }
 }
@@ -73,11 +72,19 @@ Every other client uses the same JSON config:
 
 Where to put it:
 
-- **Claude Code**: `.mcp.json` at your project root. This file is usually committed, so keep tokens out of it: use `claude mcp add -e`, `login`, or `.gitignore` it.
 - **Claude Desktop**: `claude_desktop_config.json`, at `~/Library/Application Support/Claude/` on macOS or `%APPDATA%\Claude\` on Windows. Restart the app afterwards.
 - **Cursor**: `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` for one.
+- **Claude Code, by hand**: `.mcp.json` at your project root. This file is usually committed, so never put a token in it.
 
-Leave out the `env` block if you only want search and browsing, or if you signed in with `login`.
+That is enough for search and browsing. To save collections, run `npx cosmos-mcp login` once (see [Authentication](#authentication)). The running server picks it up on its next tool call; you do not need to restart anything.
+
+If you would rather pass the token through the client config, put the flags before the `--`:
+
+```bash
+claude mcp add cosmos -s user -e COSMOS_AUTHORIZATION="Bearer <your token>" -- npx -y cosmos-mcp
+```
+
+or add `"env": { "COSMOS_AUTHORIZATION": "Bearer <your token>" }` next to `args` in the JSON. Only do this with a real token: a placeholder reads as a rejected credential.
 
 ### From a local clone
 
@@ -104,7 +111,7 @@ Cosmos has no API keys and no OAuth. The web app authenticates with a bearer tok
 npx cosmos-mcp login
 ```
 
-It walks you through copying the token, hides your input, verifies it against cosmos.so, and saves it only if it works. The credential goes in `~/.config/cosmos-mcp/config.json`, written owner-only, and is never printed back. You can also pipe it in from a password manager: `pbpaste | npx cosmos-mcp login`.
+It walks you through copying the token, hides your input, verifies it against cosmos.so, and saves it only if it works. A server that is already running picks the new token up on its next tool call. The credential goes in `~/.config/cosmos-mcp/config.json`, written owner-only, and is never printed back. You can also pipe it in from a password manager: `pbpaste | npx cosmos-mcp login`.
 
 ```bash
 npx cosmos-mcp status    # which credential is in use, and whether it still works
@@ -119,7 +126,7 @@ To copy the token (`login` prints these steps too):
 
 Do not copy the `Cookie` header: its `AWSALB` values are load-balancer routing and will not sign you in.
 
-The server reads a credential from three places; the first one wins:
+The server reads a credential from three places. The first one that holds a credential wins, and supplies all of it:
 
 1. The `COSMOS_AUTHORIZATION` environment variable, set by an MCP client's `env` block.
 2. A `.env` file next to the package, for local clones.
@@ -131,7 +138,7 @@ Treat it like a password: anyone holding it can act as you on Cosmos.
 
 - Never commit it, not to `.mcp.json`, a dotfile repo, or a screenshot.
 - Don't paste it into a chat message. That writes it into transcripts and sends it to a model provider. Use the `env` block, `.env`, or `login` instead.
-- It expires. When write tools report "not signed in", copy a fresh one.
+- It expires. When write tools report "not signed in", run `npx cosmos-mcp login` again.
 - Revoke it by signing out of that browser session on cosmos.so.
 
 The token is sent to `api.cosmos.so` and nowhere else. This server has no telemetry and writes nothing to disk beyond the credential file `login` saves.
@@ -144,11 +151,11 @@ Copy [`.env.example`](.env.example) to `.env` for a documented starting point. N
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `COSMOS_AUTHORIZATION` | unset | The whole `Authorization` header value, `Bearer ` and all. The credential; unlocks every **A** tool. |
-| `COSMOS_COOKIE` | unset | A full session-bearing `Cookie` header, if you have one. The `AWSALB` cookies alone are not enough. |
+| `COSMOS_AUTHORIZATION` | unset | The `Authorization` header value. The credential; unlocks every **A** tool. A bare token gets `Bearer ` added. |
+| `COSMOS_COOKIE` | unset | Advanced: a full session-bearing `Cookie` header. Rarely what you want; the `AWSALB` cookies on a normal request do not sign you in. |
 | `COSMOS_USER_ID` | unset | Your numeric Cosmos user id. Optional; skips the `me` lookup on first use. |
 | `COSMOS_ENDPOINT` | `https://api.cosmos.so/graphql` | GraphQL endpoint. Override only for a mock or proxy. |
-| `COSMOS_TIMEOUT_MS` | `30000` | Per-request timeout in milliseconds. |
+| `COSMOS_TIMEOUT_MS` | `30000` | Per-request timeout in milliseconds. An invalid value is ignored with a warning. |
 | `COSMOS_CLIENT_NAME` | `cosmos-web` | Sent as `x-client-name`. The API rejects unknown clients; leave it alone. |
 | `COSMOS_USER_AGENT` | a desktop Chrome string | Sent as `User-Agent`. |
 
@@ -250,9 +257,11 @@ You should see `cosmos-mcp ready on stdio` on stderr and a JSON-RPC result conta
 ### Project layout
 
 ```
-index.ts                 entrypoint: stdio transport
+index.ts                 entrypoint: CLI subcommands, else stdio transport
 src/
-  config.ts              environment variables to CosmosConfig
+  cli.ts                 login, logout, status, help
+  auth-store.ts          the credential file `login` writes
+  config.ts              environment, .env and stored credential to CosmosConfig
   errors.ts              CosmosError, and the mapping from GraphQL codes to kinds
   normalize.ts           API shapes to the flatter shapes tools return
   server.ts              McpServer construction and tool registration
@@ -264,6 +273,8 @@ src/
     account.ts           whoami, library, feed, activity
     browse.ts            search, explore, elements, users, clusters
     curate.ts            create, save, organise
+    manage.ts            save URLs, update, nest, delete, follow, pin
+    catalog.ts           which tools need sign-in
 scripts/
   probe-schema.ts        schema discovery against the live API
 docs/

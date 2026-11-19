@@ -2,7 +2,7 @@
  * Account tools — "what can I do right now?".
  *
  * Cosmos has no API keys. Everything personal (your library, your boards,
- * saving) rides on a browser session cookie in `COSMOS_COOKIE`. That makes the
+ * saving) rides on a bearer token from `cosmos-mcp login` or COSMOS_AUTHORIZATION. That makes the
  * server's capabilities configuration-dependent, so the first thing an agent
  * should do is ask.
  */
@@ -43,7 +43,7 @@ Reports whether a cosmos.so credential is configured and still valid, who it bel
 
 Read it as a capability probe:
 - authenticated: true  -> every tool works, including saving and creating boards.
-- authenticated: false -> only the read-only browse/search tools work. The result then explains exactly which environment variable is missing and how to fill it; relay that to the user rather than retrying the write.
+- authenticated: false -> only the read-only browse/search tools work. The result then says how to sign in (\`npx cosmos-mcp login\`); relay that to the user rather than retrying the write.
 
 Never an error result and never a write. One cheap request, safe to call any time you are unsure whether a save will succeed.`;
 
@@ -110,13 +110,10 @@ export const registerAccountTools: ToolRegistrar = (server, ctx) => {
     guard(async () => {
       const credential = credentialSummary(ctx.client.config);
 
-      let viewer: Awaited<ReturnType<typeof ctx.client.viewer>> = null;
-      try {
-        viewer = await ctx.client.viewer();
-      } catch (err) {
-        // A network blip should not look like a signed-out session.
-        if (!(err instanceof CosmosError) || err.kind === "network" || err.kind === "server") throw err;
-      }
+      // viewer() turns a rejected credential into null. Anything it throws —
+      // network, 5xx, a rate limit — says nothing about the credential, so it
+      // surfaces as an error rather than a misleading "rejected".
+      const viewer = await ctx.client.viewer();
 
       if (!viewer) {
         const payload = signedOutPayload(credential, ctx.client.hasCredentials ? "rejected" : "missing");
@@ -143,7 +140,7 @@ export const registerAccountTools: ToolRegistrar = (server, ctx) => {
             ...rest,
             note:
               "A viewer id was available (COSMOS_USER_ID, or a cached lookup) but cosmos.so rejected the request, " +
-              "so the session cookie is missing or expired.",
+              "so the saved token has expired. Signing in again with `npx cosmos-mcp login` fixes it.",
           });
         }
         // Anything else (network, rate limit) is not an auth problem: report

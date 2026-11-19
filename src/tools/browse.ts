@@ -1124,7 +1124,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
           .optional()
           .describe(
             "Restrict to one owner's collections. Cosmos rejects this filter for signed-out callers, " +
-              "so it needs COSMOS_COOKIE; omit it for a site-wide search.",
+              "so it needs sign-in (`npx cosmos-mcp login`); omit it for a site-wide search.",
           ),
         cursor: cursorArg,
         limit: limitArg,
@@ -1342,20 +1342,33 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         return ok(`${page.items.length} element(s) visually similar to ${seeds[0]}.`, page);
       }
 
-      const pages = await Promise.all(
+      // One bad or private seed must not throw away every other seed's results.
+      const settled = await Promise.allSettled(
         seeds.map((id) => similarForSeed(client, id, undefined, limit, previewWidth)),
       );
+      const usable = settled.flatMap((r, i) => (r.status === "fulfilled" ? [{ seed: seeds[i]!, page: r.value }] : []));
+      const failedSeeds = settled.flatMap((r, i) =>
+        r.status === "rejected"
+          ? [{ elementId: seeds[i]!, error: r.reason instanceof Error ? r.reason.message : String(r.reason) }]
+          : [],
+      );
+      if (usable.length === 0) throw (settled[0] as PromiseRejectedResult).reason;
+
       const items = interleaveSimilar(
-        pages.map((p) => p.items),
-        seeds,
+        usable.map((u) => u.page.items),
+        usable.map((u) => u.seed),
         limit,
       );
-      return ok(`${items.length} element(s) blended from ${seeds.length} seeds.`, {
-        items,
-        nextCursor: null,
-        totalCount: null,
-        note: "Multi-seed results are interleaved from separate queries; paging needs a single seed id.",
-      });
+      return ok(
+        `${items.length} element(s) blended from ${usable.length} of ${seeds.length} seeds.`,
+        {
+          items,
+          nextCursor: null,
+          totalCount: null,
+          note: "Multi-seed results are interleaved from separate queries; paging needs a single seed id.",
+          ...(failedSeeds.length > 0 ? { failedSeeds } : {}),
+        },
+      );
     }),
   );
 
@@ -1428,7 +1441,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "interiors, but not sterile' comes back as three or four distinct angles you can put on separate " +
         "slides. EXPERIMENTAL: this response has never been observed — it is gated behind a session, so " +
         "only the query was verified, not the payload. Treat a thin or oddly shaped result as the tool's " +
-        "fault, check `warnings`, and fall back to cosmos_search. Requires COSMOS_COOKIE.",
+        "fault, check `warnings`, and fall back to cosmos_search. Requires sign-in (`npx cosmos-mcp login`).",
       inputSchema: {
         brief: z
           .string()
@@ -1776,7 +1789,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       description:
         "Pages through the elements saved in a collection, newest first. This is how you actually read a " +
         "moodboard someone else built — pair it with cosmos_spotlights or cosmos_get_user to find boards " +
-        "worth reading. Public clusters work signed out; private ones need COSMOS_COOKIE.",
+        "worth reading. Public clusters work signed out; private ones need sign-in.",
       inputSchema: {
         clusterId: z.number().int().positive().describe("Numeric cluster id, from cosmos_get_cluster or a listing."),
         cursor: cursorArg,
@@ -1844,7 +1857,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       description:
         "The collections on a profile. Omit `username` to list the signed-in viewer's own boards — that " +
         "is how you find the cluster id to save into. Cosmos gates the full list behind a session; " +
-        "without COSMOS_COOKIE a named profile still returns the three collections it leads with, " +
+        "signed out, a named profile still returns the three collections it leads with, " +
         "flagged as partial.",
       inputSchema: {
         username: z.string().optional().describe("Profile handle. Omit to use the signed-in viewer."),
@@ -1878,7 +1891,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
           nextCursor: null,
           totalCount: data.user?.topClusters?.meta?.count ?? null,
           partial: true,
-          note: "Cosmos only exposes a profile's leading collections to signed-out callers. Set COSMOS_COOKIE for the full, pageable list.",
+          note: "Cosmos only exposes a profile's leading collections to signed-out callers. Sign in (`npx cosmos-mcp login`) for the full, pageable list.",
         });
       }
     }),
