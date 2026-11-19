@@ -112,7 +112,9 @@
   const n = C.tiles.length;
   const TILES_END = TILES_AT + (n - 1) * TILE_STEP + TILE_FADE;
   const DONE_AT = TILES_END + 0.1;
-  const CARD_AT = DONE_AT + 0.9, CARD_FADE = 0.35, HOLD = 1.6;
+  // How long the finished board stays on screen before the install card.
+  const RESULTS_HOLD = 3.5;
+  const CARD_AT = DONE_AT + RESULTS_HOLD, CARD_FADE = 0.35, HOLD = 1.6;
   const DURATION = CARD_AT + CARD_FADE + HOLD;
   window.DURATION = DURATION;
 
