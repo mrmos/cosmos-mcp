@@ -795,3 +795,34 @@ describe.skipIf(!process.env.COSMOS_LIVE_TESTS)("live schema validation", () => 
     expect(errors.length).toBeGreaterThan(0);
   }, 30_000);
 });
+
+describe("refusals are error results, so an agent cannot report them as success", () => {
+  const cases: [string, Record<string, unknown>][] = [
+    ["cosmos_delete_cluster", { clusterId: 1 }],
+    ["cosmos_nest_cluster", { clusterId: 1 }],
+    ["cosmos_nest_cluster", { clusterId: 1, parentClusterId: 2, detach: true }],
+    ["cosmos_nest_cluster", { clusterId: 1, parentClusterId: 1 }],
+    ["cosmos_follow_user", {}],
+    ["cosmos_follow_user", { userId: VIEWER.id }],
+    ["cosmos_update_cluster", { clusterId: 1 }],
+  ];
+  for (const [name, args] of cases) {
+    test(`${name} ${JSON.stringify(args)}`, async () => {
+      const { tools, calls } = harness({ viewer: VIEWER });
+      const result = await tools.get(name)!.handler(args);
+      expect(result.isError).toBe(true);
+      const p = payloadOf(result);
+      expect(p.error).toBe("refused");
+      expect(p.summary.length).toBeGreaterThan(10);
+      expect(calls.filter((c) => c.query.trimStart().startsWith("mutation"))).toHaveLength(0);
+    });
+  }
+});
+
+test("descriptions point to the search tool that returns the right kind of id", () => {
+  const { tools } = harness({ viewer: VIEWER });
+  const follow = tools.get("cosmos_follow_user")!.config.description as string;
+  expect(follow).toContain("cosmos_search_users");
+  const followCluster = tools.get("cosmos_follow_cluster")!.config.description as string;
+  expect(followCluster).toContain("cosmos_search_clusters");
+});

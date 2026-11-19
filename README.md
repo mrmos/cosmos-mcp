@@ -8,6 +8,8 @@ cosmos-mcp lets an AI agent build moodboards on [cosmos.so](https://www.cosmos.s
 
 Search and browsing work without an account. You sign in only when you want to save.
 
+![An agent searches Cosmos, looks at the results, and builds a moodboard](docs/demo.gif)
+
 [![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
 [![Add to Claude Code](https://img.shields.io/badge/Add%20to-Claude%20Code-D97757?logo=anthropic&logoColor=white)](#install)
 
@@ -17,7 +19,7 @@ To add it to Claude Code, run:
 claude mcp add cosmos -s user -- npx -y cosmos-mcp
 ```
 
-Then ask: "Show me 8 images of warm brutalist interiors from Cosmos."
+Then ask: "Show me 8 images of warm brutalist interiors from Cosmos." You can also start the `moodboard` prompt, which Claude Code shows as `/mcp__cosmos__moodboard`.
 
 ## Unofficial. Not affiliated with Cosmos.
 
@@ -57,6 +59,10 @@ claude mcp add cosmos -s user -- npx -y cosmos-mcp
 
 The `-s user` flag adds the server to every project. Without it, Claude Code adds the server to the current project only.
 
+### Claude Desktop extension
+
+Each [GitHub release](https://github.com/mrmos/cosmos-mcp/releases) has a `cosmos-mcp-<version>.mcpb` file. Open it, and Claude Desktop installs the server. You do not need Node. To save, paste your token into the extension settings.
+
 ### Other clients
 
 Other MCP clients use this JSON configuration:
@@ -74,7 +80,7 @@ Other MCP clients use this JSON configuration:
 
 Put it in one of these files:
 
-- Claude Desktop: `claude_desktop_config.json`. On macOS it is in `~/Library/Application Support/Claude/`. On Windows it is in `%APPDATA%\Claude\`. Restart the app after you edit it.
+- Claude Desktop, without the extension: `claude_desktop_config.json`. On macOS it is in `~/Library/Application Support/Claude/`. On Windows it is in `%APPDATA%\Claude\`. Restart the app after you edit it.
 - Cursor: `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` for one project.
 - Claude Code, if you edit the file yourself: `.mcp.json` at your project root. People usually commit this file, so never put a token in it.
 
@@ -233,6 +239,14 @@ Nothing is required. For a starting file with comments, copy [`.env.example`](.e
 
 Tools return JSON. They also fill `structuredContent` for clients that read it. Paging works the same in every tool: pass the `nextCursor` from one call as the `cursor` of the next call.
 
+`cosmos_get_element` and `cosmos_get_cluster` also take a cosmos.so link in `url`. Category arguments take a numeric id or a slug such as `interior-design`.
+
+### Prompts
+
+| Prompt | What it does |
+| --- | --- |
+| `moodboard` | Researches a `brief` and builds a moodboard. With `save` set to `yes`, it saves to a new private collection. |
+
 ## Example prompts
 
 - "Build me a moodboard about warm brutalist interiors and save it to a new private collection."
@@ -252,6 +266,7 @@ bun run dev          # run the server from source, restarting on change
 bun test             # run tests
 bun run typecheck    # tsc --noEmit
 bun run build        # bundle to dist/index.js for Node
+bun run build:mcpb   # build the Claude Desktop extension
 ```
 
 The server uses MCP over stdio. Any output on stdout that is not a JSON-RPC frame breaks the protocol, so write logs to stderr.
@@ -277,6 +292,7 @@ src/
   errors.ts              CosmosError, and the mapping from GraphQL codes to kinds
   normalize.ts           API shapes to the flatter shapes tools return
   server.ts              McpServer construction and tool registration
+  prompts.ts             the moodboard prompt
   graphql/
     client.ts            HTTP client, auth headers, viewer resolution
     fragments.ts         shared GraphQL fragments
@@ -289,12 +305,27 @@ src/
     catalog.ts           which tools need sign-in
 scripts/
   probe-schema.ts        schema discovery against the live API
+  build-mcpb.ts          builds the Claude Desktop extension
+  demo/                  records docs/demo.gif
+mcpb/manifest.json       Claude Desktop extension manifest
+server.json              MCP registry entry
 docs/
   har-ops/               reverse-engineered GraphQL operation reference
 test/
 ```
 
 [docs/README.md](docs/README.md) explains where the operation reference came from.
+
+### Demo GIF
+
+`docs/demo.gif` replays real tool output. To record it again, run:
+
+```bash
+bun run build
+bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
+```
+
+`capture.ts` runs the built server signed out and keeps only images that Cosmos marks as public domain, because the GIF is in a public repository. `render.ts` needs Google Chrome and ffmpeg.
 
 ## Questions
 

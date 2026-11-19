@@ -1,0 +1,209 @@
+<!doctype html>
+<!--
+  Demo GIF animation. Every frame is a pure function of time: open
+  demo.html?t=2.5 to see the frame at 2.5 s, or call window.render(t).
+  No timers, no wall clock, so render.ts can screenshot frames exactly.
+
+  Data comes from capture.js, which render.ts writes from capture.json
+  (real tool output recorded by capture.ts).
+
+  Regenerate: bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cosmos-mcp demo</title>
+<style>
+  :root {
+    --bg: #f3f2ee;
+    --panel: #ffffff;
+    --line: #e2e0d9;
+    --ink: #1c1c1a;
+    --muted: #7a7871;
+    --accent: #2c6e68;
+    --ok: #3d7a3a;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 800px; height: 500px; overflow: hidden; background: var(--bg); }
+  body { font-family: var(--sans); color: var(--ink); position: relative; -webkit-font-smoothing: antialiased; }
+
+  #chat {
+    position: absolute; left: 20px; top: 20px; width: 316px; height: 434px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 16px; overflow: hidden;
+  }
+  .label { font: 600 10px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  #prompt { font: 500 15px/1.4 var(--sans); min-height: 42px; }
+  .cursor { display: inline-block; width: 2px; height: 17px; background: var(--ink); vertical-align: -3px; margin-left: 1px; }
+  #calls { margin-top: 18px; }
+  .call { margin-bottom: 14px; font: 12px/1.5 var(--mono); }
+  .call .name { color: var(--accent); font-weight: 600; }
+  .call .name::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 7px; vertical-align: 1px; }
+  .call .args { color: var(--muted); padding-left: 14px; }
+  .call .res { padding-left: 14px; color: var(--ok); }
+  .spin { color: var(--muted); }
+  #done { font: 13px/1.45 var(--sans); color: var(--ink); }
+
+  #board {
+    position: absolute; left: 348px; top: 20px; width: 432px; height: 434px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  #board .empty { position: absolute; inset: 0; display: grid; place-items: center; font: 12px var(--mono); color: #b9b7b0; }
+  .tile { position: absolute; border-radius: 4px; overflow: hidden; background: #e9e7e1; }
+  .tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  #caption {
+    position: absolute; left: 348px; top: 460px; width: 432px; height: 18px;
+    font: 11px/18px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #footer {
+    position: absolute; left: 20px; top: 460px; width: 316px; height: 18px;
+    font: 11px/18px var(--sans); color: var(--muted);
+  }
+
+  #card {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: var(--bg);
+  }
+  #card .inner { text-align: center; }
+  #card h1 { font: 700 46px/1 var(--sans); letter-spacing: -.02em; }
+  #card p { margin-top: 12px; font: 15px/1.4 var(--sans); color: var(--muted); }
+  #card code {
+    display: inline-block; margin-top: 22px; padding: 10px 18px; border-radius: 8px;
+    background: var(--ink); color: #f3f2ee; font: 16px/1 var(--mono);
+  }
+  #card .small { margin-top: 18px; font-size: 11px; }
+</style>
+</head>
+<body>
+  <div id="chat">
+    <div class="label">You</div>
+    <div id="prompt"></div>
+    <div id="calls"></div>
+  </div>
+  <div id="board"><div class="empty">moodboard</div></div>
+  <div id="caption"></div>
+  <div id="footer"></div>
+  <div id="card"><div class="inner">
+    <h1>cosmos-mcp</h1>
+    <p>Search and build cosmos.so moodboards from any MCP client</p>
+    <code>npx -y cosmos-mcp</code>
+    <p class="small">Unofficial. Replay of real tool output · public-domain images</p>
+  </div></div>
+
+<script src="capture.js"></script>
+<script>
+(() => {
+  const C = window.CAPTURE;
+  const $ = (id) => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  // ---- timeline (seconds) ----
+  const PROMPT = `Build me a moodboard: "${C.brief}"`;
+  const TYPE_START = 0.4, TYPE_CPS = 24;
+  const TYPE_END = TYPE_START + PROMPT.length / TYPE_CPS;
+  const SEARCH_AT = TYPE_END + 0.35, SEARCH_RES = SEARCH_AT + 0.6;
+  const VIEW_AT = SEARCH_RES + 0.45, VIEW_RES = VIEW_AT + 0.6;
+  const TILES_AT = VIEW_RES + 0.2, TILE_STEP = 0.28, TILE_FADE = 0.35;
+  const n = C.tiles.length;
+  const TILES_END = TILES_AT + (n - 1) * TILE_STEP + TILE_FADE;
+  const DONE_AT = TILES_END + 0.1;
+  const CARD_AT = DONE_AT + 0.9, CARD_FADE = 0.35, HOLD = 1.6;
+  const DURATION = CARD_AT + CARD_FADE + HOLD;
+  window.DURATION = DURATION;
+
+  // ---- masonry layout, computed once ----
+  const BW = 432 - 2, BH = 434 - 2, PAD = 10, GAP = 6, COLS = 3;
+  let colW = (BW - 2 * PAD - (COLS - 1) * GAP) / COLS;
+  const place = (w) => {
+    const heights = new Array(COLS).fill(0);
+    return { boxes: C.tiles.map((t) => {
+      const c = heights.indexOf(Math.min(...heights));
+      const h = (w * t.height) / t.width;
+      const box = { col: c, y: heights[c], h };
+      heights[c] += h + GAP;
+      return box;
+    }), maxH: Math.max(...heights) - GAP };
+  };
+  let lay = place(colW);
+  const availH = BH - 2 * PAD;
+  if (lay.maxH > availH) { colW *= availH / lay.maxH; lay = place(colW); }
+  const offX = (BW - (COLS * colW + (COLS - 1) * GAP)) / 2;
+  const offY = (BH - lay.maxH) / 2;
+
+  const board = $("board");
+  const tileEls = C.tiles.map((t, i) => {
+    const b = lay.boxes[i];
+    const el = document.createElement("div");
+    el.className = "tile";
+    Object.assign(el.style, {
+      left: `${offX + b.col * (colW + GAP)}px`, top: `${offY + b.y}px`,
+      width: `${colW}px`, height: `${b.h}px`,
+    });
+    el.innerHTML = `<img src="${esc(t.asset)}" alt="">`;
+    board.appendChild(el);
+    return el;
+  });
+
+  const shortIds = (ids) => ids.length <= 2 ? ids.join(", ") : `${ids[0]}, ${ids[1]}, …${ids.length - 2} more`;
+  const s = C.search, v = C.view;
+  const searchArgs = `"${esc(s.arguments.query)}"<br>${esc(s.arguments.contentType)} · limit ${s.arguments.limit}`;
+  const searchRes = `→ ${s.returned} of ${s.totalCount} · ${s.publicDomain} public domain`;
+  const viewArgs = `[${shortIds(v.arguments.elementIds)}]`;
+  const viewRes = `→ ${esc(v.summary.replace(/\.$/, ""))}`;
+  const spinner = (t) => "running" + ".".repeat(1 + (Math.floor(t * 6) % 3));
+
+  $("footer").textContent = "Replay of real tool output · public-domain images";
+
+  function render(t) {
+    // prompt typing
+    const chars = Math.floor(clamp((t - TYPE_START) * TYPE_CPS, 0, PROMPT.length));
+    const typing = t < TYPE_END + 0.3;
+    const blinkOn = typing ? (t < TYPE_START || chars < PROMPT.length || Math.floor(t * 2) % 2 === 0) : false;
+    $("prompt").innerHTML = esc(PROMPT.slice(0, chars)) + (blinkOn ? '<span class="cursor"></span>' : "");
+
+    // tool calls
+    let html = "";
+    if (t >= SEARCH_AT) {
+      html += `<div class="call"><div class="name">${esc(s.tool)}</div><div class="args">${searchArgs}</div>` +
+        (t >= SEARCH_RES ? `<div class="res">${esc(searchRes)}</div>` : `<div class="args spin">${spinner(t)}</div>`) + "</div>";
+    }
+    if (t >= VIEW_AT) {
+      html += `<div class="call"><div class="name">${esc(v.tool)}</div><div class="args">${viewArgs}</div>` +
+        (t >= VIEW_RES ? `<div class="res">${viewRes}</div>` : `<div class="args spin">${spinner(t)}</div>`) + "</div>";
+    }
+    if (t >= DONE_AT) {
+      const o = ease((t - DONE_AT) / 0.3);
+      html += `<div id="done" style="opacity:${o}">Done. ${n} public-domain images on the board.</div>`;
+    }
+    $("calls").innerHTML = html;
+
+    // tiles
+    let latest = -1;
+    tileEls.forEach((el, i) => {
+      const p = ease((t - (TILES_AT + i * TILE_STEP)) / TILE_FADE);
+      el.style.opacity = p;
+      el.style.transform = `translateY(${(1 - p) * 10}px) scale(${0.96 + 0.04 * p})`;
+      if (p > 0) latest = i;
+    });
+    board.querySelector(".empty").style.opacity = latest >= 0 ? 0 : 1;
+    const tile = C.tiles[latest];
+    $("caption").textContent = tile ? `${tile.id} · @${tile.owner} · ${tile.caption ?? ""}` : "";
+
+    // title card
+    const c = ease((t - CARD_AT) / CARD_FADE);
+    $("card").style.opacity = c;
+    $("card").style.display = c > 0 ? "grid" : "none";
+  }
+
+  window.render = render;
+  const q = new URLSearchParams(location.search).get("t");
+  render(q === null ? DURATION : Number(q));
+})();
+</script>
+</body>
+</html>

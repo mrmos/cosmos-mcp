@@ -94,17 +94,28 @@ a probe running in a loop.
 
 1. Confirm the operation with the probe technique above. Add its query and a sample
    response under `docs/har-ops/`.
-2. Register the tool in the matching `src/tools/*.ts` module — `account.ts`, `browse.ts`
-   or `curate.ts` — using the helpers in `src/tools/kit.ts`. Use `guard()` so a
-   rejection cannot kill the stdio transport, `ok()`/`fail()` for results, and the
-   shared `cursorArg`/`limitArg` so paging behaves the same everywhere.
-3. Normalise the response in `src/normalize.ts`. Tools should return flat, small shapes.
+2. Register the tool in the matching `src/tools/*.ts` module (`account.ts`, `browse.ts`,
+   `curate.ts` or `manage.ts`), using the helpers in `src/tools/kit.ts`. Use `guard()` so
+   a rejection cannot kill the stdio transport, `ok()`/`fail()` for results, `refuse()`
+   when the tool declines a call, and the shared `cursorArg`/`limitArg` so paging behaves
+   the same everywhere.
+3. Add the tool name to `src/tools/catalog.ts`, as signed out or signed in only. A test
+   fails if a registered tool is missing from it.
+4. Normalize the response in `src/normalize.ts`. Tools should return flat, small shapes.
    Raw API payloads are large and full of `__typename`.
-4. Write the tool description for an agent, not a human. Say when to reach for it and
+5. Write the tool description for an agent, not a human. Say when to reach for it and
    what to reach for instead.
-5. Add it to the right table in the README, in the "works without auth" or "needs auth"
-   section.
-6. Add a test. Mock the transport; do not add a test that needs a cookie.
+6. Add it to the right table in the README, with "Yes" in the Sign-in column if it needs
+   a credential. Update the tool counts in the README Questions section. A test checks them.
+7. Add a test. Mock the transport; do not add a test that needs a cookie.
+
+## Releasing
+
+Run `npm version patch && git push --follow-tags`. The publish workflow then:
+
+1. Publishes the package to npm.
+2. Builds `cosmos-mcp-<version>.mcpb` and attaches it to a GitHub release.
+3. Copies the version into `server.json` and publishes it to the MCP registry.
 
 ## Style
 

@@ -44,3 +44,7 @@ captures/
 
 # local MCP registration (absolute paths / machine specific)
 .mcp.json
+
+# Claude Desktop extension build output
+build/
+*.mcpb

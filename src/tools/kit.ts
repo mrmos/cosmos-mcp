@@ -19,7 +19,7 @@ export type ToolRegistrar = (server: McpServer, ctx: ToolContext) => void;
 export function ok(summary: string, data: unknown): CallToolResult {
   const payload = { summary, ...(data as object) };
   return {
-    content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+    content: [{ type: "text", text: JSON.stringify(payload) }],
     structuredContent: payload as Record<string, unknown>,
   };
 }
@@ -38,7 +38,21 @@ export function fail(error: unknown): CallToolResult {
   const kind = error instanceof CosmosError ? error.kind : "unknown";
   return {
     isError: true,
-    content: [{ type: "text", text: JSON.stringify({ error: kind, message }, null, 2) }],
+    content: [{ type: "text", text: JSON.stringify({ error: kind, message }) }],
+  };
+}
+
+/**
+ * A request the tool declined to carry out: bad argument combinations, a
+ * destructive call without confirmation, or nothing to do. It is an error
+ * result, so an agent cannot mistake it for success, but it keeps the same
+ * summary-plus-fields shape as `ok()` so the guidance reads the same way.
+ */
+export function refuse(summary: string, data: Record<string, unknown> = {}): CallToolResult {
+  const payload = { error: "refused", summary, ...data };
+  return {
+    isError: true,
+    content: [{ type: "text", text: JSON.stringify(payload) }],
   };
 }
 

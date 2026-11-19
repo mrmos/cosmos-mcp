@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import pkg from "../package.json" with { type: "json" };
 import { loadConfig, type CosmosConfig } from "./config";
 import { CosmosClient } from "./graphql/client";
 import { configPath } from "./auth-store";
@@ -7,9 +8,11 @@ import { registerAccountTools } from "./tools/account";
 import { registerBrowseTools } from "./tools/browse";
 import { registerCurateTools } from "./tools/curate";
 import { registerManageTools } from "./tools/manage";
+import { registerPrompts } from "./prompts";
 
 export const SERVER_NAME = "cosmos-mcp";
-export const SERVER_VERSION = "0.1.1";
+// One source of truth: `npm version` bumps package.json, and the bundle inlines it.
+export const SERVER_VERSION: string = pkg.version;
 
 const INSTRUCTIONS = `Browse and curate cosmos.so, a visual discovery site, for moodboarding.
 
@@ -115,6 +118,7 @@ export function createServer(config?: CosmosConfig): McpServer {
   registerBrowseTools(server, ctx);
   registerCurateTools(server, ctx);
   registerManageTools(server, ctx);
+  registerPrompts(server);
 
   return server;
 }

@@ -709,7 +709,7 @@ export const browseQueries = Object.freeze({
 // ---------------------------------------------------------------------------
 
 export type ContentType = "IMAGE" | "VIDEO" | "PRODUCT" | "ALL";
-export type SearchOrder = "RELEVANT" | "RECENT" | "POPULAR" | "OLDEST" | "RANDOM";
+export type SearchOrder = "RELEVANT" | "RECENT" | "LATEST" | "POPULAR" | "OLDEST" | "RANDOM";
 
 /**
  * `ElementOrder` has no `RECENT` member — the live enum is
@@ -719,6 +719,7 @@ export type SearchOrder = "RELEVANT" | "RECENT" | "POPULAR" | "OLDEST" | "RANDOM
 const ORDER_ALIASES: Record<SearchOrder, string> = {
   RELEVANT: "RELEVANT",
   RECENT: "LATEST",
+  LATEST: "LATEST",
   POPULAR: "POPULAR",
   OLDEST: "OLDEST",
   RANDOM: "RANDOM",
@@ -1015,7 +1016,7 @@ export function interleaveSimilar(
 // Registration
 // ---------------------------------------------------------------------------
 
-const READ_ONLY = { readOnlyHint: true, openWorldHint: true } as const;
+const READ_ONLY = { readOnlyHint: true, idempotentHint: true, openWorldHint: true } as const;
 
 const elementIdArg = z.number().int().positive();
 
@@ -1025,14 +1026,72 @@ const elementIdArg = z.number().int().positive();
  * first. Saying so here is what stops an agent guessing.
  */
 const categoryArg = z
-  .number()
-  .int()
-  .positive()
+  .union([z.number().int().positive(), z.string().min(1)])
   .optional()
   .describe(
-    "Numeric category id, as returned by cosmos_categories — call that first. Slugs are not accepted. " +
+    "Category, as a numeric id or a slug (for example 'interior-design') from cosmos_categories. " +
       "Omit to browse everything.",
   );
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+async function fetchCategories(client: CosmosClient): Promise<Category[]> {
+  const data = await client.request<{ categories: any }>("CosmosMcpCategories", CATEGORIES, {});
+  return ((data.categories?.items ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
+}
+
+/**
+ * Cosmos itself takes a numeric category id and has no slug argument. Agents
+ * reach for the slug or the name, so resolve those here instead of making the
+ * agent call cosmos_categories first.
+ */
+export async function resolveCategory(
+  client: CosmosClient,
+  value: number | string,
+  operation: string,
+  needSlug = false,
+): Promise<Category | { id: number; name: null; slug: null }> {
+  const asNumber = typeof value === "number" ? value : /^\d+$/.test(value.trim()) ? Number(value) : null;
+  // A numeric id is already what the API takes: no lookup unless the caller needs the slug.
+  if (asNumber !== null && !needSlug) return { id: asNumber, name: null, slug: null };
+  const categories = await fetchCategories(client);
+  const wanted = String(value).trim().toLowerCase();
+  const match = categories.find(
+    (c) => c.id === asNumber || c.slug?.toLowerCase() === wanted || c.name?.toLowerCase() === wanted,
+  );
+  if (match) return match;
+  if (asNumber !== null) return { id: asNumber, name: null, slug: null };
+  throw new CosmosError(
+    `${operation}: no category ${JSON.stringify(value)}. Valid slugs: ${categories.map((c) => c.slug).join(", ")}.`,
+    { kind: "validation", operation },
+  );
+}
+
+/**
+ * Pulls what a cosmos.so link points at. Users paste links far more often than
+ * ids, so the lookup tools take either.
+ *   /e/<id>              an element
+ *   /<username>/<slug>   a collection
+ */
+export function parseCosmosUrl(
+  raw: string,
+): { kind: "element"; elementId: number } | { kind: "cluster"; username: string; slug: string } | null {
+  let url: URL;
+  try {
+    url = new URL(/^https?:\/\//i.test(raw.trim()) ? raw.trim() : `https://${raw.trim()}`);
+  } catch {
+    return null;
+  }
+  if (!/(^|\.)cosmos\.so$/i.test(url.hostname)) return null;
+  const parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+  if (parts[0] === "e" && parts[1] && /^\d+$/.test(parts[1])) return { kind: "element", elementId: Number(parts[1]) };
+  if (parts.length === 2 && parts[0] !== "e") return { kind: "cluster", username: parts[0]!, slug: parts[1]! };
+  return null;
+}
 
 /** Shared paging plumbing: `pageSize`/`pageCursor` is what every list root takes. */
 function pageVars(cursor: string | undefined, limit: number | undefined): Record<string, unknown> {
@@ -1081,11 +1140,11 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         color: z
           .string()
           .optional()
-          .describe("Dominant colour as hex, with or without the leading '#', e.g. '#8B4513'."),
+          .describe("Dominant color as hex, with or without the leading '#', e.g. '#8B4513'."),
         order: z
-          .enum(["RELEVANT", "RECENT", "POPULAR", "OLDEST", "RANDOM"])
+          .enum(["RELEVANT", "RECENT", "LATEST", "POPULAR", "OLDEST", "RANDOM"])
           .optional()
-          .describe("Result ordering. Defaults to RELEVANT."),
+          .describe("Result ordering. Defaults to RELEVANT. RECENT and LATEST mean the same thing."),
         cursor: cursorArg,
         limit: limitArg,
         previewWidth: previewWidthArg,
@@ -1260,13 +1319,36 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "or a feed when you need provenance or the full-resolution media URL for a single image, rather " +
         "than re-listing a page. For judging how something actually looks, use cosmos_view_images instead.",
       inputSchema: {
-        elementId: elementIdArg.describe("Numeric element id, as returned by any listing tool."),
+        elementId: elementIdArg.optional().describe("Numeric element id, as returned by any listing tool. Pass this or `url`."),
+        url: z
+          .string()
+          .optional()
+          .describe("A cosmos.so element link, such as https://www.cosmos.so/e/123456. Pass this or `elementId`."),
         previewWidth: previewWidthArg,
       },
       annotations: READ_ONLY,
     },
-    guard(async (args: { elementId: number; previewWidth?: number }) => {
-      const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
+    guard(async (input: { elementId?: number; url?: string; previewWidth?: number }) => {
+      const previewWidth = input.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
+      let elementId = input.elementId;
+      if (input.url !== undefined) {
+        const parsed = parseCosmosUrl(input.url);
+        if (parsed?.kind !== "element") {
+          throw new CosmosError(
+            `cosmos_get_element: ${JSON.stringify(input.url)} is not a cosmos.so element link (expected cosmos.so/e/<id>). ` +
+              "For a collection link, use cosmos_get_cluster.",
+            { kind: "validation", operation: "cosmos_get_element" },
+          );
+        }
+        elementId = parsed.elementId;
+      }
+      if (elementId === undefined) {
+        throw new CosmosError("cosmos_get_element: pass `elementId` or `url`.", {
+          kind: "validation",
+          operation: "cosmos_get_element",
+        });
+      }
+      const args = { elementId };
       const viewerId = await optionalViewerId(client);
       const data = await client.request<{ elementView: any; elementTopConnections: any }>(
         "CosmosMcpElementDetails",
@@ -1511,17 +1593,18 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       },
       annotations: READ_ONLY,
     },
-    guard(async (args: { category?: number; cursor?: string; limit?: number; previewWidth?: number }) => {
+    guard(async (args: { category?: number | string; cursor?: string; limit?: number; previewWidth?: number }) => {
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
-      if (args.category) {
+      if (args.category !== undefined) {
+        const category = await resolveCategory(client, args.category, "cosmos_explore");
         const data = await client.request<{ categoryElements: any }>(
           "CosmosMcpCategoryElements",
           CATEGORY_ELEMENTS,
-          { categoryId: args.category, ...pageVars(args.cursor, args.limit) },
+          { categoryId: category.id, ...pageVars(args.cursor, args.limit) },
         );
         const page = elementPage(data.categoryElements, previewWidth);
         return ok(
-          `${page.items.length} element(s) in category ${args.category} of ${page.totalCount ?? "?"} total.`,
+          `${page.items.length} element(s) in category ${category.slug ?? category.id} of ${page.totalCount ?? "?"} total.`,
           page,
         );
       }
@@ -1545,17 +1628,18 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "route from a mood to a finished direction: the titles are briefs in themselves, and one board " +
         "can be handed to a client as-is, where forty loose search results cannot. Each result carries a " +
         "few preview images so you can judge it without a second call; when one fits, pass its id to " +
-        "cosmos_list_cluster_elements for the rest. Pass `category` to narrow to one subject area — call " +
-        "cosmos_categories first, it returns the numeric ids this argument takes.",
+        "cosmos_list_cluster_elements for the rest. Pass `category` (an id, or a slug such as 'interior-design', from cosmos_categories) " +
+        "to narrow to one subject area. This is the full, pageable catalog; cosmos_spotlights is only the " +
+        "short set currently featured on the Explore page.",
       inputSchema: {
         category: categoryArg,
         previewCount: z
           .number()
           .int()
-          .min(0)
+          .min(1)
           .max(6)
           .optional()
-          .describe("Preview images per board (0-6). Defaults to 3; raise it only for a short list."),
+          .describe("Preview images per board (1-6). Cosmos rejects 0. Defaults to 3. Raise it only for a short list."),
         cursor: cursorArg,
         limit: limitArg,
         previewWidth: previewWidthArg,
@@ -1564,7 +1648,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
     },
     guard(
       async (args: {
-        category?: number;
+        category?: number | string;
         previewCount?: number;
         cursor?: string;
         limit?: number;
@@ -1573,17 +1657,19 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
         const previewCount = args.previewCount ?? 3;
         const vars = { ...pageVars(args.cursor, args.limit), previewCount };
-        const data = args.category
+        const category =
+          args.category !== undefined ? await resolveCategory(client, args.category, "cosmos_browse_boards") : null;
+        const data = category
           ? await client.request<{ categoryClusters: any }>("CosmosMcpCategoryClusters", CATEGORY_CLUSTERS, {
-              categoryId: args.category,
+              categoryId: category.id,
               ...vars,
             })
           : await client.request<{ featuredClusters: any }>("CosmosMcpFeaturedClusters", FEATURED_CLUSTERS, vars);
-        const list = args.category ? (data as any).categoryClusters : (data as any).featuredClusters;
+        const list = category ? (data as any).categoryClusters : (data as any).featuredClusters;
         const page = normalizePage(list, (c) => normalizeBoard(c, previewWidth));
         return ok(
           `${page.items.length} curated board(s)` +
-            (args.category ? ` in category ${args.category}` : "") +
+            (category ? ` in category ${category.slug ?? category.id}` : "") +
             ` of ${page.totalCount ?? "?"} total.`,
           page,
         );
@@ -1599,7 +1685,9 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "Cosmos' hand-picked collections — tightly themed boards like 'Rooms Lit Only by Lamps'. Each " +
         "one is a ready-made reference set with a strong point of view, so this is the fastest way to " +
         "borrow a coherent aesthetic: pick a spotlight, then call cosmos_list_cluster_elements on its id " +
-        "to pull the images. Better than search when the brief is a mood rather than a subject.",
+        "to pull the images. Better than search when the brief is a mood rather than a subject. This is " +
+        "only the short set currently featured on the Explore page. For the full catalog of ~800 curated " +
+        "boards, filterable by category, use cosmos_browse_boards.",
       inputSchema: { cursor: cursorArg, limit: limitArg, previewWidth: previewWidthArg },
       annotations: READ_ONLY,
     },
@@ -1629,18 +1717,14 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       description:
         "The seventeen top-level subject areas Cosmos organises the site by (Fashion, Interiors, " +
         "Typography, Architecture, Cinema…). Call this first when you need to know what the site covers " +
-        "before committing to a search phrase. Each `slug` doubles as the `category` argument to " +
-        "cosmos_suggested_searches and works well as a `query` for cosmos_search.",
+        "before committing to a search phrase. Either the `id` or the `slug` works as the `category` " +
+        "argument to cosmos_explore, cosmos_browse_boards and cosmos_suggested_searches, and the slug works " +
+        "well as a `query` for cosmos_search.",
       inputSchema: {},
       annotations: READ_ONLY,
     },
     guard(async () => {
-      const data = await client.request<{ categories: any }>("CosmosMcpCategories", CATEGORIES, {});
-      const items = ((data.categories?.items ?? []) as any[]).map((c) => ({
-        id: c.id,
-        name: c.name,
-        slug: c.slug,
-      }));
+      const items = await fetchCategories(client);
       return ok(`${items.length} category(ies).`, { items });
     }),
   );
@@ -1656,18 +1740,24 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "results are often empty for signed-out sessions; cosmos_categories and cosmos_spotlights are " +
         "the dependable alternatives.",
       inputSchema: {
-        category: z
-          .string()
-          .optional()
-          .describe("Restrict saved searches to one category slug, as returned by cosmos_categories."),
+        category: categoryArg.describe(
+          "Restrict saved searches to one category, as a slug or numeric id from cosmos_categories.",
+        ),
         previewWidth: previewWidthArg,
       },
       annotations: READ_ONLY,
     },
-    guard(async (args: { category?: string; previewWidth?: number }) => {
+    guard(async (args: { category?: number | string; previewWidth?: number }) => {
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
+      // This API takes the slug, unlike explore and boards, which take the id.
+      const searchCategory =
+        typeof args.category === "string" && !/^\d+$/.test(args.category.trim())
+          ? args.category
+          : args.category !== undefined
+            ? ((await resolveCategory(client, args.category, "cosmos_suggested_searches", true)).slug ?? null)
+            : null;
       const data = await client.request<{ searches: any }>("CosmosMcpSuggestedSearches", SUGGESTED_SEARCHES, {
-        searchCategory: args.category ?? null,
+        searchCategory,
       });
       const map = (list: any) =>
         ((list?.items ?? []) as any[])
@@ -1728,22 +1818,39 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       title: "Get a cluster",
       description:
         "Metadata for one collection: name, description, owner, size, cover and any subclusters. " +
-        "Identify it either by clusterId or by the pair (username, slug) — a cosmos.so URL like " +
-        "cosmos.so/spaces/rooms-lit-only-by-lamps gives you both. Call this before " +
+        "Identify it by clusterId, by a cosmos.so link in `url`, or by the pair (username, slug): in " +
+        "cosmos.so/<username>/<slug>, the first path segment is the owner and the second the slug. Call this before " +
         "cosmos_list_cluster_elements when you want to know how big a board is before paging it.",
       inputSchema: {
-        clusterId: z.number().int().positive().optional().describe("Numeric cluster id. Use this or username+slug."),
+        clusterId: z.number().int().positive().optional().describe("Numeric cluster id. Use this, `url`, or username+slug."),
+        url: z
+          .string()
+          .optional()
+          .describe("A cosmos.so collection link, such as https://www.cosmos.so/<username>/<slug>."),
         username: z.string().optional().describe("Owner's handle, from the cluster URL."),
         slug: z.string().optional().describe("Cluster slug, the last path segment of the cluster URL."),
         previewWidth: previewWidthArg,
       },
       annotations: READ_ONLY,
     },
-    guard(async (args: { clusterId?: number; username?: string; slug?: string; previewWidth?: number }) => {
+    guard(async (input: { clusterId?: number; url?: string; username?: string; slug?: string; previewWidth?: number }) => {
+      const args = { ...input };
+      if (input.url !== undefined) {
+        const parsed = parseCosmosUrl(input.url);
+        if (parsed?.kind !== "cluster") {
+          throw new CosmosError(
+            `cosmos_get_cluster: ${JSON.stringify(input.url)} is not a cosmos.so collection link (expected cosmos.so/<username>/<slug>).` +
+              (parsed?.kind === "element" ? " It is an element link: use cosmos_get_element." : ""),
+            { kind: "validation", operation: "cosmos_get_cluster" },
+          );
+        }
+        args.username = parsed.username;
+        args.slug = parsed.slug;
+      }
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
       const bySlug = Boolean(args.username && args.slug);
       if (!bySlug && !args.clusterId) {
-        throw new CosmosError("Pass either clusterId, or both username and slug.", {
+        throw new CosmosError("cosmos_get_cluster: pass clusterId, url, or both username and slug.", {
           kind: "validation",
           operation: "cosmos_get_cluster",
         });
@@ -1839,6 +1946,9 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       annotations: READ_ONLY,
     },
     guard(async (args: { clusterId: number; previewWidth?: number }) => {
+      // Fail fast with the sign-in hint and this tool's name, instead of a
+      // round trip that 401s under the GraphQL operation name.
+      await client.requireViewer("cosmos_cluster_recommendations");
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
       const data = await client.request<{ clusterRecommendations: any }>(
         "CosmosMcpClusterRecommendations",
@@ -1855,8 +1965,9 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
     {
       title: "List a user's clusters",
       description:
-        "The collections on a profile. Omit `username` to list the signed-in viewer's own boards — that " +
-        "is how you find the cluster id to save into. Cosmos gates the full list behind a session; " +
+        "The PUBLIC collections on someone's profile. To find one of the user's own boards to save into, " +
+        "use cosmos_list_my_clusters instead: it includes private boards and filters by name. Omitting " +
+        "`username` lists the signed-in viewer's public boards. Cosmos gates the full list behind a session; " +
         "signed out, a named profile still returns the three collections it leads with, " +
         "flagged as partial.",
       inputSchema: {
@@ -1906,21 +2017,22 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
         "reading URLs. Use it to judge whether candidates fit a brief, to compare a shortlist side by " +
         "side, or to describe an image a user linked. Videos come back as their poster frame. This is by " +
         "far the most expensive tool here — pass a shortlist of two to eight ids, not a whole page of " +
-        "search results, and keep `width` small unless fine detail matters.",
+        "search results, and keep `previewWidth` small unless fine detail matters.",
       inputSchema: {
         elementIds: z.array(elementIdArg).min(1).max(8).describe("Up to eight element ids to render."),
-        width: z
+        previewWidth: z
           .number()
           .int()
           .min(80)
           .max(1024)
           .optional()
           .describe("Pixel width to fetch each image at (80-1024). Defaults to 400."),
+        width: z.number().int().min(80).max(1024).optional().describe("Older name for `previewWidth`."),
       },
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
     },
-    guard(async (args: { elementIds: number[]; width?: number }) => {
-      const width = args.width ?? DEFAULT_PREVIEW_WIDTH;
+    guard(async (args: { elementIds: number[]; previewWidth?: number; width?: number }) => {
+      const width = args.previewWidth ?? args.width ?? DEFAULT_PREVIEW_WIDTH;
       const ids = [...new Set(args.elementIds)];
       const results = await Promise.all(ids.map((id) => fetchElementImage(client, id, width)));
 

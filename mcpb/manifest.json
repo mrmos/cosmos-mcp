@@ -1,0 +1,56 @@
+{
+  "manifest_version": "0.3",
+  "name": "cosmos-mcp",
+  "display_name": "Cosmos (unofficial)",
+  "version": "0.0.0",
+  "description": "Search cosmos.so and build visual moodboards. Search works without an account.",
+  "long_description": "An unofficial MCP server for cosmos.so, a site for collecting images. It searches Cosmos, finds similar images, shows images to the model, and saves collections to your account.\n\nSearch and browsing work without an account. To save, paste the Authorization header from a signed-in cosmos.so browser session into the token field. Cosmos has no public API, so this extension uses the private API of the web app and can stop working when Cosmos changes it. Not affiliated with Cosmos.",
+  "author": {
+    "name": "mrmos",
+    "url": "https://github.com/mrmos"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrmos/cosmos-mcp.git"
+  },
+  "homepage": "https://github.com/mrmos/cosmos-mcp#readme",
+  "support": "https://github.com/mrmos/cosmos-mcp/issues",
+  "license": "MIT",
+  "keywords": ["cosmos", "moodboard", "design", "inspiration", "images"],
+  "privacy_policies": ["https://www.cosmos.so/privacy"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "COSMOS_AUTHORIZATION": "${user_config.cosmos_authorization}"
+      }
+    }
+  },
+  "prompts": [
+    {
+      "name": "moodboard",
+      "description": "Research a brief on cosmos.so and build a moodboard.",
+      "arguments": ["brief"],
+      "text": "Build a moodboard on cosmos.so for this brief: ${arguments.brief}. Call cosmos_whoami first. Seed with cosmos_search, look at candidates with cosmos_view_images, and save to a new private collection only if you are signed in."
+    }
+  ],
+  "tools_generated": true,
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.17.0"
+    }
+  },
+  "user_config": {
+    "cosmos_authorization": {
+      "type": "string",
+      "title": "cosmos.so token (optional)",
+      "description": "Needed only to save. In a signed-in cosmos.so tab, open DevTools > Network, click a request to api.cosmos.so, and copy the full Authorization request header (it starts with \"Bearer \"). Leave empty for search only.",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}

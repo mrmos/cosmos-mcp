@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.mrmos/cosmos-mcp",
+  "title": "Cosmos",
+  "description": "Unofficial cosmos.so server: search, browse and build visual moodboards. Search works signed out.",
+  "repository": {
+    "url": "https://github.com/mrmos/cosmos-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "cosmos-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "COSMOS_AUTHORIZATION",
+          "description": "Optional. The Authorization header (Bearer token) from a signed-in cosmos.so browser session. Needed only to save. You can run `npx cosmos-mcp login` instead.",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

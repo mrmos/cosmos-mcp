@@ -29,6 +29,7 @@ import {
   guard,
   limitArg,
   ok,
+  refuse,
   previewWidthArg,
   type ToolRegistrar,
 } from "./kit";
@@ -621,7 +622,7 @@ export const registerCurateTools: ToolRegistrar = (server, ctx) => {
   server.registerTool(
     "cosmos_list_my_clusters",
     {
-      title: "Cosmos: list my clusters (boards)",
+      title: "List my clusters (boards)",
       description: `List the signed-in user's own clusters — boards — including PRIVATE ones that no public tool can see.
 
 Use it to resolve a board the user names in prose ("the kitchen renovation board") into the clusterId that cosmos_save_elements and cosmos_organize_elements need. Pass \`search\` to filter by name server-side instead of paging through everything.
@@ -682,7 +683,7 @@ Read-only, one request per page. Requires sign-in — call cosmos_whoami first i
   server.registerTool(
     "cosmos_create_cluster",
     {
-      title: "Cosmos: create a cluster (board)",
+      title: "Create a cluster (board)",
       description: `Create a new empty cluster (board) owned by the signed-in user, then fill it with cosmos_save_elements.
 
 BUILDING A GOOD BOARD: alternate search and recommendations, about half and half. Seed with cosmos_search — check the candidates with cosmos_view_images first, captions mislead — then loop: a batch from cosmos_cluster_recommendations, a fresh batch from search, repeat. Recommendations curate far better than search, but run alone they echo and the board turns self-similar; search batches inject material the engine has not seen. Verify your seed really shows what the user asked for, since everything downstream inherits its direction.
@@ -740,7 +741,7 @@ Returns the new cluster including its id (feed that to cosmos_save_elements) and
   server.registerTool(
     "cosmos_save_elements",
     {
-      title: "Cosmos: save elements to a cluster",
+      title: "Save elements to a cluster",
       description: `Add one or more elements to a single cluster. This is the ordinary "save these images to that board" action.
 
 WRITES, but additive only: nothing is removed and re-adding an element that is already in the cluster is a no-op, so it is safe to retry.
@@ -778,7 +779,7 @@ Get elementIds from search/browse results and clusterId from cosmos_list_my_clus
   server.registerTool(
     "cosmos_organize_elements",
     {
-      title: "Cosmos: move elements between clusters",
+      title: "Move elements between clusters",
       description: `Edit which clusters a set of elements belongs to, in one atomic call: connect to the clusters in \`clusterIdsToConnect\` AND disconnect from the ones in \`clusterIdsToDisconnect\`. That combination is how you MOVE elements from one board to another.
 
 DESTRUCTIVE: every id in \`clusterIdsToDisconnect\` removes those elements from that board. There is no undo through this server — the only way back is to re-save them. Never populate \`clusterIdsToDisconnect\` on a guess; confirm the current placement with cosmos_find_clusters_for_element first, and confirm removals with the user.
@@ -817,7 +818,7 @@ Leave \`clusterIdsToDisconnect\` empty (the default) and this behaves exactly li
         const connect = args.clusterIdsToConnect ?? [];
         const disconnect = args.clusterIdsToDisconnect ?? [];
         if (connect.length === 0 && disconnect.length === 0) {
-          return ok("Nothing to do: both clusterIdsToConnect and clusterIdsToDisconnect were empty.", {
+          return refuse("Nothing to do: both clusterIdsToConnect and clusterIdsToDisconnect were empty.", {
             success: false,
             elementIds: args.elementIds,
             clusterIdsToConnect: connect,
@@ -855,7 +856,7 @@ Leave \`clusterIdsToDisconnect\` empty (the default) and this behaves exactly li
   server.registerTool(
     "cosmos_find_clusters_for_element",
     {
-      title: "Cosmos: where can this element be saved?",
+      title: "Where can this element be saved?",
       description: `For the given element(s), list the signed-in user's clusters they can be saved to, and flag the ones that ALREADY contain them (\`alreadyContainsElements: true\`).
 
 Call this before cosmos_save_elements or cosmos_organize_elements: it is the cheap way to avoid re-saving something the user already has, and the only reliable way to learn which board an element currently sits in before you disconnect it.
@@ -919,7 +920,7 @@ Also returns \`savedToLibrary\`: whether the element is already in the user's li
   server.registerTool(
     "cosmos_my_library",
     {
-      title: "Cosmos: my saved elements",
+      title: "My saved elements",
       description: `Everything the signed-in user has saved, newest first by default — across every cluster, including private ones and things saved but never filed.
 
 Use it to answer "what have I saved about X", to gather material for a new board, or with \`unsortedOnly: true\` to find the loose saves that still need filing (pair with cosmos_quick_connect_suggestion).
@@ -936,7 +937,10 @@ Read-only. Costs one request per page and each item carries a thumbnail URL, so 
           .boolean()
           .optional()
           .describe("True returns only elements not filed into any cluster — the user's inbox of loose saves."),
-        order: z.enum(LIBRARY_ORDERS).optional().describe("Sort order. Defaults to LATEST (most recently saved)."),
+        order: z
+          .enum([...LIBRARY_ORDERS, "RECENT"])
+          .optional()
+          .describe("Sort order. Defaults to LATEST (most recently saved). RECENT and LATEST mean the same thing."),
         limit: limitArg,
         cursor: cursorArg,
         previewWidth: previewWidthArg,
@@ -953,17 +957,19 @@ Read-only. Costs one request per page and each item carries a thumbnail URL, so 
       async (args: {
         contentType?: (typeof CONTENT_TYPES)[number];
         unsortedOnly?: boolean;
-        order?: (typeof LIBRARY_ORDERS)[number];
+        order?: (typeof LIBRARY_ORDERS)[number] | "RECENT";
         limit?: number;
         cursor?: string;
         previewWidth?: number;
       }) => {
         const viewer = await client.requireViewer("cosmos_my_library");
         const width = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
+        // cosmos_search calls it RECENT; the API enum calls it LATEST.
+        const order = args.order === "RECENT" ? "LATEST" : args.order;
         const data = await client.request<{ allElementsV2: any }>(
           "CosmosMcpMyLibrary",
           MY_LIBRARY_QUERY,
-          buildLibraryVariables({ ...args, userId: viewer.id }),
+          buildLibraryVariables({ ...args, order, userId: viewer.id }),
         );
         const page = normalizePage(data.allElementsV2, (n) => normalizeElement(n, width));
         return ok(
@@ -978,7 +984,7 @@ Read-only. Costs one request per page and each item carries a thumbnail URL, so 
   server.registerTool(
     "cosmos_following_feed",
     {
-      title: "Cosmos: following feed",
+      title: "Following feed",
       description: `The signed-in user's home feed: recent saving sessions by the people and clusters they follow, each one a batch of elements added to a board.
 
 Use it for "what's new from people I follow" or to pull fresh inspiration from trusted curators rather than global search. Items include the curator, the destination cluster and the elements themselves, so you can hand elementIds straight to cosmos_save_elements.
@@ -1024,7 +1030,7 @@ Read-only, one request per page. Element-heavy: prefer \`limit\` around 10 unles
   server.registerTool(
     "cosmos_activity",
     {
-      title: "Cosmos: my notifications",
+      title: "My notifications",
       description: `The signed-in user's notification feed: new followers, people saving their elements, collaboration invites, cluster follows, finished imports.
 
 Each entry comes with a one-line \`text\` rendering plus the structured actor/cluster references, so you can summarise "what happened while I was away" without decoding Cosmos' activity union.
@@ -1071,7 +1077,7 @@ Read-only — it does NOT mark anything as read; \`isRead\` reflects the current
   server.registerTool(
     "cosmos_quick_connect_suggestion",
     {
-      title: "Cosmos: where should this go?",
+      title: "Where should this go?",
       description: `Ask Cosmos which of the user's own clusters an element most likely belongs in — the recommendation behind the app's one-tap save.
 
 Use it when filing loose saves (pair with cosmos_my_library \`unsortedOnly: true\`) or when the user says "save this somewhere sensible" without naming a board. It returns a single suggested cluster plus \`alreadyContainsElement\`, so you can skip a pointless save.

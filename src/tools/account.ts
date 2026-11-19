@@ -97,7 +97,7 @@ export const registerAccountTools: ToolRegistrar = (server, ctx) => {
   server.registerTool(
     "cosmos_whoami",
     {
-      title: "Cosmos: who am I / what works",
+      title: "Who am I / what works",
       description: WHOAMI_DESCRIPTION,
       inputSchema: {},
       annotations: {

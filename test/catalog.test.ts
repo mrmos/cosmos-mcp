@@ -55,3 +55,28 @@ test("tools that merely degrade signed out are listed as available, not gated", 
     expect(gated.has(name)).toBe(false);
   }
 });
+
+test("the README's tool counts match the catalog", async () => {
+  const readme = await Bun.file(new URL("../README.md", import.meta.url)).text();
+  const total = SIGNED_OUT_TOOLS.length + SIGNED_IN_ONLY_TOOLS.length;
+  expect(readme).toContain(`${SIGNED_OUT_TOOLS.length} of the ${total} tools work signed out`);
+});
+
+test("server.json describes this npm package", async () => {
+  const pkg = await Bun.file(new URL("../package.json", import.meta.url)).json();
+  const server = await Bun.file(new URL("../server.json", import.meta.url)).json();
+  expect(server.name).toBe(pkg.mcpName);
+  expect(server.packages[0].identifier).toBe(pkg.name);
+});
+
+test("the server registers the moodboard prompt", async () => {
+  const server = createServer({ ...loadConfig({}), cookie: undefined, authorization: undefined });
+  const client = new Client({ name: "prompt-test", version: "0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+  const { prompts } = await client.listPrompts();
+  const got = await client.getPrompt({ name: "moodboard", arguments: { brief: "sleep" } });
+  await client.close();
+  expect(prompts.map((p) => p.name)).toEqual(["moodboard"]);
+  expect(JSON.stringify(got.messages)).toContain("sleep");
+});
