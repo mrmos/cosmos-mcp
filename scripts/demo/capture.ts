@@ -28,17 +28,29 @@ const FFMPEG = Bun.which("ffmpeg") ?? "/opt/homebrew/bin/ffmpeg";
 // Tried in order; the first with at least MIN public-domain images wins.
 // Pass briefs as arguments to override the list.
 //
-// Why this brief: Cosmos flags `isPublicDomain` only on images sourced from
-// The Public Domain Review. On 2026-11-19 descriptive briefs returned almost
-// none in the first 40 results ("warm brutalist interiors" 0, "vintage
-// botanical illustration" 0, "japanese woodblock print" 2, "1920s architecture
-// photograph" 1, "nasa archive" 0, "victorian book illustrations" 2), while
-// "the public domain review" returned 16 of 40.
+// Why these briefs: the GIF is committed to a public repository, so it shows
+// only images that Cosmos flags `isPublicDomain`. Cosmos sets that flag only on
+// images from The Public Domain Review, so most design briefs return none. On
+// 2026-11-19, of 40 image results: "warm brutalist interiors" 0, "bauhaus color
+// study" 0, "paper marbling patterns" 0, "antique type specimen" 2, "Ernst
+// Haeckel" 9, "Maria Sibylla Merian" 11, "scientific illustration plates" 12.
+//
+// Searching an artist's name, not a description, is also what the server
+// instructions tell agents to do for specialist subjects, so the GIF shows a
+// designer's brief in the prompt and the name the agent actually searched.
 const BRIEFS = process.argv.slice(2).length > 0 ? process.argv.slice(2) : [
-  "the public domain review",
-  "japanese woodblock print",
-  "victorian book illustrations",
+  "Ernst Haeckel",
+  "Maria Sibylla Merian",
+  "scientific illustration plates",
 ];
+
+/** What the user types in the GIF, for each default brief. Others get a generic line. */
+const PROMPTS: Record<string, string> = {
+  "Ernst Haeckel": "Moodboard for a jellyfish-inspired textile print. Start from Ernst Haeckel's sea creatures.",
+  "Maria Sibylla Merian": "Moodboard for a botanical packaging range. Start from Maria Sibylla Merian's insect plates.",
+  "scientific illustration plates": "Moodboard for a museum identity: antique scientific illustration plates.",
+};
+const promptFor = (brief: string) => PROMPTS[brief] ?? `Build me a moodboard: "${brief}"`;
 const MIN = 8;
 const KEEP = 8; // cosmos_view_images takes at most eight ids
 const LIMIT = 40;
@@ -209,6 +221,7 @@ try {
     signedIn: false,
     triedBriefs: tried,
     brief: chosen.query,
+    prompt: promptFor(chosen.query),
     search: {
       tool: "cosmos_search",
       arguments: chosen.args,

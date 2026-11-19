@@ -8,7 +8,7 @@ cosmos-mcp lets an AI agent build moodboards on [cosmos.so](https://www.cosmos.s
 
 Search and browsing work without an account. You sign in only when you want to save.
 
-![An agent searches Cosmos, looks at the results, and builds a moodboard](docs/demo.gif)
+![An agent turns a textile brief into a search for Ernst Haeckel, looks at the plates, and builds a jellyfish moodboard](docs/demo.gif)
 
 [![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
 [![Add to Claude Code](https://img.shields.io/badge/Add%20to-Claude%20Code-D97757?logo=anthropic&logoColor=white)](#install)

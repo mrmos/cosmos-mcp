@@ -103,7 +103,7 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
   // ---- timeline (seconds) ----
-  const PROMPT = `Build me a moodboard: "${C.brief}"`;
+  const PROMPT = C.prompt ?? `Build me a moodboard: "${C.brief}"`;
   const TYPE_START = 0.4, TYPE_CPS = 24;
   const TYPE_END = TYPE_START + PROMPT.length / TYPE_CPS;
   const SEARCH_AT = TYPE_END + 0.35, SEARCH_RES = SEARCH_AT + 0.6;
