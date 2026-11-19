@@ -43,7 +43,7 @@ captures/
 .DS_Store
 
 # local MCP registration (absolute paths / machine specific)
-.mcp.json
+/.mcp.json
 
 # Claude Desktop extension build output
 build/
