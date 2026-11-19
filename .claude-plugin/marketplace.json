@@ -1,0 +1,19 @@
+{
+  "name": "cosmos-mcp",
+  "owner": {
+    "name": "mrmos",
+    "url": "https://github.com/mrmos"
+  },
+  "metadata": {
+    "description": "The cosmos plugin for Claude Code: search cosmos.so and build moodboards."
+  },
+  "plugins": [
+    {
+      "name": "cosmos",
+      "source": "./plugin",
+      "description": "Search cosmos.so and build visual moodboards. Unofficial. Search works without an account.",
+      "license": "MIT",
+      "keywords": ["cosmos", "moodboard", "design", "images"]
+    }
+  ]
+}

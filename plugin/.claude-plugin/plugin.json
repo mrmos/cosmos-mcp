@@ -1,0 +1,30 @@
+{
+  "name": "cosmos",
+  "version": "0.1.1",
+  "description": "Search cosmos.so and build visual moodboards. Unofficial. Search works without an account.",
+  "author": {
+    "name": "mrmos",
+    "url": "https://github.com/mrmos"
+  },
+  "homepage": "https://github.com/mrmos/cosmos-mcp#readme",
+  "repository": "https://github.com/mrmos/cosmos-mcp",
+  "license": "MIT",
+  "keywords": [
+    "cosmos",
+    "moodboard",
+    "design",
+    "inspiration",
+    "images",
+    "mcp"
+  ],
+  "documentationUrl": "https://github.com/mrmos/cosmos-mcp#readme",
+  "supportUrl": "https://github.com/mrmos/cosmos-mcp/issues",
+  "privacyPolicyUrl": "https://github.com/mrmos/cosmos-mcp#privacy-policy",
+  "network": {
+    "hosts": [
+      "api.cosmos.so",
+      "cdn.cosmos.so",
+      "registry.npmjs.org"
+    ]
+  }
+}
