@@ -6,19 +6,17 @@
  *   bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
  *
  * This starts the built server (dist/index.js) signed in, talks MCP JSON-RPC to
- * it over stdio, runs cosmos_search once per query, then calls
+ * it over stdio, runs cosmos_search once per query (one by default), then calls
  * cosmos_view_images on the chosen results and stores the returned images,
  * shrunk with ffmpeg, in scripts/demo/assets/. Everything the animation shows
  * comes from scripts/demo/capture.json.
  *
  * The brief is a real one: a reference board for a site hero with a chrome
- * pointing-glove cursor and a glitchy CRT-glass orb. The queries are the ones
- * an agent would split that brief into, and two of their results are already
- * on that board. The images are not public domain.
+ * pointing-glove cursor and a glitchy CRT-glass orb. The query is the look
+ * that board describes. The images are not public domain.
  *
  * It runs signed in (run `bun run index.ts login` first) because Cosmos
- * personalizes search: signed out, the same queries return other images, and
- * none from that board.
+ * personalizes search: signed out, the same query returns other images.
  *
  * Which images appear: PICK below (or DEMO_PICK, comma-separated element ids
  * in display order) chooses them from the search results, which is how the
@@ -33,23 +31,19 @@ import { join } from "node:path";
 import { DEMO, saveViewedImages, startServer } from "./mcp";
 
 const customQueries = process.argv.slice(2);
-const QUERIES = customQueries.length > 0 ? customQueries : [
-  "chrome pointing hand",
-  "glitch CRT",
-  "chromatic aberration glass",
-];
+const QUERIES = customQueries.length > 0 ? customQueries : ["low-poly, chrome, chromatic fringe, melting glass"];
 const PROMPT =
-  process.env.DEMO_PROMPT ?? "Moodboard for a site hero: a chrome pointing-glove cursor and a glitchy CRT-glass orb.";
+  process.env.DEMO_PROMPT ?? "create a moodboard - low-poly, chrome, chromatic fringe, melting glass";
 const PICK = process.env.DEMO_PICK
   ? process.env.DEMO_PICK.split(",").map((s) => Number(s.trim()))
   : customQueries.length > 0
     ? null
-    : [1120601128, 1051226712, 1833414104, 1425210929, 983892966, 461120264, 1502361040, 1231349542];
+    : [726190968, 1975799015, 52612539, 1708613448, 891282819, 1773125994, 2072992296, 651076537];
 const KEEP = 8; // cosmos_view_images takes at most eight ids
 const LIMIT = 40;
 
 const isImage = (e: any) =>
-  (e.media?.kind === "image" || e.media?.kind === "animated") && !e.media?.nsfw && e.media?.thumbnailUrl;
+  (e.media?.kind === "image" || e.media?.kind === "animated") && !e.media?.nsfw && !e.media?.aiGenerated && e.media?.thumbnailUrl;
 
 const server = await startServer({ signedIn: true });
 try {
@@ -100,10 +94,9 @@ try {
         tool: "cosmos_view_images",
         args: `[${shortIds(viewArgs.elementIds)}]`,
         result: `→ ${String(view.structuredContent?.summary ?? view.content[0]?.text).replace(/\.$/, "")}`,
-        reveal: "tiles",
       },
     ],
-    done: `Done. ${tiles.length} images: chrome hands, CRT glitch, glass.`,
+    done: `Done. ${tiles.length} images: chrome, chromatic fringe, melting glass.`,
     footer: "Replay of real tool output",
     cardNote: "Unofficial. Replay of real tool output",
     searches: searches.map((s) => ({ query: s.query, summary: s.summary, totalCount: s.totalCount, returned: s.items.length })),

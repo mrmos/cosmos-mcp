@@ -1,68 +1,45 @@
 {
-  "capturedAt": "2026-11-20T03:14:35.921Z",
+  "capturedAt": "2026-11-20T03:23:26.879Z",
   "server": {
     "name": "cosmos-mcp",
     "version": "0.1.1"
   },
   "signedIn": true,
-  "prompt": "Moodboard for a site hero: a chrome pointing-glove cursor and a glitchy CRT-glass orb.",
+  "prompt": "create a moodboard - low-poly, chrome, chromatic fringe, melting glass",
   "calls": [
     {
       "tool": "cosmos_search",
-      "args": "\"chrome pointing hand\"",
-      "result": "→ 40 of 129"
-    },
-    {
-      "tool": "cosmos_search",
-      "args": "\"glitch CRT\"",
-      "result": "→ 40 of 145"
-    },
-    {
-      "tool": "cosmos_search",
-      "args": "\"chromatic aberration glass\"",
-      "result": "→ 40 of 144"
+      "args": "\"low-poly, chrome, chromatic fringe, melting glass\"",
+      "result": "→ 40 of 126"
     },
     {
       "tool": "cosmos_view_images",
-      "args": "[1120601128, 1051226712, …6 more]",
-      "result": "→ Rendered 8 of 8 element(s) at 400px",
-      "reveal": "tiles"
+      "args": "[726190968, 1975799015, …6 more]",
+      "result": "→ Rendered 8 of 8 element(s) at 400px"
     }
   ],
-  "done": "Done. 8 images: chrome hands, CRT glitch, glass.",
+  "done": "Done. 8 images: chrome, chromatic fringe, melting glass.",
   "footer": "Replay of real tool output",
   "cardNote": "Unofficial. Replay of real tool output",
   "searches": [
     {
-      "query": "chrome pointing hand",
-      "summary": "40 result(s) for \"chrome pointing hand\" of 129 total.",
-      "totalCount": 129,
-      "returned": 40
-    },
-    {
-      "query": "glitch CRT",
-      "summary": "40 result(s) for \"glitch CRT\" of 145 total.",
-      "totalCount": 145,
-      "returned": 40
-    },
-    {
-      "query": "chromatic aberration glass",
-      "summary": "40 result(s) for \"chromatic aberration glass\" of 144 total.",
-      "totalCount": 144,
+      "query": "low-poly, chrome, chromatic fringe, melting glass",
+      "summary": "40 result(s) for \"low-poly, chrome, chromatic fringe, melting glass\" of 126 total.",
+      "totalCount": 126,
       "returned": 40
     }
   ],
   "view": {
     "arguments": {
       "elementIds": [
-        1120601128,
-        1051226712,
-        1833414104,
-        1425210929,
-        983892966,
-        461120264,
-        1502361040,
-        1231349542
+        726190968,
+        1975799015,
+        52612539,
+        1708613448,
+        891282819,
+        1773125994,
+        2072992296,
+        651076537
       ],
       "previewWidth": 400
     },
@@ -70,128 +47,132 @@
   },
   "tiles": [
     {
-      "id": 1120601128,
-      "url": "https://www.cosmos.so/e/1120601128",
+      "id": 726190968,
+      "url": "https://www.cosmos.so/e/726190968",
       "caption": null,
-      "owner": "studio.ojas",
+      "owner": "pragmaticarchive",
       "source": {
-        "url": "https://www.rawpixel.com/image/21469777/metallic-hand-cursor-icon?utm_source=pinterest",
-        "author": "rico_mak",
+        "url": "https://twitter.com/tuomodesign/status/1360265499469369350/photo/2",
+        "author": "idabgfx",
         "isPublicDomain": false
       },
-      "imageUrl": "https://cdn.cosmos.so/01a070d9-9e3f-7e23-bde7-5046cd8805ba",
-      "thumbnailUrl": "https://cdn.cosmos.so/01a070d9-9e3f-7e23-bde7-5046cd8805ba?format=webp&w=400",
-      "asset": "assets/1120601128.jpg",
-      "width": 300,
-      "height": 300
-    },
-    {
-      "id": 1051226712,
-      "url": "https://www.cosmos.so/e/1051226712",
-      "caption": null,
-      "owner": "caramelo2",
-      "source": {
-        "url": "https://www.instagram.com/p/DZf885UgvtE/?img_index=3&igsh=NXlnNGZnYjVkaG5l&igsi=NXlnNGZnYjVkaG5l",
-        "author": "maxdrekker",
-        "isPublicDomain": false
-      },
-      "imageUrl": "https://cdn.cosmos.so/b27f79fa-658a-46b4-9471-2c180ce607f2",
-      "thumbnailUrl": "https://cdn.cosmos.so/b27f79fa-658a-46b4-9471-2c180ce607f2?format=webp&w=400",
-      "asset": "assets/1051226712.jpg",
+      "imageUrl": "https://cdn.cosmos.so/d1bd321b-f1c3-4e5a-b192-717aedda27b3",
+      "thumbnailUrl": "https://cdn.cosmos.so/d1bd321b-f1c3-4e5a-b192-717aedda27b3?format=webp&w=400",
+      "asset": "assets/726190968.jpg",
       "width": 300,
       "height": 376
     },
     {
-      "id": 1833414104,
-      "url": "https://www.cosmos.so/e/1833414104",
+      "id": 1975799015,
+      "url": "https://www.cosmos.so/e/1975799015",
       "caption": null,
-      "owner": "jontudor",
+      "owner": "anselumjuju",
       "source": {
-        "url": "http://vhsgifs.tumblr.com/post/99440056363",
-        "author": "jonnypockets",
+        "url": "https://assetpro.design/",
+        "author": "assetprodesign",
         "isPublicDomain": false
       },
-      "imageUrl": "https://cdn.cosmos.so/f57b31b9-2be4-4a49-8a8a-55e36ed017b6",
-      "thumbnailUrl": "https://cdn.cosmos.so/f57b31b9-2be4-4a49-8a8a-55e36ed017b6?format=webp&w=400",
-      "asset": "assets/1833414104.jpg",
-      "width": 300,
-      "height": 248
-    },
-    {
-      "id": 1425210929,
-      "url": "https://www.cosmos.so/e/1425210929",
-      "caption": null,
-      "owner": "solarguishe",
-      "source": {
-        "url": "https://www.pinterest.com/pin/662169951478879363",
-        "author": "LouisBradder",
-        "isPublicDomain": false
-      },
-      "imageUrl": "https://cdn.cosmos.so/9ec22ecf-bb49-4d0a-ab84-2df4014cf9f2",
-      "thumbnailUrl": "https://cdn.cosmos.so/9ec22ecf-bb49-4d0a-ab84-2df4014cf9f2?format=webp&w=400",
-      "asset": "assets/1425210929.jpg",
-      "width": 300,
-      "height": 332
-    },
-    {
-      "id": 983892966,
-      "url": "https://www.cosmos.so/e/983892966",
-      "caption": "Retro loop gif made in Blender.",
-      "owner": null,
-      "source": {
-        "url": "https://www.tumblr.com/dashboard",
-        "author": "a_kromatyk",
-        "isPublicDomain": false
-      },
-      "imageUrl": "https://cdn.cosmos.so/e1a9c54c-02a5-46a6-bbad-194f3fb3d5ab",
-      "thumbnailUrl": "https://cdn.cosmos.so/e1a9c54c-02a5-46a6-bbad-194f3fb3d5ab?format=webp&w=400",
-      "asset": "assets/983892966.jpg",
+      "imageUrl": "https://cdn.cosmos.so/63d5d1bf-b246-4202-a79f-794534f4b6e9",
+      "thumbnailUrl": "https://cdn.cosmos.so/63d5d1bf-b246-4202-a79f-794534f4b6e9?format=webp&w=400",
+      "asset": "assets/1975799015.jpg",
       "width": 300,
       "height": 300
     },
     {
-      "id": 461120264,
-      "url": "https://www.cosmos.so/e/461120264",
-      "caption": "Cover art for the album BALAM by musician Xenology.",
-      "owner": "lindokuhle",
-      "source": null,
-      "imageUrl": "https://cdn.cosmos.so/c58b43a9-e946-44e6-a28b-5a03cafad41c",
-      "thumbnailUrl": "https://cdn.cosmos.so/c58b43a9-e946-44e6-a28b-5a03cafad41c?format=webp&w=400",
-      "asset": "assets/461120264.jpg",
-      "width": 300,
-      "height": 376
-    },
-    {
-      "id": 1502361040,
-      "url": "https://www.cosmos.so/e/1502361040",
-      "caption": null,
-      "owner": "skylarkitchen",
+      "id": 52612539,
+      "url": "https://www.cosmos.so/e/52612539",
+      "caption": "A 2021 digital illustration, The Beauty of Scientific Diagrams, by Khyati Trehan.",
+      "owner": "trialanderror",
       "source": {
-        "url": "https://www.pinterest.com/pin/537898749266920782",
-        "author": "iheanachosabina",
-        "isPublicDomain": false
-      },
-      "imageUrl": "https://cdn.cosmos.so/12d2e633-406a-4a4b-abd5-5cc97bac3b71",
-      "thumbnailUrl": "https://cdn.cosmos.so/12d2e633-406a-4a4b-abd5-5cc97bac3b71?format=webp&w=400",
-      "asset": "assets/1502361040.jpg",
-      "width": 300,
-      "height": 394
-    },
-    {
-      "id": 1231349542,
-      "url": "https://www.cosmos.so/e/1231349542",
-      "caption": "A retro-futuristic artwork by Japanese illustrator Hajime Sorayama.",
-      "owner": "ahmedzidan",
-      "source": {
-        "url": "http://sorayama.jp/works/",
+        "url": "https://www.are.na/block/13597497",
         "author": null,
         "isPublicDomain": false
       },
-      "imageUrl": "https://cdn.cosmos.so/5b476d43-56e6-4ca4-964b-89c6fa0ef465",
-      "thumbnailUrl": "https://cdn.cosmos.so/5b476d43-56e6-4ca4-964b-89c6fa0ef465?format=webp&w=400",
-      "asset": "assets/1231349542.jpg",
+      "imageUrl": "https://cdn.cosmos.so/3f115862-a42e-4919-bb49-a67bf85e0bac.",
+      "thumbnailUrl": "https://cdn.cosmos.so/3f115862-a42e-4919-bb49-a67bf85e0bac.?format=webp&w=400",
+      "asset": "assets/52612539.jpg",
       "width": 300,
-      "height": 428
+      "height": 300
+    },
+    {
+      "id": 1708613448,
+      "url": "https://www.cosmos.so/e/1708613448",
+      "caption": null,
+      "owner": "okaoka",
+      "source": {
+        "url": "https://www.pinterest.com/pin/627478160614933829",
+        "author": "Hypnoticinfinity",
+        "isPublicDomain": false
+      },
+      "imageUrl": "https://cdn.cosmos.so/c34bfb0a-744c-4e7c-8b8c-a5488fb759ae",
+      "thumbnailUrl": "https://cdn.cosmos.so/c34bfb0a-744c-4e7c-8b8c-a5488fb759ae?format=webp&w=400",
+      "asset": "assets/1708613448.jpg",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "id": 891282819,
+      "url": "https://www.cosmos.so/e/891282819",
+      "caption": null,
+      "owner": "julieduprat",
+      "source": {
+        "url": "https://fr.pinterest.com/pin/162622236541728827/",
+        "author": "Aceevisuals",
+        "isPublicDomain": false
+      },
+      "imageUrl": "https://cdn.cosmos.so/ab7824eb-dff4-4fec-8fcb-90e23024644e",
+      "thumbnailUrl": "https://cdn.cosmos.so/ab7824eb-dff4-4fec-8fcb-90e23024644e?format=webp&w=400",
+      "asset": "assets/891282819.jpg",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "id": 1773125994,
+      "url": "https://www.cosmos.so/e/1773125994",
+      "caption": null,
+      "owner": "aleramos77",
+      "source": {
+        "url": "https://31.media.tumblr.com/5b353a48bca04fc816107988784fd089/tumblr_nszgaqHcBb1tfsn81o1_500.gif",
+        "author": "yeesyes",
+        "isPublicDomain": false
+      },
+      "imageUrl": "https://cdn.cosmos.so/0942c5c3-dd72-4be9-a1a5-23a1950aad68",
+      "thumbnailUrl": "https://cdn.cosmos.so/0942c5c3-dd72-4be9-a1a5-23a1950aad68?format=webp&w=400",
+      "asset": "assets/1773125994.jpg",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "id": 2072992296,
+      "url": "https://www.cosmos.so/e/2072992296",
+      "caption": null,
+      "owner": "zrsr1",
+      "source": {
+        "url": "https://onewiththemultiverse.tumblr.com/post/626428818980208640/ericaofanderson-flutter-you-can-get-this-gif",
+        "author": null,
+        "isPublicDomain": false
+      },
+      "imageUrl": "https://cdn.cosmos.so/01a0e011-09f3-70ff-adc9-502305b41aed",
+      "thumbnailUrl": "https://cdn.cosmos.so/01a0e011-09f3-70ff-adc9-502305b41aed?format=webp&w=400",
+      "asset": "assets/2072992296.jpg",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "id": 651076537,
+      "url": "https://www.cosmos.so/e/651076537",
+      "caption": "A digital texture from the HOLO III - Holographic Textures Collection by design studio RWDS.",
+      "owner": "cyborne",
+      "source": {
+        "url": "https://www.behance.net/gallery/107793471/HOLO-III-Holographic-Textures-Collection",
+        "author": "Dietpoisonisstillpoison",
+        "isPublicDomain": false
+      },
+      "imageUrl": "https://cdn.cosmos.so/0d768d9a-e761-465c-baa2-e631855fc3ca",
+      "thumbnailUrl": "https://cdn.cosmos.so/0d768d9a-e761-465c-baa2-e631855fc3ca?format=webp&w=400",
+      "asset": "assets/651076537.jpg",
+      "width": 300,
+      "height": 376
     }
   ]
 }

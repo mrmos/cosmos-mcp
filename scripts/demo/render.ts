@@ -5,9 +5,9 @@
  *
  *   bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
  *
- * For the second demo, pass the capture file and the output path:
+ * To render another capture, pass the capture file and the output path:
  *
- *   bun run scripts/demo/render.ts scripts/demo/capture-similar.json docs/demo-similar.gif
+ *   bun run scripts/demo/render.ts path/to/capture.json path/to/out.gif
  *
  * Needs Google Chrome (headless) and ffmpeg; nothing is downloaded. Writes
  * capture.js from capture.json, drives one headless Chrome over the DevTools

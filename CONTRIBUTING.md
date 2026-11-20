@@ -3,15 +3,91 @@
 Bug reports and pull requests are welcome. Keep changes small and explain what you
 observed.
 
+You need [Bun](https://bun.com).
+
 ```bash
-bun install
-bun test
-bun run typecheck
-bun run build
+bun install          # install dependencies
+bun run dev          # run the server from source, restarting on change
+bun test             # run tests
+bun run typecheck    # tsc --noEmit
+bun run build        # bundle to dist/index.js for Node
+bun run build:mcpb   # build the Claude Desktop extension
 ```
 
-CI runs all four on every push and pull request. The tests that hit the live API are
-gated behind `COSMOS_LIVE_TESTS=1` and never run in CI.
+CI runs install, test, typecheck and build on every push and pull request. The tests
+that hit the live API are gated behind `COSMOS_LIVE_TESTS=1` and never run in CI.
+
+## Running from a clone
+
+Point your MCP client at the source. Use an absolute path, because MCP clients do not
+always resolve relative paths:
+
+```bash
+claude mcp add cosmos -- bun run /absolute/path/to/cosmos-mcp/index.ts serve
+```
+
+A clone reads `.env`, so you can leave `env` out of the client configuration. Inside the
+clone, `npx cosmos-mcp` fails with `command not found`, because npx finds the unbuilt
+local package. Use `bun run index.ts login` and the like instead.
+
+The server speaks MCP over stdio. Any output on stdout that is not a JSON-RPC frame
+breaks the protocol, so write logs to stderr. To smoke-test the built file:
+
+```bash
+bun run build
+printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}\n' \
+  | node dist/index.js serve
+```
+
+It prints `cosmos-mcp ready on stdio` on stderr and a JSON-RPC result with `serverInfo`
+on stdout.
+
+## Project layout
+
+```
+index.ts                 entrypoint: CLI subcommands, else stdio transport
+src/
+  cli.ts                 login, logout, status, help
+  auth-store.ts          the credential file `login` writes
+  config.ts              environment, .env and stored credential to CosmosConfig
+  errors.ts              CosmosError, and the mapping from GraphQL codes to kinds
+  normalize.ts           API shapes to the flatter shapes tools return
+  server.ts              McpServer construction and tool registration
+  prompts.ts             the moodboard prompt
+  graphql/
+    client.ts            HTTP client, auth headers, viewer resolution
+    fragments.ts         shared GraphQL fragments
+  tools/
+    kit.ts               shared helpers: ok/fail/refuse/guard, common arguments
+    account.ts           whoami, library, feed, activity
+    browse.ts            search, explore, elements, users, clusters
+    curate.ts            create, save, organize
+    manage.ts            save URLs, update, nest, delete, follow, pin
+    catalog.ts           which tools need sign-in
+scripts/
+  probe-schema.ts        schema discovery against the live API
+  build-mcpb.ts          builds the Claude Desktop extension
+  demo/                  records docs/demo.gif
+mcpb/manifest.json       Claude Desktop extension manifest
+server.json              MCP registry entry
+docs/
+  har-ops/               reverse-engineered GraphQL operation reference
+test/
+```
+
+## Recording the demo GIF
+
+`docs/demo.gif` replays real tool output, recorded signed in because Cosmos personalizes
+results. Its images are not public domain. `render.ts` needs Google Chrome and ffmpeg.
+Sign in first with `bun run index.ts login`.
+
+```bash
+bun run build
+bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
+```
+
+Pass other queries as arguments, for example
+`bun run scripts/demo/capture.ts "warm brutalist interiors"`.
 
 ## Where the schema came from
 
@@ -106,7 +182,8 @@ a probe running in a loop.
 5. Write the tool description for an agent, not a human. Say when to reach for it and
    what to reach for instead.
 6. Add it to the right table in the README, with "Yes" in the Sign-in column if it needs
-   a credential. Update the tool counts in the README Questions section. A test checks them.
+   a credential. Update the tool count at the top of the README Tools section. A test
+   checks it.
 7. Add a test. Mock the transport; do not add a test that needs a cookie.
 
 ## Releasing
