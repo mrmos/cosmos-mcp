@@ -1,11 +1,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { CosmosClient } from "../src/graphql/client";
 import { CosmosError } from "../src/errors";
 import { clearAuth, configPath, writeAuth } from "../src/auth-store";
 import { loadConfig, type CosmosConfig } from "../src/config";
+import { cleanSandboxes, sandbox } from "./sandbox";
 
 /**
  * The real client against a local stand-in for api.cosmos.so. Each test sets
@@ -129,14 +127,10 @@ describe("viewer", () => {
 });
 
 describe("picking up `cosmos-mcp login` without a restart", () => {
-  const dirs: string[] = [];
-  afterEach(() => {
-    for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
-  });
+  afterEach(cleanSandboxes);
 
   test("a stored credential written after start-up is used on the next call", async () => {
-    const env = { XDG_CONFIG_HOME: mkdtempSync(join(tmpdir(), "cosmos-mcp-client-")) };
-    dirs.push(env.XDG_CONFIG_HOME);
+    const env = sandbox();
     const endpoint = config().endpoint;
     const load = () => ({ ...loadConfig(env), endpoint });
 

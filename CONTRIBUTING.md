@@ -67,27 +67,12 @@ src/
 scripts/
   probe-schema.ts        schema discovery against the live API
   build-mcpb.ts          builds the Claude Desktop extension
-  demo/                  records docs/demo.gif
 mcpb/manifest.json       Claude Desktop extension manifest
 server.json              MCP registry entry
 docs/
   har-ops/               reverse-engineered GraphQL operation reference
 test/
 ```
-
-## Recording the demo GIF
-
-`docs/demo.gif` replays real tool output, recorded signed in because Cosmos personalizes
-results. Its images are not public domain. `render.ts` needs Google Chrome and ffmpeg.
-Sign in first with `bun run index.ts login`.
-
-```bash
-bun run build
-bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
-```
-
-Pass other queries as arguments, for example
-`bun run scripts/demo/capture.ts "warm brutalist interiors"`.
 
 ## Where the schema came from
 

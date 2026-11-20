@@ -822,7 +822,6 @@ Leave \`clusterIdsToDisconnect\` empty (the default) and this behaves exactly li
         const disconnect = args.clusterIdsToDisconnect ?? [];
         if (connect.length === 0 && disconnect.length === 0) {
           return refuse("Nothing to do: both clusterIdsToConnect and clusterIdsToDisconnect were empty.", {
-            success: false,
             elementIds: args.elementIds,
             clusterIdsToConnect: connect,
             clusterIdsToDisconnect: disconnect,

@@ -451,7 +451,6 @@ Returns \`changes\`, the list of what actually differed, so you can report back 
         const viewer = await client.requireViewer("cosmos_update_cluster");
         if (!hasClusterUpdates(args)) {
           return refuse("Nothing to do: no name, description, isPrivate or coverImageElementId was given.", {
-            success: false,
             clusterId: args.clusterId,
             changes: [],
           });
@@ -541,7 +540,7 @@ Deletes one board per call, by design. Subclusters and the elements inside are C
       if (args.confirm !== true) {
         return refuse(
           `Refused: deleting cluster ${args.clusterId} is permanent and cannot be undone. Confirm with the user, then call again with confirm: true.`,
-          { success: false, clusterId: args.clusterId, deleted: false, confirmationRequired: true },
+          { clusterId: args.clusterId, deleted: false, confirmationRequired: true },
         );
       }
       const data = await client.request<{ cluster: { deleteCluster: { success: boolean } | null } }>(
@@ -596,19 +595,16 @@ WRITES, but nothing is lost — no elements move and nothing is deleted, only wh
       const detach = args.detach === true;
       if (detach && args.parentClusterId !== undefined) {
         return refuse("Refused: pass either parentClusterId (to nest) or detach: true (to un-nest), not both.", {
-          success: false,
           clusterId: args.clusterId,
         });
       }
       if (!detach && args.parentClusterId === undefined) {
         return refuse("Nothing to do: pass parentClusterId to nest this board, or detach: true to un-nest it.", {
-          success: false,
           clusterId: args.clusterId,
         });
       }
       if (args.parentClusterId === args.clusterId) {
         return refuse(`Refused: cluster ${args.clusterId} cannot be its own parent.`, {
-          success: false,
           clusterId: args.clusterId,
         });
       }
@@ -709,11 +705,11 @@ WRITES and is publicly visible: the other person is notified that they have a ne
     guard(async (args: { userId?: number; username?: string; follow?: boolean }) => {
       const viewer = await client.requireViewer("cosmos_follow_user");
       if ((args.userId === undefined) === (args.username === undefined)) {
-        return refuse("Refused: pass exactly one of userId or username.", { success: false });
+        return refuse("Refused: pass exactly one of userId or username.");
       }
       const followeeId = args.userId ?? (await client.userIdForUsername(args.username!));
       if (followeeId === viewer.id) {
-        return refuse("Refused: you cannot follow yourself.", { success: false, userId: followeeId });
+        return refuse("Refused: you cannot follow yourself.", { userId: followeeId });
       }
       const follow = args.follow ?? true;
       const [op, query] = follow

@@ -10,11 +10,7 @@ interface GraphQLResponse<T> {
 const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 3;
 
-/**
- * Lets a running server notice `cosmos-mcp login` without a client restart.
- * `path` is the stored-credential file; `reload` rebuilds the config from
- * scratch when that file changes.
- */
+/** Reload the config when the `login` credential file at `path` changes, so sign-in needs no restart. */
 export interface CredentialWatch {
   path: string;
   reload: () => CosmosConfig;
@@ -42,24 +38,17 @@ export class CosmosClient {
   }
 
   get config(): CosmosConfig {
-    this.syncStoredCredential();
-    return this.currentConfig;
-  }
-
-  /**
-   * Re-reads the config when the file `login`/`logout` writes has changed.
-   * A credential from the environment or `.env` outranks that file, so the
-   * check is skipped then: nothing written there could take effect.
-   */
-  private syncStoredCredential(): void {
-    if (!this.watch) return;
+    // An environment or .env credential outranks the file, so a change there cannot take effect.
     const source = this.currentConfig.credentialSource;
-    if (source === "environment" || source === "dotenv") return;
-    const mtime = mtimeOf(this.watch.path);
-    if (mtime === this.watchedMtime) return;
-    this.watchedMtime = mtime;
-    this.currentConfig = this.watch.reload();
-    this.viewerPromise = undefined;
+    if (this.watch && source !== "environment" && source !== "dotenv") {
+      const mtime = mtimeOf(this.watch.path);
+      if (mtime !== this.watchedMtime) {
+        this.watchedMtime = mtime;
+        this.currentConfig = this.watch.reload();
+        this.viewerPromise = undefined;
+      }
+    }
+    return this.currentConfig;
   }
 
   /** True when a credential is configured. Says nothing about it still being valid. */
@@ -86,17 +75,13 @@ export class CosmosClient {
    * Executes one operation. Throws `CosmosError` on transport failure or when
    * the response carries errors and no usable data.
    *
-   * Cosmos returns partial data with a non-empty `errors` array for fields the
-   * viewer may not read (a private cluster inside a public list, say). When
-   * `data` still holds something usable we return it and let the caller
-   * decide. Two exceptions throw instead: a mutation with any error (a write
-   * that half-happened is not a success), and a query whose every top-level
-   * field came back null (there is nothing to decide with).
+   * Cosmos returns partial data plus `errors` for fields the viewer may not
+   * read (a private cluster inside a public list). We return usable partial
+   * data, but throw for a mutation with any error or a query whose top-level
+   * fields are all null.
    *
-   * Mutations are never retried after the request may have reached the
-   * server — a timeout or 5xx can follow a write that landed, and replaying it
-   * would save twice or report a successful delete as "not found". A 429 is
-   * the exception: the server refused it before doing anything.
+   * Mutations are retried only after a 429: a timeout or 5xx can follow a
+   * write that landed, and replaying it would save twice.
    */
   async request<T>(operationName: string, query: string, variables: Record<string, unknown> = {}): Promise<T> {
     const config = this.config;
@@ -190,14 +175,12 @@ export class CosmosClient {
     const config = this.config;
     if (!config.cookie && !config.authorization) return null;
     if (config.userId) return { id: config.userId, username: config.username ?? null };
-    // A rejected credential (401) resolves to null and stays cached. Anything
-    // thrown is dropped so the next call retries: a transient failure, or a
-    // 403, which can be a WAF or load balancer having a moment. Caching a 403
+    // A 401 resolves to null and stays cached. Anything thrown is dropped so the
+    // next call retries, a 403 included: it can be a WAF hiccup, and caching it
     // would sign the server out until restart.
     this.viewerPromise ??= this.fetchViewer().catch((err) => {
       this.viewerPromise = undefined;
-      if (isForbidden(err)) return null;
-      throw err;
+      return forbiddenAsNull(err);
     });
     return this.viewerPromise;
   }
@@ -210,10 +193,7 @@ export class CosmosClient {
    */
   async verify(): Promise<Viewer | null> {
     if (!this.hasCredentials) return null;
-    return this.fetchViewer().catch((err) => {
-      if (isForbidden(err)) return null;
-      throw err;
-    });
+    return this.fetchViewer().catch(forbiddenAsNull);
   }
 
   /** The `me` lookup. Null on a 401; a 403 throws so `viewer()` does not cache it. */
@@ -263,7 +243,10 @@ export interface Viewer {
   username: string | null;
 }
 
-const isForbidden = (err: unknown) => err instanceof CosmosError && err.kind === "forbidden";
+function forbiddenAsNull(err: unknown): null {
+  if (err instanceof CosmosError && err.kind === "forbidden") return null;
+  throw err;
+}
 
 /** 0 when the file is missing: logout removed it, or login has not run yet. */
 function mtimeOf(path: string): number {

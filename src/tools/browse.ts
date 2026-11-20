@@ -709,7 +709,8 @@ export const browseQueries = Object.freeze({
 // ---------------------------------------------------------------------------
 
 export type ContentType = "IMAGE" | "VIDEO" | "PRODUCT" | "ALL";
-export type SearchOrder = "RELEVANT" | "RECENT" | "LATEST" | "POPULAR" | "OLDEST" | "RANDOM";
+const SEARCH_ORDERS = ["RELEVANT", "RECENT", "LATEST", "POPULAR", "OLDEST", "RANDOM"] as const;
+export type SearchOrder = (typeof SEARCH_ORDERS)[number];
 
 /**
  * `ElementOrder` has no `RECENT` member — the live enum is
@@ -1039,16 +1040,22 @@ interface Category {
   slug: string;
 }
 
-async function fetchCategories(client: CosmosClient): Promise<Category[]> {
-  const data = await client.request<{ categories: any }>("CosmosMcpCategories", CATEGORIES, {});
-  return ((data.categories?.items ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
+/** The category list is effectively static, so fetch it once per client. */
+const categoryCache = new WeakMap<CosmosClient, Promise<Category[]>>();
+
+function fetchCategories(client: CosmosClient): Promise<Category[]> {
+  let cached = categoryCache.get(client);
+  if (!cached) {
+    cached = client
+      .request<{ categories: any }>("CosmosMcpCategories", CATEGORIES, {})
+      .then((data) => ((data.categories?.items ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, slug: c.slug })));
+    cached.catch(() => categoryCache.delete(client)); // a failed fetch must not stick
+    categoryCache.set(client, cached);
+  }
+  return cached;
 }
 
-/**
- * Cosmos itself takes a numeric category id and has no slug argument. Agents
- * reach for the slug or the name, so resolve those here instead of making the
- * agent call cosmos_categories first.
- */
+/** Cosmos takes only a numeric category id. Agents reach for the slug or name, so resolve those. */
 export async function resolveCategory(
   client: CosmosClient,
   value: number | string,
@@ -1063,8 +1070,7 @@ export async function resolveCategory(
   const match = categories.find(
     (c) => c.id === asNumber || c.slug?.toLowerCase() === wanted || c.name?.toLowerCase() === wanted,
   );
-  // An unknown id lands here only when the caller needs its slug, and passing
-  // the bare id on would quietly drop the filter, so it is an error too.
+  // An unknown id is an error too: passing it on would quietly drop the filter.
   if (match) return match;
   throw new CosmosError(
     `${operation}: no category ${JSON.stringify(value)}. Valid slugs: ${categories.map((c) => c.slug).join(", ")}.`,
@@ -1072,12 +1078,7 @@ export async function resolveCategory(
   );
 }
 
-/**
- * Pulls what a cosmos.so link points at. Users paste links far more often than
- * ids, so the lookup tools take either.
- *   /e/<id>              an element
- *   /<username>/<slug>   a collection
- */
+/** What a cosmos.so link points at: `/e/<id>` is an element, `/<username>/<slug>` a collection. */
 export function parseCosmosUrl(
   raw: string,
 ): { kind: "element"; elementId: number } | { kind: "cluster"; username: string; slug: string } | null {
@@ -1097,6 +1098,26 @@ export function parseCosmosUrl(
   if (parts[0] === "e" && parts[1] && /^\d+$/.test(parts[1])) return { kind: "element", elementId: Number(parts[1]) };
   if (parts.length === 2 && parts[0] !== "e") return { kind: "cluster", username: parts[0]!, slug: parts[1]! };
   return null;
+}
+
+type CosmosLink = NonNullable<ReturnType<typeof parseCosmosUrl>>;
+
+const LINK_SHAPES = {
+  element: { noun: "element", pattern: "cosmos.so/e/<id>", tool: "cosmos_get_element" },
+  cluster: { noun: "collection", pattern: "cosmos.so/<username>/<slug>", tool: "cosmos_get_cluster" },
+} as const;
+
+/** Parses `url` as a link of the kind `operation` takes, or throws a validation error that names the right tool. */
+function linkTarget<K extends CosmosLink["kind"]>(url: string, want: K, operation: string): Extract<CosmosLink, { kind: K }> {
+  const parsed = parseCosmosUrl(url);
+  if (parsed?.kind === want) return parsed as Extract<CosmosLink, { kind: K }>;
+  const shape = LINK_SHAPES[want];
+  const other = parsed ? LINK_SHAPES[parsed.kind] : null;
+  throw new CosmosError(
+    `${operation}: ${JSON.stringify(url)} is not a cosmos.so ${shape.noun} link (expected ${shape.pattern}).` +
+      (other ? ` It is ${other.noun === "element" ? "an" : "a"} ${other.noun} link: use ${other.tool}.` : ""),
+    { kind: "validation", operation },
+  );
 }
 
 /** Shared paging plumbing: `pageSize`/`pageCursor` is what every list root takes. */
@@ -1148,7 +1169,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
           .optional()
           .describe("Dominant color as hex, with or without the leading '#', e.g. '#8B4513'."),
         order: z
-          .enum(["RELEVANT", "RECENT", "LATEST", "POPULAR", "OLDEST", "RANDOM"])
+          .enum(SEARCH_ORDERS)
           .optional()
           .describe("Result ordering. Defaults to RELEVANT. RECENT and LATEST mean the same thing."),
         cursor: cursorArg,
@@ -1336,18 +1357,8 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
     },
     guard(async (input: { elementId?: number; url?: string; previewWidth?: number }) => {
       const previewWidth = input.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
-      let elementId = input.elementId;
-      if (input.url !== undefined) {
-        const parsed = parseCosmosUrl(input.url);
-        if (parsed?.kind !== "element") {
-          throw new CosmosError(
-            `cosmos_get_element: ${JSON.stringify(input.url)} is not a cosmos.so element link (expected cosmos.so/e/<id>). ` +
-              "For a collection link, use cosmos_get_cluster.",
-            { kind: "validation", operation: "cosmos_get_element" },
-          );
-        }
-        elementId = parsed.elementId;
-      }
+      const elementId =
+        input.url !== undefined ? linkTarget(input.url, "element", "cosmos_get_element").elementId : input.elementId;
       if (elementId === undefined) {
         throw new CosmosError("cosmos_get_element: pass `elementId` or `url`.", {
           kind: "validation",
@@ -1755,9 +1766,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
     },
     guard(async (args: { category?: number | string; previewWidth?: number }) => {
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
-      // This API takes the slug, unlike explore and boards, which take the id.
-      // Resolve every form (id, slug, name, any case) so a typo is an error
-      // rather than an empty or unfiltered result.
+      // This API takes the slug, unlike explore and boards. Resolving makes a typo an error, not an unfiltered result.
       const searchCategory =
         args.category !== undefined
           ? (await resolveCategory(client, args.category, "cosmos_suggested_searches", true)).slug
@@ -1840,19 +1849,8 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       annotations: READ_ONLY,
     },
     guard(async (input: { clusterId?: number; url?: string; username?: string; slug?: string; previewWidth?: number }) => {
-      const args = { ...input };
-      if (input.url !== undefined) {
-        const parsed = parseCosmosUrl(input.url);
-        if (parsed?.kind !== "cluster") {
-          throw new CosmosError(
-            `cosmos_get_cluster: ${JSON.stringify(input.url)} is not a cosmos.so collection link (expected cosmos.so/<username>/<slug>).` +
-              (parsed?.kind === "element" ? " It is an element link: use cosmos_get_element." : ""),
-            { kind: "validation", operation: "cosmos_get_cluster" },
-          );
-        }
-        args.username = parsed.username;
-        args.slug = parsed.slug;
-      }
+      const args =
+        input.url !== undefined ? { ...input, ...linkTarget(input.url, "cluster", "cosmos_get_cluster") } : input;
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
       const bySlug = Boolean(args.username && args.slug);
       if (!bySlug && !args.clusterId) {
@@ -1952,8 +1950,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       annotations: READ_ONLY,
     },
     guard(async (args: { clusterId: number; previewWidth?: number }) => {
-      // Fail fast with the sign-in hint and this tool's name, instead of a
-      // round trip that 401s under the GraphQL operation name.
+      // Fail fast with the sign-in hint under this tool's name.
       await client.requireViewer("cosmos_cluster_recommendations");
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
       const data = await client.request<{ clusterRecommendations: any }>(

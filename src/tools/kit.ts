@@ -37,14 +37,9 @@ export function fail(error: unknown): CallToolResult {
   };
 }
 
-/**
- * A request the tool declined to carry out: bad argument combinations, a
- * destructive call without confirmation, or nothing to do. It is an error
- * result, so an agent cannot mistake it for success, but it keeps the same
- * summary-plus-fields shape as `ok()` so the guidance reads the same way.
- */
+/** A call the tool declined (bad arguments, no confirmation, nothing to do): an error, shaped like `ok()`. */
 export function refuse(summary: string, data: Record<string, unknown> = {}): CallToolResult {
-  const payload = { error: "refused", summary, ...data };
+  const payload = { error: "refused", summary, success: false, ...data };
   return {
     isError: true,
     content: [{ type: "text", text: JSON.stringify(payload) }],

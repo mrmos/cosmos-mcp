@@ -1,22 +1,12 @@
 import { test, expect, afterEach } from "bun:test";
-import { mkdtempSync, rmSync, statSync, writeFileSync, mkdirSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { statSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { clearAuth, configPath, readAuth, redact, writeAuth } from "../src/auth-store";
 import { loadConfig } from "../src/config";
 
-const dirs: string[] = [];
+import { cleanSandboxes, sandbox } from "./sandbox";
 
-/** An isolated config home, so tests never touch the real ~/.config. */
-function sandbox(): NodeJS.ProcessEnv {
-  const dir = mkdtempSync(join(tmpdir(), "cosmos-mcp-test-"));
-  dirs.push(dir);
-  return { XDG_CONFIG_HOME: dir };
-}
-
-afterEach(() => {
-  for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
-});
+afterEach(cleanSandboxes);
 
 test("round-trips a credential", () => {
   const env = sandbox();

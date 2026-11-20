@@ -110,9 +110,7 @@ export const registerAccountTools: ToolRegistrar = (server, ctx) => {
     guard(async () => {
       const credential = credentialSummary(ctx.client.config);
 
-      // viewer() turns a rejected credential into null. Anything it throws —
-      // network, 5xx, a rate limit — says nothing about the credential, so it
-      // surfaces as an error rather than a misleading "rejected".
+      // A rejected credential is null. A throw (network, 5xx, rate limit) stays an error, not "rejected".
       const viewer = await ctx.client.viewer();
 
       if (!viewer) {

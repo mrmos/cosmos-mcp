@@ -81,37 +81,20 @@ export function classify(code: string | undefined, status: number): CosmosErrorK
   return "unknown";
 }
 
-/**
- * Codes that mean the query document itself no longer matches the API. The
- * agent cannot fix those by changing its arguments: Cosmos changed its private
- * schema, and only a new release of this server can.
- */
-const SCHEMA_DRIFT_CODES = new Set([
-  "FIELDS_ON_CORRECT_TYPE",
-  "GRAPHQL_VALIDATION_FAILED",
-  "UNKNOWN_ARGUMENT",
-  "UNKNOWN_TYPE",
-  "PROVIDED_REQUIRED_ARGUMENTS",
-  "ARGUMENTS_OF_CORRECT_TYPE",
-  "VARIABLES_ARE_INPUT_TYPES",
-]);
+/** The query no longer matches the private schema: only a new release can fix it. */
+const SCHEMA_DRIFT_CODES = new Set(
+  "FIELDS_ON_CORRECT_TYPE GRAPHQL_VALIDATION_FAILED UNKNOWN_ARGUMENT UNKNOWN_TYPE PROVIDED_REQUIRED_ARGUMENTS ARGUMENTS_OF_CORRECT_TYPE VARIABLES_ARE_INPUT_TYPES".split(" "),
+);
 
 const SCHEMA_DRIFT_HINT =
   "cosmos.so probably changed its private API. Tell the user to update with `npx -y cosmos-mcp@latest` " +
   "(npx can keep an old copy cached), or to report it at https://github.com/mrmos/cosmos-mcp/issues.";
 
 /**
- * Builds the user-facing message for a set of GraphQL errors. `signedIn` says
- * whether the request carried a credential: Cosmos answers a signed-out read
- * of a private board with "forbidden", which then means "sign in", not
- * "this account lacks access".
+ * Builds the user-facing message for a set of GraphQL errors. Signed out,
+ * "forbidden" means "sign in", not "this account lacks access".
  */
-export function describe(
-  kind: CosmosErrorKind,
-  errors: CosmosGraphQLError[],
-  operation: string,
-  signedIn = true,
-): string {
+export function describe(kind: CosmosErrorKind, errors: CosmosGraphQLError[], operation: string, signedIn = true): string {
   const detail = errors.map((e) => e.message).join("; ") || "no error detail returned";
   if (errors.some((e) => SCHEMA_DRIFT_CODES.has(String(e.extensions?.code ?? "")))) {
     return `${operation}: ${detail}. ${SCHEMA_DRIFT_HINT}`;

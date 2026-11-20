@@ -18,11 +18,7 @@ export interface CosmosConfig {
   cookie?: string;
   /** `Authorization` header value, always with its `Bearer ` prefix. */
   authorization?: string;
-  /**
-   * Where the credential came from. Cookie, authorization and the stored
-   * user id are taken from one source as a unit, so a stale value in one place
-   * can never be paired with a credential for another account.
-   */
+  /** The one source that supplied cookie, authorization and user id together. */
   credentialSource: CredentialSource;
   /**
    * Skips the `me` lookup when set. Useful when the session cookie works but
@@ -80,11 +76,7 @@ function loadDotEnv(): Record<string, string> {
   return out;
 }
 
-/**
- * A bad number in an env var should not stop the server from starting: an MCP
- * client would only show "server failed" with the reason buried in a log. Warn
- * on stderr and fall back to the default instead.
- */
+/** Warns and falls back on a bad number: a startup failure would hide the reason in a client log. */
 function parsePositiveInt(raw: string | undefined, label: string): number | undefined {
   if (raw === undefined || raw.trim() === "") return undefined;
   const n = Number(raw);
@@ -111,12 +103,7 @@ export function asAuthorizationHeader(raw: string | undefined): string | undefin
   return /^Bearer\s+\S/i.test(value) ? value : undefined;
 }
 
-/**
- * A `${...}` template the MCP host did not fill in, such as an optional
- * `${user_config.cosmos_authorization}` the user left empty in Claude Desktop.
- * Treating it as a credential would sign every request with garbage, and as an
- * environment credential it would also outrank a later `cosmos-mcp login`.
- */
+/** A `${...}` placeholder the MCP host left unfilled, such as an empty optional Claude Desktop field. */
 const UNFILLED_TEMPLATE_RE = /^\$\{[^}]*\}$/;
 
 const nonEmpty = (v: string | undefined) => {

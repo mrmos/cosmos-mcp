@@ -1,19 +1,10 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { writeAuth } from "../src/auth-store";
 import { asAuthorizationHeader, loadConfig } from "../src/config";
 
-const dirs: string[] = [];
-function sandbox(): NodeJS.ProcessEnv {
-  const dir = mkdtempSync(join(tmpdir(), "cosmos-mcp-config-"));
-  dirs.push(dir);
-  return { XDG_CONFIG_HOME: dir };
-}
-afterEach(() => {
-  for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
-});
+import { cleanSandboxes, sandbox } from "./sandbox";
+
+afterEach(cleanSandboxes);
 
 const hasDotEnvCredential = loadConfig({ XDG_CONFIG_HOME: "/nonexistent" }).credentialSource === "dotenv";
 

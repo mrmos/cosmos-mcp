@@ -256,11 +256,8 @@ function help(): number {
 }
 
 /**
- * Returns an exit code, or null when the caller should start the server.
- *
- * `interactive` is true when stdin is a terminal. MCP clients always pipe
- * stdin, so a bare run from a terminal is a person who would otherwise stare
- * at a silent process waiting for JSON-RPC: show them help instead.
+ * Returns an exit code, or null when the caller should start the server. MCP
+ * clients pipe stdin, so a bare run in a terminal (`interactive`) gets help.
  */
 export async function runCli(argv: string[], interactive = false): Promise<number | null> {
   switch (argv[0]) {

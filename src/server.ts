@@ -11,7 +11,6 @@ import { registerManageTools } from "./tools/manage";
 import { registerPrompts } from "./prompts";
 
 export const SERVER_NAME = "cosmos-mcp";
-// One source of truth: `npm version` bumps package.json, and the bundle inlines it.
 export const SERVER_VERSION: string = pkg.version;
 
 const INSTRUCTIONS = `Browse and curate cosmos.so, a visual discovery site, for moodboarding.
@@ -98,21 +97,16 @@ writes, and anything touching private or personal data, needs sign-in: when the
 user wants to save, ask them to run \`npx cosmos-mcp login\` in a terminal (never
 to paste a token into chat), then retry — no restart is needed.`;
 
-/**
- * With no explicit config, the server watches the file `cosmos-mcp login`
- * writes, so signing in takes effect on the next tool call instead of after a
- * client restart.
- */
+/** Without an explicit config, the server watches the `login` credential file. */
 export function createServer(config?: CosmosConfig): McpServer {
   const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     { instructions: INSTRUCTIONS },
   );
 
-  const client = config
-    ? new CosmosClient(config)
-    : new CosmosClient(loadConfig(), { path: configPath(), reload: loadConfig });
-  const ctx: ToolContext = { client };
+  const ctx: ToolContext = {
+    client: config ? new CosmosClient(config) : new CosmosClient(loadConfig(), { path: configPath(), reload: loadConfig }),
+  };
 
   registerAccountTools(server, ctx);
   registerBrowseTools(server, ctx);
