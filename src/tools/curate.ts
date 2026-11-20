@@ -380,6 +380,8 @@ const elementIdsArg = z
 const CONTENT_TYPES = ["IMAGE", "VIDEO", "PRODUCT", "LINK"] as const;
 /** Verified live: ElementOrder accepts exactly these. */
 const LIBRARY_ORDERS = ["LATEST", "OLDEST", "POPULAR", "RANDOM"] as const;
+/** The API values, plus RECENT as an alias for LATEST to match cosmos_search. */
+type LibraryOrder = (typeof LIBRARY_ORDERS)[number] | "RECENT";
 /** Verified live: ClusterSortField accepts exactly these. */
 const CLUSTER_SORT_FIELDS = ["UPDATED_AT", "CREATED_AT", "NAME", "ELEMENT_COUNT"] as const;
 
@@ -576,7 +578,7 @@ export function buildLibraryVariables(args: {
   userId: number;
   contentType?: (typeof CONTENT_TYPES)[number];
   unsortedOnly?: boolean;
-  order?: (typeof LIBRARY_ORDERS)[number];
+  order?: LibraryOrder;
   limit?: number;
   cursor?: string;
 }): Record<string, unknown> {
@@ -586,7 +588,8 @@ export function buildLibraryVariables(args: {
   return {
     userId: args.userId,
     filters: Object.keys(filters).length > 0 ? filters : null,
-    order: args.order ?? null,
+    // cosmos_search calls it RECENT; the API enum calls it LATEST.
+    order: (args.order === "RECENT" ? "LATEST" : args.order) ?? null,
     pageSize: args.limit ?? DEFAULT_LIMIT,
     pageCursor: args.cursor ?? null,
   };
@@ -957,19 +960,17 @@ Read-only. Costs one request per page and each item carries a thumbnail URL, so 
       async (args: {
         contentType?: (typeof CONTENT_TYPES)[number];
         unsortedOnly?: boolean;
-        order?: (typeof LIBRARY_ORDERS)[number] | "RECENT";
+        order?: LibraryOrder;
         limit?: number;
         cursor?: string;
         previewWidth?: number;
       }) => {
         const viewer = await client.requireViewer("cosmos_my_library");
         const width = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
-        // cosmos_search calls it RECENT; the API enum calls it LATEST.
-        const order = args.order === "RECENT" ? "LATEST" : args.order;
         const data = await client.request<{ allElementsV2: any }>(
           "CosmosMcpMyLibrary",
           MY_LIBRARY_QUERY,
-          buildLibraryVariables({ ...args, order, userId: viewer.id }),
+          buildLibraryVariables({ ...args, userId: viewer.id }),
         );
         const page = normalizePage(data.allElementsV2, (n) => normalizeElement(n, width));
         return ok(

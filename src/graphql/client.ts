@@ -31,7 +31,7 @@ const isMutation = (query: string) => /^\s*mutation\b/.test(query);
  */
 export class CosmosClient {
   private currentConfig: CosmosConfig;
-  private viewerPromise: Promise<ViewerCheck> | undefined;
+  private viewerPromise: Promise<Viewer | null> | undefined;
   private readonly watch: CredentialWatch | undefined;
   private watchedMtime: number;
 
@@ -190,16 +190,16 @@ export class CosmosClient {
     const config = this.config;
     if (!config.cookie && !config.authorization) return null;
     if (config.userId) return { id: config.userId, username: config.username ?? null };
-    this.viewerPromise ??= this.checkViewer().catch((err) => {
-      this.viewerPromise = undefined; // transient failure: allow a retry
+    // A rejected credential (401) resolves to null and stays cached. Anything
+    // thrown is dropped so the next call retries: a transient failure, or a
+    // 403, which can be a WAF or load balancer having a moment. Caching a 403
+    // would sign the server out until restart.
+    this.viewerPromise ??= this.fetchViewer().catch((err) => {
+      this.viewerPromise = undefined;
+      if (isForbidden(err)) return null;
       throw err;
     });
-    const result = await this.viewerPromise;
-    // Only a definite 401 is worth remembering. A 403 can be a WAF or load
-    // balancer having a moment, and caching it would sign the server out until
-    // restart.
-    if (result === "forbidden") this.viewerPromise = undefined;
-    return typeof result === "string" ? null : result;
+    return this.viewerPromise;
   }
 
   /**
@@ -209,21 +209,23 @@ export class CosmosClient {
    * (network, 5xx, rate limit) throws, so callers can tell the two apart.
    */
   async verify(): Promise<Viewer | null> {
-    const result = await this.checkViewer();
-    return typeof result === "string" ? null : result;
+    if (!this.hasCredentials) return null;
+    return this.fetchViewer().catch((err) => {
+      if (isForbidden(err)) return null;
+      throw err;
+    });
   }
 
-  /** The `me` lookup, keeping a 401 apart from a 403 so `viewer()` can cache only the first. */
-  private async checkViewer(): Promise<ViewerCheck> {
-    if (!this.hasCredentials) return "unauthenticated";
+  /** The `me` lookup. Null on a 401; a 403 throws so `viewer()` does not cache it. */
+  private async fetchViewer(): Promise<Viewer | null> {
     try {
       const d = await this.request<{ me: { id: number; username: string } | null }>(
         "CosmosMcpViewer",
         "query CosmosMcpViewer { me { id username } }",
       );
-      return d.me ? { id: d.me.id, username: d.me.username } : "unauthenticated";
+      return d.me ? { id: d.me.id, username: d.me.username } : null;
     } catch (err) {
-      if (err instanceof CosmosError && (err.kind === "unauthenticated" || err.kind === "forbidden")) return err.kind;
+      if (err instanceof CosmosError && err.kind === "unauthenticated") return null;
       throw err;
     }
   }
@@ -261,15 +263,11 @@ export interface Viewer {
   username: string | null;
 }
 
-/** A resolved viewer, or why the credential was turned away. */
-type ViewerCheck = Viewer | "unauthenticated" | "forbidden";
+const isForbidden = (err: unknown) => err instanceof CosmosError && err.kind === "forbidden";
 
+/** 0 when the file is missing: logout removed it, or login has not run yet. */
 function mtimeOf(path: string): number {
-  try {
-    return statSync(path).mtimeMs;
-  } catch {
-    return 0; // missing: logout removed it, or login has not run yet
-  }
+  return statSync(path, { throwIfNoEntry: false })?.mtimeMs ?? 0;
 }
 
 /** True when there is no data, or every top-level field in it is null. */

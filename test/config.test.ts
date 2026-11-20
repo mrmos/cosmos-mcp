@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { writeAuth } from "../src/auth-store";
-import { loadConfig, normalizeAuthorization } from "../src/config";
+import { asAuthorizationHeader, loadConfig } from "../src/config";
 
 const dirs: string[] = [];
 function sandbox(): NodeJS.ProcessEnv {
@@ -18,9 +18,9 @@ afterEach(() => {
 const hasDotEnvCredential = loadConfig({ XDG_CONFIG_HOME: "/nonexistent" }).credentialSource === "dotenv";
 
 test("a bare JWT gets its Bearer prefix; a full header is left alone", () => {
-  expect(normalizeAuthorization("aaa.bbb.ccc")).toBe("Bearer aaa.bbb.ccc");
-  expect(normalizeAuthorization("  Bearer aaa.bbb.ccc ")).toBe("Bearer aaa.bbb.ccc");
-  expect(normalizeAuthorization("")).toBeUndefined();
+  expect(asAuthorizationHeader("aaa.bbb.ccc")).toBe("Bearer aaa.bbb.ccc");
+  expect(asAuthorizationHeader("  Bearer aaa.bbb.ccc ")).toBe("Bearer aaa.bbb.ccc");
+  expect(asAuthorizationHeader("")).toBeUndefined();
   expect(loadConfig({ ...sandbox(), COSMOS_AUTHORIZATION: "aaa.bbb.ccc" }).authorization).toBe("Bearer aaa.bbb.ccc");
 });
 

@@ -14,7 +14,7 @@
 
 import { z } from "zod";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { CosmosError } from "../errors";
+import { CosmosError, errorMessage } from "../errors";
 import type { CosmosClient } from "../graphql/client";
 import { CLUSTER_CORE, ELEMENT_CORE, MEDIA_CORE, USER_CORE } from "../graphql/fragments";
 import {
@@ -1437,7 +1437,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
       const usable = settled.flatMap((r, i) => (r.status === "fulfilled" ? [{ seed: seeds[i]!, page: r.value }] : []));
       const failedSeeds = settled.flatMap((r, i) =>
         r.status === "rejected"
-          ? [{ elementId: seeds[i]!, error: r.reason instanceof Error ? r.reason.message : String(r.reason) }]
+          ? [{ elementId: seeds[i]!, error: errorMessage(r.reason) }]
           : [],
       );
       if (usable.length === 0) throw (settled[0] as PromiseRejectedResult).reason;
@@ -2035,7 +2035,7 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
           .describe("Pixel width to fetch each image at (80-1024). Defaults to 400."),
         width: z.number().int().min(80).max(1024).optional().describe("Older name for `previewWidth`."),
       },
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: READ_ONLY,
     },
     guard(async (args: { elementIds: number[]; previewWidth?: number; width?: number }) => {
       const width = args.previewWidth ?? args.width ?? DEFAULT_PREVIEW_WIDTH;
@@ -2094,7 +2094,7 @@ async function fetchElementImage(client: CosmosClient, elementId: number, width:
     // The full auth blurb would be repeated per id and drown the captions; an
     // unknown or private element reads as `unauthenticated` when signed out.
     const reason =
-      err instanceof CosmosError ? `lookup failed (${err.kind})` : err instanceof Error ? err.message : String(err);
+      err instanceof CosmosError ? `lookup failed (${err.kind})` : errorMessage(err);
     return { kind: "error", elementId, reason };
   }
   if (!element?.media?.thumbnailUrl) return { kind: "error", elementId, reason: "no renderable media" };
@@ -2117,6 +2117,6 @@ async function fetchElementImage(client: CosmosClient, elementId: number, width:
       isVideo: element.media.kind === "video",
     };
   } catch (err) {
-    return { kind: "error", elementId, reason: err instanceof Error ? err.message : String(err) };
+    return { kind: "error", elementId, reason: errorMessage(err) };
   }
 }

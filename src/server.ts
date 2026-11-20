@@ -111,7 +111,7 @@ export function createServer(config?: CosmosConfig): McpServer {
 
   const client = config
     ? new CosmosClient(config)
-    : new CosmosClient(loadConfig(), { path: configPath(), reload: () => loadConfig() });
+    : new CosmosClient(loadConfig(), { path: configPath(), reload: loadConfig });
   const ctx: ToolContext = { client };
 
   registerAccountTools(server, ctx);

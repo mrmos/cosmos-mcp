@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import type { CosmosClient } from "../graphql/client";
-import { CosmosError } from "../errors";
+import { CosmosError, errorMessage } from "../errors";
 
 export interface ToolContext {
   client: CosmosClient;
@@ -29,12 +29,7 @@ export function ok(summary: string, data: unknown): CallToolResult {
  * remediation text (how to sign in, say) instead of a bare stack.
  */
 export function fail(error: unknown): CallToolResult {
-  const message =
-    error instanceof CosmosError
-      ? error.message
-      : error instanceof Error
-        ? error.message
-        : String(error);
+  const message = errorMessage(error);
   const kind = error instanceof CosmosError ? error.kind : "unknown";
   return {
     isError: true,

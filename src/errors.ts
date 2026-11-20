@@ -1,3 +1,8 @@
+/** The message of anything thrown, for error text. */
+export function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 /** GraphQL error entry as returned by api.cosmos.so. */
 export interface CosmosGraphQLError {
   message: string;

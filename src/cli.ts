@@ -9,7 +9,8 @@
  */
 
 import { asAuthorizationHeader, loadConfig, type CosmosConfig } from "./config";
-import { CosmosClient } from "./graphql/client";
+import { errorMessage } from "./errors";
+import { CosmosClient, type Viewer } from "./graphql/client";
 import { clearAuth, configPath, readAuth, redact, writeAuth } from "./auth-store";
 import { SIGNED_IN_ONLY_TOOLS, SIGNED_OUT_TOOLS } from "./tools/catalog";
 
@@ -151,15 +152,14 @@ async function login(): Promise<number> {
     ...loadConfig({}),
     cookie: cred.kind === "cookie" ? cred.cookie : undefined,
     authorization: cred.kind === "authorization" ? cred.authorization : undefined,
-    userId: undefined,
   });
 
-  let viewer: { id: number; username: string | null } | null;
+  let viewer: Viewer | null;
   try {
     viewer = await client.verify();
   } catch (err) {
     out();
-    out(`Could not reach cosmos.so: ${err instanceof Error ? err.message : String(err)}`);
+    out(`Could not reach cosmos.so: ${errorMessage(err)}`);
     out("Nothing was saved.");
     return 1;
   }
@@ -210,11 +210,11 @@ async function status(): Promise<number> {
   out();
   out("Checking it against cosmos.so…");
   // verify(), not viewer(): a stored user id must not stand in for a live check.
-  let viewer: Awaited<ReturnType<CosmosClient["verify"]>>;
+  let viewer: Viewer | null;
   try {
     viewer = await new CosmosClient(config).verify();
   } catch (err) {
-    out(`Could not check it: ${err instanceof Error ? err.message : String(err)}`);
+    out(`Could not check it: ${errorMessage(err)}`);
     out("This is a network or cosmos.so problem, not necessarily a bad credential. Try again shortly.");
     return 1;
   }

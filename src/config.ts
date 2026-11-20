@@ -112,23 +112,20 @@ export function asAuthorizationHeader(raw: string | undefined): string | undefin
 }
 
 /**
- * People paste the bare token as often as the whole header. The API needs the
- * `Bearer ` prefix, and without it every call 401s as "not signed in".
- * Values that are not recognisably a token pass through unchanged.
- */
-export function normalizeAuthorization(raw: string | undefined): string | undefined {
-  const value = raw?.trim();
-  if (!value) return undefined;
-  return asAuthorizationHeader(value) ?? value;
-}
-
-/**
  * A `${...}` template the MCP host did not fill in, such as an optional
  * `${user_config.cosmos_authorization}` the user left empty in Claude Desktop.
  * Treating it as a credential would sign every request with garbage, and as an
  * environment credential it would also outrank a later `cosmos-mcp login`.
  */
 const UNFILLED_TEMPLATE_RE = /^\$\{[^}]*\}$/;
+
+const nonEmpty = (v: string | undefined) => {
+  const value = v?.trim();
+  return value && !UNFILLED_TEMPLATE_RE.test(value) ? value : undefined;
+};
+
+/** The credential half of the config, taken from one source as a unit. */
+type Credential = Pick<CosmosConfig, "credentialSource" | "authorization" | "cookie" | "userId" | "username">;
 
 /**
  * Resolves configuration from three places, in order of precedence:
@@ -145,50 +142,37 @@ const UNFILLED_TEMPLATE_RE = /^\$\{[^}]*\}$/;
 export function loadConfig(processEnv: NodeJS.ProcessEnv = process.env): CosmosConfig {
   const fileEnv = loadDotEnv();
   const read = (key: string): string | undefined => processEnv[key] ?? fileEnv[key];
-  const nonEmpty = (v: string | undefined) => {
-    const value = v?.trim();
-    return value && !UNFILLED_TEMPLATE_RE.test(value) ? value : undefined;
+  const fromVars = (vars: Record<string, string | undefined>, source: CredentialSource): Credential | undefined => {
+    const authorization = nonEmpty(vars.COSMOS_AUTHORIZATION);
+    const cookie = nonEmpty(vars.COSMOS_COOKIE);
+    if (!authorization && !cookie) return undefined;
+    const userId = parsePositiveInt(nonEmpty(vars.COSMOS_USER_ID), "COSMOS_USER_ID");
+    return { credentialSource: source, authorization, cookie, userId };
+  };
+  const fromStored = (): Credential | undefined => {
+    const stored = readAuth(processEnv);
+    const authorization = nonEmpty(stored.authorization);
+    const cookie = nonEmpty(stored.cookie);
+    if (!authorization && !cookie) return undefined;
+    return {
+      credentialSource: "stored",
+      authorization,
+      cookie,
+      userId: typeof stored.userId === "number" ? stored.userId : undefined,
+      username: typeof stored.username === "string" ? stored.username : undefined,
+    };
   };
 
-  let credentialSource: CredentialSource = "none";
-  let cookie: string | undefined;
-  let authorization: string | undefined;
-  let userId: number | undefined;
-  let username: string | undefined;
-
-  const envAuth = nonEmpty(processEnv.COSMOS_AUTHORIZATION);
-  const envCookie = nonEmpty(processEnv.COSMOS_COOKIE);
-  const dotAuth = nonEmpty(fileEnv.COSMOS_AUTHORIZATION);
-  const dotCookie = nonEmpty(fileEnv.COSMOS_COOKIE);
-
-  if (envAuth || envCookie) {
-    credentialSource = "environment";
-    authorization = envAuth;
-    cookie = envCookie;
-    userId = parsePositiveInt(nonEmpty(processEnv.COSMOS_USER_ID), "COSMOS_USER_ID");
-  } else if (dotAuth || dotCookie) {
-    credentialSource = "dotenv";
-    authorization = dotAuth;
-    cookie = dotCookie;
-    userId = parsePositiveInt(nonEmpty(fileEnv.COSMOS_USER_ID), "COSMOS_USER_ID");
-  } else {
-    const stored = readAuth(processEnv);
-    if (stored.authorization || stored.cookie) {
-      credentialSource = "stored";
-      authorization = nonEmpty(stored.authorization);
-      cookie = nonEmpty(stored.cookie);
-      userId = typeof stored.userId === "number" ? stored.userId : undefined;
-      username = typeof stored.username === "string" ? stored.username : undefined;
-    }
-  }
+  const { authorization, ...credential } = fromVars(processEnv, "environment") ??
+    fromVars(fileEnv, "dotenv") ??
+    fromStored() ?? { credentialSource: "none" };
 
   return {
     endpoint: read("COSMOS_ENDPOINT")?.trim() || DEFAULT_ENDPOINT,
-    cookie,
-    authorization: normalizeAuthorization(authorization),
-    credentialSource,
-    userId,
-    username,
+    ...credential,
+    // People paste the bare token as often as the whole header, and the API
+    // needs the `Bearer ` prefix. Values that are not recognisably a token pass through.
+    authorization: authorization && (asAuthorizationHeader(authorization) ?? authorization),
     clientName: read("COSMOS_CLIENT_NAME")?.trim() || DEFAULT_CLIENT_NAME,
     userAgent: read("COSMOS_USER_AGENT")?.trim() || DEFAULT_USER_AGENT,
     timeoutMs: parsePositiveInt(read("COSMOS_TIMEOUT_MS"), "COSMOS_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS,
