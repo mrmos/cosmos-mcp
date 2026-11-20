@@ -26,3 +26,10 @@ test("the moodboard prompt saves only when asked, and never asks for a token in 
   expect(browsing).not.toContain("cosmos_create_cluster");
   expect(browsing).toContain("Do not save");
 });
+
+test("a signed-out forbidden says to sign in, not that the account lacks access", () => {
+  const errors = [{ message: "You are not authorize to see this cluster" }];
+  expect(describeError("forbidden", errors, "Op", false)).toContain("cosmos-mcp login");
+  expect(describeError("forbidden", errors, "Op", false)).not.toContain("signed in, but");
+  expect(describeError("forbidden", errors, "Op")).toContain("signed in, but");
+});

@@ -31,7 +31,7 @@ const isMutation = (query: string) => /^\s*mutation\b/.test(query);
  */
 export class CosmosClient {
   private currentConfig: CosmosConfig;
-  private viewerPromise: Promise<Viewer | null> | undefined;
+  private viewerPromise: Promise<ViewerCheck> | undefined;
   private readonly watch: CredentialWatch | undefined;
   private watchedMtime: number;
 
@@ -159,7 +159,7 @@ export class CosmosClient {
       const errors = payload.errors ?? [];
       if (errors.length > 0 && (write || nothingUsable(payload.data))) {
         const kind = classify(errors[0]?.extensions?.code as string | undefined, res.status);
-        throw new CosmosError(describe(kind, errors, operationName), {
+        throw new CosmosError(describe(kind, errors, operationName, Boolean(config.cookie || config.authorization)), {
           kind,
           status: res.status,
           operation: operationName,
@@ -190,19 +190,17 @@ export class CosmosClient {
     const config = this.config;
     if (!config.cookie && !config.authorization) return null;
     if (config.userId) return { id: config.userId, username: config.username ?? null };
-    this.viewerPromise ??= this.verify().catch((err) => {
+    this.viewerPromise ??= this.checkViewer().catch((err) => {
       this.viewerPromise = undefined; // transient failure: allow a retry
       throw err;
     });
-    const viewer = await this.viewerPromise;
+    const result = await this.viewerPromise;
     // Only a definite 401 is worth remembering. A 403 can be a WAF or load
     // balancer having a moment, and caching it would sign the server out until
     // restart.
-    if (!viewer && !this.lastVerifyUnauthenticated) this.viewerPromise = undefined;
-    return viewer;
+    if (result === "forbidden") this.viewerPromise = undefined;
+    return typeof result === "string" ? null : result;
   }
-
-  private lastVerifyUnauthenticated = false;
 
   /**
    * Asks cosmos.so who the credential belongs to, always over the network —
@@ -211,19 +209,21 @@ export class CosmosClient {
    * (network, 5xx, rate limit) throws, so callers can tell the two apart.
    */
   async verify(): Promise<Viewer | null> {
-    if (!this.hasCredentials) return null;
+    const result = await this.checkViewer();
+    return typeof result === "string" ? null : result;
+  }
+
+  /** The `me` lookup, keeping a 401 apart from a 403 so `viewer()` can cache only the first. */
+  private async checkViewer(): Promise<ViewerCheck> {
+    if (!this.hasCredentials) return "unauthenticated";
     try {
       const d = await this.request<{ me: { id: number; username: string } | null }>(
         "CosmosMcpViewer",
         "query CosmosMcpViewer { me { id username } }",
       );
-      this.lastVerifyUnauthenticated = !d.me;
-      return d.me ? { id: d.me.id, username: d.me.username } : null;
+      return d.me ? { id: d.me.id, username: d.me.username } : "unauthenticated";
     } catch (err) {
-      if (err instanceof CosmosError && (err.kind === "unauthenticated" || err.kind === "forbidden")) {
-        this.lastVerifyUnauthenticated = err.kind === "unauthenticated";
-        return null;
-      }
+      if (err instanceof CosmosError && (err.kind === "unauthenticated" || err.kind === "forbidden")) return err.kind;
       throw err;
     }
   }
@@ -260,6 +260,9 @@ export interface Viewer {
   /** Null when the id came from COSMOS_USER_ID rather than a `me` lookup. */
   username: string | null;
 }
+
+/** A resolved viewer, or why the credential was turned away. */
+type ViewerCheck = Viewer | "unauthenticated" | "forbidden";
 
 function mtimeOf(path: string): number {
   try {

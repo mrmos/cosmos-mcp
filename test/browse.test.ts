@@ -1402,6 +1402,7 @@ describe("cosmos.so links", () => {
     expect(parseCosmosUrl("https://example.com/e/12")).toBeNull();
     expect(parseCosmosUrl("https://www.cosmos.so/someone")).toBeNull();
     expect(parseCosmosUrl("not a url at all")).toBeNull();
+    expect(parseCosmosUrl("https://www.cosmos.so/someone/100%")).toBeNull();
   });
 
   test("cosmos_get_element takes a link", async () => {
@@ -1478,6 +1479,23 @@ describe("category arguments take an id or a slug", () => {
     );
     await run();
     expect(calls.at(-1)!.vars.searchCategory).toBe("fashion");
+  });
+
+  test("cosmos_suggested_searches resolves a name, in any case, to its slug", async () => {
+    const { run, calls } = call(
+      "cosmos_suggested_searches",
+      { category: "Fashion" },
+      { request: async (op) => (op === "CosmosMcpCategories" ? categories : { searches: null }) },
+    );
+    await run();
+    expect(calls.at(-1)!.vars.searchCategory).toBe("fashion");
+  });
+
+  test("cosmos_suggested_searches refuses an unknown id instead of dropping the filter", async () => {
+    const { run, calls } = call("cosmos_suggested_searches", { category: 999 }, { request: async () => categories });
+    const result = await run();
+    expect(result.isError).toBe(true);
+    expect(calls.map((c) => c.op)).toEqual(["CosmosMcpCategories"]);
   });
 });
 

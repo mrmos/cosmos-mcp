@@ -8,7 +8,7 @@
  * and a stray byte there corrupts the protocol.
  */
 
-import { loadConfig, type CosmosConfig } from "./config";
+import { asAuthorizationHeader, loadConfig, type CosmosConfig } from "./config";
 import { CosmosClient } from "./graphql/client";
 import { clearAuth, configPath, readAuth, redact, writeAuth } from "./auth-store";
 import { SIGNED_IN_ONLY_TOOLS, SIGNED_OUT_TOOLS } from "./tools/catalog";
@@ -88,9 +88,6 @@ async function readSecret(prompt: string): Promise<string> {
   });
 }
 
-/** A JWT is three base64url segments joined by dots. */
-const JWT_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-
 export type Credential =
   | { kind: "authorization"; authorization: string }
   | { kind: "cookie"; cookie: string }
@@ -107,9 +104,8 @@ export function classifyCredential(raw: string): Credential {
   if (value === "") return { kind: "unknown" };
 
   // "Bearer eyJ…" or a bare JWT.
-  const bare = value.replace(/^Bearer\s+/i, "");
-  if (JWT_RE.test(bare)) return { kind: "authorization", authorization: `Bearer ${bare}` };
-  if (/^Bearer\s+\S/i.test(value)) return { kind: "authorization", authorization: value };
+  const authorization = asAuthorizationHeader(value);
+  if (authorization) return { kind: "authorization", authorization };
 
   if (value.includes("=") && !value.startsWith("{")) {
     // AWS load-balancer cookies alone never authenticate; refuse them early so
@@ -251,7 +247,6 @@ function help(): number {
   out("  cosmos-mcp login     Save a cosmos.so credential, after checking it works.");
   out("  cosmos-mcp status    Show which credential is in use and whether it is still valid.");
   out("  cosmos-mcp logout    Remove the saved credential.");
-  out();
   out();
   out("Add it to Claude Code:");
   out("  claude mcp add cosmos -s user -- npx -y cosmos-mcp");

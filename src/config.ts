@@ -99,15 +99,36 @@ function parsePositiveInt(raw: string | undefined, label: string): number | unde
 const JWT_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
 /**
+ * The `Authorization` header for a pasted value that is recognisably a token:
+ * a bare JWT, or anything already carrying a `Bearer ` prefix. Undefined
+ * otherwise. Shared by `loadConfig` and the `login` command.
+ */
+export function asAuthorizationHeader(raw: string | undefined): string | undefined {
+  const value = raw?.trim();
+  if (!value) return undefined;
+  const bare = value.replace(/^Bearer\s+/i, "");
+  if (JWT_RE.test(bare)) return `Bearer ${bare}`;
+  return /^Bearer\s+\S/i.test(value) ? value : undefined;
+}
+
+/**
  * People paste the bare token as often as the whole header. The API needs the
  * `Bearer ` prefix, and without it every call 401s as "not signed in".
+ * Values that are not recognisably a token pass through unchanged.
  */
 export function normalizeAuthorization(raw: string | undefined): string | undefined {
   const value = raw?.trim();
   if (!value) return undefined;
-  if (/^Bearer\s+/i.test(value)) return value;
-  return JWT_RE.test(value) ? `Bearer ${value}` : value;
+  return asAuthorizationHeader(value) ?? value;
 }
+
+/**
+ * A `${...}` template the MCP host did not fill in, such as an optional
+ * `${user_config.cosmos_authorization}` the user left empty in Claude Desktop.
+ * Treating it as a credential would sign every request with garbage, and as an
+ * environment credential it would also outrank a later `cosmos-mcp login`.
+ */
+const UNFILLED_TEMPLATE_RE = /^\$\{[^}]*\}$/;
 
 /**
  * Resolves configuration from three places, in order of precedence:
@@ -117,17 +138,22 @@ export function normalizeAuthorization(raw: string | undefined): string | undefi
  *   3. `~/.config/cosmos-mcp/config.json` — written by `cosmos-mcp login`
  *
  * The third exists because `npx` users have no package directory to edit.
- * The first place that holds a credential supplies all of it.
+ * The first place that holds a credential supplies all of it, user id
+ * included: `COSMOS_USER_ID` counts only when it sits beside the credential,
+ * so an old id in `.env` cannot be paired with another account's login.
  */
 export function loadConfig(processEnv: NodeJS.ProcessEnv = process.env): CosmosConfig {
   const fileEnv = loadDotEnv();
   const read = (key: string): string | undefined => processEnv[key] ?? fileEnv[key];
-  const nonEmpty = (v: string | undefined) => (v?.trim() ? v.trim() : undefined);
+  const nonEmpty = (v: string | undefined) => {
+    const value = v?.trim();
+    return value && !UNFILLED_TEMPLATE_RE.test(value) ? value : undefined;
+  };
 
   let credentialSource: CredentialSource = "none";
   let cookie: string | undefined;
   let authorization: string | undefined;
-  let storedUserId: number | undefined;
+  let userId: number | undefined;
   let username: string | undefined;
 
   const envAuth = nonEmpty(processEnv.COSMOS_AUTHORIZATION);
@@ -139,31 +165,30 @@ export function loadConfig(processEnv: NodeJS.ProcessEnv = process.env): CosmosC
     credentialSource = "environment";
     authorization = envAuth;
     cookie = envCookie;
+    userId = parsePositiveInt(nonEmpty(processEnv.COSMOS_USER_ID), "COSMOS_USER_ID");
   } else if (dotAuth || dotCookie) {
     credentialSource = "dotenv";
     authorization = dotAuth;
     cookie = dotCookie;
+    userId = parsePositiveInt(nonEmpty(fileEnv.COSMOS_USER_ID), "COSMOS_USER_ID");
   } else {
     const stored = readAuth(processEnv);
     if (stored.authorization || stored.cookie) {
       credentialSource = "stored";
       authorization = nonEmpty(stored.authorization);
       cookie = nonEmpty(stored.cookie);
-      storedUserId = typeof stored.userId === "number" ? stored.userId : undefined;
+      userId = typeof stored.userId === "number" ? stored.userId : undefined;
       username = typeof stored.username === "string" ? stored.username : undefined;
     }
   }
-
-  const explicitUserId = parsePositiveInt(read("COSMOS_USER_ID"), "COSMOS_USER_ID");
 
   return {
     endpoint: read("COSMOS_ENDPOINT")?.trim() || DEFAULT_ENDPOINT,
     cookie,
     authorization: normalizeAuthorization(authorization),
     credentialSource,
-    userId: explicitUserId ?? storedUserId,
-    // The stored username describes the stored user id; drop it if the id was overridden.
-    username: explicitUserId === undefined ? username : undefined,
+    userId,
+    username,
     clientName: read("COSMOS_CLIENT_NAME")?.trim() || DEFAULT_CLIENT_NAME,
     userAgent: read("COSMOS_USER_AGENT")?.trim() || DEFAULT_USER_AGENT,
     timeoutMs: parsePositiveInt(read("COSMOS_TIMEOUT_MS"), "COSMOS_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS,

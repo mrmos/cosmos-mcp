@@ -53,13 +53,29 @@ test("the stored credential brings its user id and username", () => {
   expect(config.username).toBe("account-a");
 });
 
-test("an explicit COSMOS_USER_ID wins, and drops the stored username that described another id", () => {
+test("COSMOS_USER_ID cannot override the id saved with a login for another account", () => {
   if (hasDotEnvCredential) return;
   const env = sandbox();
   writeAuth({ authorization: "Bearer stored", userId: 111, username: "account-a" }, env);
   const config = loadConfig({ ...env, COSMOS_USER_ID: "222" });
+  expect(config.credentialSource).toBe("stored");
+  expect(config.userId).toBe(111);
+  expect(config.username).toBe("account-a");
+});
+
+test("COSMOS_USER_ID applies beside an env credential", () => {
+  const config = loadConfig({ ...sandbox(), COSMOS_AUTHORIZATION: "Bearer env", COSMOS_USER_ID: "222" });
+  expect(config.credentialSource).toBe("environment");
   expect(config.userId).toBe(222);
-  expect(config.username).toBeUndefined();
+});
+
+test("an unfilled ${...} template from the MCP host is not a credential", () => {
+  if (hasDotEnvCredential) return;
+  const env = sandbox();
+  writeAuth({ authorization: "Bearer stored", userId: 111 }, env);
+  const config = loadConfig({ ...env, COSMOS_AUTHORIZATION: "${user_config.cosmos_authorization}" });
+  expect(config.credentialSource).toBe("stored");
+  expect(config.authorization).toBe("Bearer stored");
 });
 
 test("a malformed number falls back to the default instead of crashing start-up", () => {

@@ -76,7 +76,6 @@ export function classify(code: string | undefined, status: number): CosmosErrorK
   return "unknown";
 }
 
-/** Builds the user-facing message for a set of GraphQL errors. */
 /**
  * Codes that mean the query document itself no longer matches the API. The
  * agent cannot fix those by changing its arguments: Cosmos changed its private
@@ -96,12 +95,26 @@ const SCHEMA_DRIFT_HINT =
   "cosmos.so probably changed its private API. Tell the user to update with `npx -y cosmos-mcp@latest` " +
   "(npx can keep an old copy cached), or to report it at https://github.com/mrmos/cosmos-mcp/issues.";
 
-export function describe(kind: CosmosErrorKind, errors: CosmosGraphQLError[], operation: string): string {
+/**
+ * Builds the user-facing message for a set of GraphQL errors. `signedIn` says
+ * whether the request carried a credential: Cosmos answers a signed-out read
+ * of a private board with "forbidden", which then means "sign in", not
+ * "this account lacks access".
+ */
+export function describe(
+  kind: CosmosErrorKind,
+  errors: CosmosGraphQLError[],
+  operation: string,
+  signedIn = true,
+): string {
   const detail = errors.map((e) => e.message).join("; ") || "no error detail returned";
   if (errors.some((e) => SCHEMA_DRIFT_CODES.has(String(e.extensions?.code ?? "")))) {
     return `${operation}: ${detail}. ${SCHEMA_DRIFT_HINT}`;
   }
   if (kind === "unauthenticated") return `${operation}: not signed in. ${AUTH_HINT}`;
+  if (kind === "forbidden" && !signedIn) {
+    return `${operation}: not signed in, and this is private or needs an account. ${detail}. ${AUTH_HINT}`;
+  }
   if (kind === "forbidden") return `${operation}: signed in, but this account cannot access that. ${detail}`;
   if (kind === "rate_limited") return `${operation}: rate limited by cosmos.so. Retry in a moment.`;
   return `${operation}: ${detail}`;

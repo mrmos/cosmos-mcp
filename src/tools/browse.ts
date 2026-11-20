@@ -1063,8 +1063,9 @@ export async function resolveCategory(
   const match = categories.find(
     (c) => c.id === asNumber || c.slug?.toLowerCase() === wanted || c.name?.toLowerCase() === wanted,
   );
+  // An unknown id lands here only when the caller needs its slug, and passing
+  // the bare id on would quietly drop the filter, so it is an error too.
   if (match) return match;
-  if (asNumber !== null) return { id: asNumber, name: null, slug: null };
   throw new CosmosError(
     `${operation}: no category ${JSON.stringify(value)}. Valid slugs: ${categories.map((c) => c.slug).join(", ")}.`,
     { kind: "validation", operation },
@@ -1087,7 +1088,12 @@ export function parseCosmosUrl(
     return null;
   }
   if (!/(^|\.)cosmos\.so$/i.test(url.hostname)) return null;
-  const parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+  let parts: string[];
+  try {
+    parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+  } catch {
+    return null; // a malformed %-escape: not a link we can read
+  }
   if (parts[0] === "e" && parts[1] && /^\d+$/.test(parts[1])) return { kind: "element", elementId: Number(parts[1]) };
   if (parts.length === 2 && parts[0] !== "e") return { kind: "cluster", username: parts[0]!, slug: parts[1]! };
   return null;
@@ -1750,12 +1756,12 @@ export const registerBrowseTools: ToolRegistrar = (server, ctx) => {
     guard(async (args: { category?: number | string; previewWidth?: number }) => {
       const previewWidth = args.previewWidth ?? DEFAULT_PREVIEW_WIDTH;
       // This API takes the slug, unlike explore and boards, which take the id.
+      // Resolve every form (id, slug, name, any case) so a typo is an error
+      // rather than an empty or unfiltered result.
       const searchCategory =
-        typeof args.category === "string" && !/^\d+$/.test(args.category.trim())
-          ? args.category
-          : args.category !== undefined
-            ? ((await resolveCategory(client, args.category, "cosmos_suggested_searches", true)).slug ?? null)
-            : null;
+        args.category !== undefined
+          ? (await resolveCategory(client, args.category, "cosmos_suggested_searches", true)).slug
+          : null;
       const data = await client.request<{ searches: any }>("CosmosMcpSuggestedSearches", SUGGESTED_SEARCHES, {
         searchCategory,
       });
