@@ -8,9 +8,29 @@
  * and a stray byte there corrupts the protocol.
  */
 
-import { loadConfig } from "./config";
-import { CosmosClient } from "./graphql/client";
+import { asAuthorizationHeader, loadConfig, type CosmosConfig } from "./config";
+import { errorMessage } from "./errors";
+import { CosmosClient, type Viewer } from "./graphql/client";
 import { clearAuth, configPath, readAuth, redact, writeAuth } from "./auth-store";
+import { SIGNED_IN_ONLY_TOOLS, SIGNED_OUT_TOOLS } from "./tools/catalog";
+
+const TOTAL_TOOLS = SIGNED_OUT_TOOLS.length + SIGNED_IN_ONLY_TOOLS.length;
+
+/** Human wording for where a credential came from, and how to change it. */
+function describeSource(config: CosmosConfig): string {
+  switch (config.credentialSource) {
+    case "environment":
+      return `the ${config.authorization ? "COSMOS_AUTHORIZATION" : "COSMOS_COOKIE"} environment variable`;
+    case "dotenv":
+      return "the .env file next to the package";
+    case "stored": {
+      const stored = readAuth();
+      return `${configPath()} (saved ${stored.savedAt ?? "at an unknown time"})`;
+    }
+    case "none":
+      return "nowhere — no credential configured";
+  }
+}
 
 const out = (s = "") => process.stderr.write(s + "\n");
 
@@ -69,9 +89,6 @@ async function readSecret(prompt: string): Promise<string> {
   });
 }
 
-/** A JWT is three base64url segments joined by dots. */
-const JWT_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-
 export type Credential =
   | { kind: "authorization"; authorization: string }
   | { kind: "cookie"; cookie: string }
@@ -88,9 +105,8 @@ export function classifyCredential(raw: string): Credential {
   if (value === "") return { kind: "unknown" };
 
   // "Bearer eyJ…" or a bare JWT.
-  const bare = value.replace(/^Bearer\s+/i, "");
-  if (JWT_RE.test(bare)) return { kind: "authorization", authorization: `Bearer ${bare}` };
-  if (/^Bearer\s+\S/i.test(value)) return { kind: "authorization", authorization: value };
+  const authorization = asAuthorizationHeader(value);
+  if (authorization) return { kind: "authorization", authorization };
 
   if (value.includes("=") && !value.startsWith("{")) {
     // AWS load-balancer cookies alone never authenticate; refuse them early so
@@ -136,15 +152,14 @@ async function login(): Promise<number> {
     ...loadConfig({}),
     cookie: cred.kind === "cookie" ? cred.cookie : undefined,
     authorization: cred.kind === "authorization" ? cred.authorization : undefined,
-    userId: undefined,
   });
 
-  let viewer: { id: number; username: string | null } | null;
+  let viewer: Viewer | null;
   try {
-    viewer = await client.viewer();
+    viewer = await client.verify();
   } catch (err) {
     out();
-    out(`Could not reach cosmos.so: ${err instanceof Error ? err.message : String(err)}`);
+    out(`Could not reach cosmos.so: ${errorMessage(err)}`);
     out("Nothing was saved.");
     return 1;
   }
@@ -164,38 +179,45 @@ async function login(): Promise<number> {
   out();
   out(`Signed in as @${viewer.username ?? viewer.id}.`);
   out(`Saved to ${path} (owner-only permissions).`);
-  out("All 36 tools are now available. Restart your MCP client to pick this up.");
+
+  const effective = loadConfig();
+  if (effective.credentialSource !== "stored") {
+    out();
+    out(`Warning: ${describeSource(effective)} also holds a credential, and it takes priority`);
+    out("over the one just saved. Remove it, or this login will have no effect.");
+    return 0;
+  }
+  out(`All ${TOTAL_TOOLS} tools are now available. A running server picks this up on its next`);
+  out("tool call. If your MCP client config sets COSMOS_AUTHORIZATION, that still wins: remove it.");
   return 0;
 }
 
 async function status(): Promise<number> {
   const config = loadConfig();
-  const stored = readAuth();
-
-  const source =
-    process.env.COSMOS_AUTHORIZATION || process.env.COSMOS_COOKIE
-      ? "environment variable"
-      : stored.authorization || stored.cookie
-        ? `${configPath()} (saved ${stored.savedAt ?? "at an unknown time"})`
-        : config.authorization || config.cookie
-          ? ".env next to the package"
-          : "nowhere — no credential configured";
 
   const kind = config.authorization ? "Bearer token" : config.cookie ? "Cookie" : "(none)";
-  out(`Credential source: ${source}`);
+  out(`Credential source: ${describeSource(config)}`);
   out(`Credential:        ${kind} · ${redact(config.authorization ?? config.cookie)}`);
   out(`Endpoint:          ${config.endpoint}`);
 
   if (!config.cookie && !config.authorization) {
     out();
-    out("18 of the 36 tools work without signing in: search, browsing and public profiles.");
+    out(`${SIGNED_OUT_TOOLS.length} of the ${TOTAL_TOOLS} tools work without signing in: search, browsing and public profiles.`);
     out("Run `cosmos-mcp login` to unlock saving and collections.");
     return 0;
   }
 
   out();
   out("Checking it against cosmos.so…");
-  const viewer = await new CosmosClient(config).viewer().catch(() => null);
+  // verify(), not viewer(): a stored user id must not stand in for a live check.
+  let viewer: Viewer | null;
+  try {
+    viewer = await new CosmosClient(config).verify();
+  } catch (err) {
+    out(`Could not check it: ${errorMessage(err)}`);
+    out("This is a network or cosmos.so problem, not necessarily a bad credential. Try again shortly.");
+    return 1;
+  }
   if (viewer) {
     out(`Valid. Signed in as @${viewer.username ?? viewer.id}.`);
     return 0;
@@ -207,11 +229,11 @@ async function status(): Promise<number> {
 function logout(): number {
   const removed = clearAuth();
   out(removed ? `Removed ${configPath()}.` : "No stored credential to remove.");
-  const envVar = process.env.COSMOS_AUTHORIZATION ? "COSMOS_AUTHORIZATION" : process.env.COSMOS_COOKIE ? "COSMOS_COOKIE" : null;
-  if (envVar) {
+  const remaining = loadConfig();
+  if (remaining.credentialSource !== "none") {
     out();
-    out(`Note: ${envVar} is still set in your environment, so the server stays signed in.`);
-    out("Unset it, or remove it from your MCP client config, to fully sign out.");
+    out(`Note: ${describeSource(remaining)} still holds a credential, so the server stays signed in.`);
+    out("Remove it there, or from your MCP client config, to fully sign out.");
   }
   out("Signing out of that browser session on cosmos.so revokes the token itself.");
   return 0;
@@ -221,18 +243,30 @@ function help(): number {
   out("cosmos-mcp — unofficial MCP server for cosmos.so");
   out();
   out("  cosmos-mcp           Run the MCP server on stdio. This is what MCP clients invoke.");
+  out("  cosmos-mcp serve     The same, even from an interactive terminal.");
   out("  cosmos-mcp login     Save a cosmos.so credential, after checking it works.");
   out("  cosmos-mcp status    Show which credential is in use and whether it is still valid.");
   out("  cosmos-mcp logout    Remove the saved credential.");
+  out();
+  out("Add it to Claude Code:");
+  out("  claude mcp add cosmos -s user -- npx -y cosmos-mcp");
   out();
   out("Docs: https://github.com/mrmos/cosmos-mcp");
   return 0;
 }
 
-/** Returns an exit code, or null when the caller should start the server. */
-export async function runCli(argv: string[]): Promise<number | null> {
+/**
+ * Returns an exit code, or null when the caller should start the server. MCP
+ * clients pipe stdin, so a bare run in a terminal (`interactive`) gets help.
+ */
+export async function runCli(argv: string[], interactive = false): Promise<number | null> {
   switch (argv[0]) {
     case undefined:
+      if (!interactive) return null;
+      out("cosmos-mcp is an MCP server: it is meant to be started by an MCP client, not run by hand.");
+      out();
+      return help();
+    case "serve":
       return null;
     case "login":
       return login();

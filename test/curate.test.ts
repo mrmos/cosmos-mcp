@@ -53,7 +53,7 @@ function harness(opts: {
     async requireViewer(operation: string) {
       if (opts.viewer) return opts.viewer;
       throw new CosmosError(
-        `${operation}: not signed in. Set COSMOS_COOKIE to the \`Cookie\` header from a signed-in cosmos.so browser session.`,
+        `${operation}: not signed in. Ask the user to run \`npx cosmos-mcp login\`.`,
         { kind: "unauthenticated", operation },
       );
     },
@@ -694,7 +694,7 @@ describe("signed out", () => {
       expect(result.isError, name).toBe(true);
       const body = JSON.parse((result.content[0] as { text: string }).text);
       expect(body.error, name).toBe("unauthenticated");
-      expect(body.message, name).toContain("COSMOS_COOKIE");
+      expect(body.message, name).toContain("cosmos-mcp login");
     }
     expect(calls).toHaveLength(0);
   });

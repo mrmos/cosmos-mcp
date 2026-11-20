@@ -17,6 +17,7 @@ import {
   normalizeSearchElement,
   normalizeSearchUser,
   normalizeSpotlight,
+  parseCosmosUrl,
   registerBrowseTools,
 } from "../src/tools/browse";
 
@@ -753,6 +754,38 @@ describe("cosmos_similar_elements", () => {
     expect(p.note).toContain("single seed");
   });
 
+  test("one failing seed does not discard the other seeds' results", async () => {
+    const { run } = call(
+      "cosmos_similar_elements",
+      { elementIds: [7, 8], limit: 4 },
+      {
+        request: async (_op, _q, vars) => {
+          if ((vars.elementIds as number[])[0] === 8) throw new CosmosError("no such element", { kind: "not_found" });
+          return { similarElementsV2: elementList([10, 11]) };
+        },
+      },
+    );
+    const result = await run();
+    expect(result.isError).toBeUndefined();
+    const p = payloadOf(result);
+    expect(p.items.map((e: any) => e.id)).toEqual([10, 11]);
+    expect(p.failedSeeds).toEqual([{ elementId: 8, error: "no such element" }]);
+    expect(p.summary).toContain("1 of 2 seeds");
+  });
+
+  test("every seed failing is an error result", async () => {
+    const { run } = call(
+      "cosmos_similar_elements",
+      { elementIds: [7, 8] },
+      {
+        request: async () => {
+          throw new CosmosError("boom", { kind: "server" });
+        },
+      },
+    );
+    expect((await run()).isError).toBe(true);
+  });
+
   test("seeds never come back as their own results", async () => {
     const { run } = call(
       "cosmos_similar_elements",
@@ -1020,7 +1053,7 @@ describe("cosmos_list_user_clusters", () => {
     const p = payloadOf(result);
     expect(p.partial).toBe(true);
     expect(p.totalCount).toBe(21);
-    expect(p.note).toContain("COSMOS_COOKIE");
+    expect(p.note).toContain("cosmos-mcp login");
     expect(calls.map((c) => c.op)).toEqual(["CosmosMcpUserClusters", "CosmosMcpUserTopClusters"]);
   });
 
@@ -1355,4 +1388,118 @@ describe.skipIf(!process.env.COSMOS_LIVE_TESTS)("live schema validation", () => 
       expect({ bad, coerced: r.codes.includes("ARGUMENTS_OF_CORRECT_TYPE") }).toEqual({ bad, coerced: true });
     }
   }, 30_000);
+});
+
+describe("cosmos.so links", () => {
+  test("parseCosmosUrl reads element and collection links", () => {
+    expect(parseCosmosUrl("https://www.cosmos.so/e/2098353719")).toEqual({ kind: "element", elementId: 2098353719 });
+    expect(parseCosmosUrl("cosmos.so/e/12?ref=x")).toEqual({ kind: "element", elementId: 12 });
+    expect(parseCosmosUrl("https://www.cosmos.so/someone/warm-rooms")).toEqual({
+      kind: "cluster",
+      username: "someone",
+      slug: "warm-rooms",
+    });
+    expect(parseCosmosUrl("https://example.com/e/12")).toBeNull();
+    expect(parseCosmosUrl("https://www.cosmos.so/someone")).toBeNull();
+    expect(parseCosmosUrl("not a url at all")).toBeNull();
+    expect(parseCosmosUrl("https://www.cosmos.so/someone/100%")).toBeNull();
+  });
+
+  test("cosmos_get_element takes a link", async () => {
+    const { run, calls } = call(
+      "cosmos_get_element",
+      { url: "https://www.cosmos.so/e/7" },
+      { request: async () => ({ elementView: { element: elementNode(7) }, elementTopConnections: null }) },
+    );
+    const result = await run();
+    expect(result.isError).toBeUndefined();
+    expect(calls[0]!.vars.elementId).toBe(7);
+  });
+
+  test("a collection link given to cosmos_get_element says which tool to use", async () => {
+    const { run } = call("cosmos_get_element", { url: "https://www.cosmos.so/someone/board" });
+    const result = await run();
+    expect(result.isError).toBe(true);
+    expect(JSON.stringify(result.content)).toContain("cosmos_get_cluster");
+  });
+
+  test("cosmos_get_cluster takes a link and looks it up by owner and slug", async () => {
+    const { run, calls } = call(
+      "cosmos_get_cluster",
+      { url: "https://www.cosmos.so/someone/warm-rooms" },
+      { request: async () => ({ cluster: null, clusterConnections: null }) },
+    );
+    await run();
+    expect(calls[0]!.op).toBe("CosmosMcpClusterBySlug");
+    expect(calls[0]!.vars).toEqual({ input: { ownerUsername: "someone", slug: "warm-rooms" } });
+  });
+});
+
+describe("category arguments take an id or a slug", () => {
+  const categories = {
+    categories: { items: [{ id: 4, name: "Interiors", slug: "interiors" }, { id: 9, name: "Fashion", slug: "fashion" }] },
+  };
+
+  test("a slug is resolved to the id the API needs", async () => {
+    const { run, calls } = call(
+      "cosmos_browse_boards",
+      { category: "interiors" },
+      {
+        request: async (op) =>
+          op === "CosmosMcpCategories" ? categories : { categoryClusters: { items: [], meta: { count: 0 } } },
+      },
+    );
+    await run();
+    expect(calls.map((c) => c.op)).toEqual(["CosmosMcpCategories", "CosmosMcpCategoryClusters"]);
+    expect(calls[1]!.vars.categoryId).toBe(4);
+  });
+
+  test("a numeric id costs no extra lookup", async () => {
+    const { run, calls } = call(
+      "cosmos_explore",
+      { category: 9 },
+      { request: async () => ({ categoryElements: { items: [], meta: { count: 0 } } }) },
+    );
+    await run();
+    expect(calls.map((c) => c.op)).toEqual(["CosmosMcpCategoryElements"]);
+  });
+
+  test("an unknown slug lists the valid ones", async () => {
+    const { run } = call("cosmos_explore", { category: "nope" }, { request: async () => categories });
+    const result = await run();
+    expect(result.isError).toBe(true);
+    expect(JSON.stringify(result.content)).toContain("interiors, fashion");
+  });
+
+  test("cosmos_suggested_searches turns an id into the slug its API takes", async () => {
+    const { run, calls } = call(
+      "cosmos_suggested_searches",
+      { category: 9 },
+      { request: async (op) => (op === "CosmosMcpCategories" ? categories : { searches: null }) },
+    );
+    await run();
+    expect(calls.at(-1)!.vars.searchCategory).toBe("fashion");
+  });
+
+  test("cosmos_suggested_searches resolves a name, in any case, to its slug", async () => {
+    const { run, calls } = call(
+      "cosmos_suggested_searches",
+      { category: "Fashion" },
+      { request: async (op) => (op === "CosmosMcpCategories" ? categories : { searches: null }) },
+    );
+    await run();
+    expect(calls.at(-1)!.vars.searchCategory).toBe("fashion");
+  });
+
+  test("cosmos_suggested_searches refuses an unknown id instead of dropping the filter", async () => {
+    const { run, calls } = call("cosmos_suggested_searches", { category: 999 }, { request: async () => categories });
+    const result = await run();
+    expect(result.isError).toBe(true);
+    expect(calls.map((c) => c.op)).toEqual(["CosmosMcpCategories"]);
+  });
+});
+
+test("cosmos_view_images accepts previewWidth like every other tool", () => {
+  const { tool } = call("cosmos_view_images", {});
+  expect(Object.keys(tool.config.inputSchema)).toContain("previewWidth");
 });

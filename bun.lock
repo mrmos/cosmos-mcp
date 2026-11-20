@@ -4,15 +4,11 @@
   "workspaces": {
     "": {
       "name": "cosmos-mcp",
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.30.0",
-        "zod": "^4.4.3",
-      },
       "devDependencies": {
+        "@modelcontextprotocol/sdk": "^1.30.0",
         "@types/bun": "latest",
-      },
-      "peerDependencies": {
         "typescript": "^5",
+        "zod": "^4.4.3",
       },
     },
   },

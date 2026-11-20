@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import type { CosmosClient } from "../graphql/client";
-import { CosmosError } from "../errors";
+import { CosmosError, errorMessage } from "../errors";
 
 export interface ToolContext {
   client: CosmosClient;
@@ -19,26 +19,30 @@ export type ToolRegistrar = (server: McpServer, ctx: ToolContext) => void;
 export function ok(summary: string, data: unknown): CallToolResult {
   const payload = { summary, ...(data as object) };
   return {
-    content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+    content: [{ type: "text", text: JSON.stringify(payload) }],
     structuredContent: payload as Record<string, unknown>,
   };
 }
 
 /**
  * Failure result. Returns `isError` rather than throwing so the agent sees the
- * remediation text (how to set COSMOS_COOKIE, say) instead of a bare stack.
+ * remediation text (how to sign in, say) instead of a bare stack.
  */
 export function fail(error: unknown): CallToolResult {
-  const message =
-    error instanceof CosmosError
-      ? error.message
-      : error instanceof Error
-        ? error.message
-        : String(error);
+  const message = errorMessage(error);
   const kind = error instanceof CosmosError ? error.kind : "unknown";
   return {
     isError: true,
-    content: [{ type: "text", text: JSON.stringify({ error: kind, message }, null, 2) }],
+    content: [{ type: "text", text: JSON.stringify({ error: kind, message }) }],
+  };
+}
+
+/** A call the tool declined (bad arguments, no confirmation, nothing to do): an error, shaped like `ok()`. */
+export function refuse(summary: string, data: Record<string, unknown> = {}): CallToolResult {
+  const payload = { error: "refused", summary, success: false, ...data };
+  return {
+    isError: true,
+    content: [{ type: "text", text: JSON.stringify(payload) }],
   };
 }
 

@@ -95,11 +95,11 @@ describe("credentialSummary", () => {
 describe("signedOutPayload", () => {
   const cred = credentialSummary({});
 
-  test("missing credential points at COSMOS_COOKIE", () => {
+  test("missing credential points at cosmos-mcp login, not the cookie", () => {
     const p = signedOutPayload(cred, "missing");
     expect(p.authenticated).toBe(false);
     expect(p.reason).toBe("missing");
-    expect(p.howToFix).toContain("COSMOS_COOKIE");
+    expect(p.howToFix).toContain("cosmos-mcp login");
     expect(p.toolsAvailableNow).toContain("cosmos_search");
     expect(p.toolsRequiringSignIn).toContain("cosmos_save_elements");
   });
@@ -133,7 +133,7 @@ describe("cosmos_whoami", () => {
     const p = payloadOf(result);
     expect(p.authenticated).toBe(false);
     expect(p.reason).toBe("missing");
-    expect(p.howToFix).toContain("COSMOS_COOKIE");
+    expect(p.howToFix).toContain("cosmos-mcp login");
     expect(p.toolsAvailableNow.length).toBeGreaterThan(0);
   });
 
@@ -194,6 +194,15 @@ describe("cosmos_whoami", () => {
     const p = payloadOf(result);
     expect(p.authenticated).toBe(true);
     expect(p.library).toEqual({ clusterCount: null, elementCount: null });
+  });
+
+  test("a rate-limited viewer lookup is an error, not a 'rejected' credential", async () => {
+    const { result } = await callWhoami({
+      hasCredentials: true,
+      viewerError: new CosmosError("rate limited", { kind: "rate_limited" }),
+    });
+    expect(result.isError).toBe(true);
+    expect(JSON.stringify(result.content)).not.toContain("rejected");
   });
 
   test("a network error surfaces as an error result rather than a false negative", async () => {

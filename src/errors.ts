@@ -1,3 +1,8 @@
+/** The message of anything thrown, for error text. */
+export function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 /** GraphQL error entry as returned by api.cosmos.so. */
 export interface CosmosGraphQLError {
   message: string;
@@ -45,9 +50,11 @@ export class CosmosError extends Error {
 }
 
 const AUTH_HINT =
-  "Set COSMOS_COOKIE to the `Cookie` header from a signed-in cosmos.so browser " +
-  "session (DevTools > Network > any api.cosmos.so request > Request Headers). " +
-  "Browsing and search work without it; saving and collections do not.";
+  "Ask the user to run `npx cosmos-mcp login` in their own terminal, then retry" +
+  ": a running server picks up the saved credential without a restart. " +
+  "Alternatively set COSMOS_AUTHORIZATION to the whole `Authorization` request header " +
+  "(\"Bearer …\") from a signed-in cosmos.so browser session. Never ask the user to paste it into chat. " +
+  "Search and browsing work without signing in; saving and collections do not.";
 
 /** Maps a GraphQL error code plus HTTP status onto a `CosmosErrorKind`. */
 export function classify(code: string | undefined, status: number): CosmosErrorKind {
@@ -74,10 +81,28 @@ export function classify(code: string | undefined, status: number): CosmosErrorK
   return "unknown";
 }
 
-/** Builds the user-facing message for a set of GraphQL errors. */
-export function describe(kind: CosmosErrorKind, errors: CosmosGraphQLError[], operation: string): string {
+/** The query no longer matches the private schema: only a new release can fix it. */
+const SCHEMA_DRIFT_CODES = new Set(
+  "FIELDS_ON_CORRECT_TYPE GRAPHQL_VALIDATION_FAILED UNKNOWN_ARGUMENT UNKNOWN_TYPE PROVIDED_REQUIRED_ARGUMENTS ARGUMENTS_OF_CORRECT_TYPE VARIABLES_ARE_INPUT_TYPES".split(" "),
+);
+
+const SCHEMA_DRIFT_HINT =
+  "cosmos.so probably changed its private API. Tell the user to update with `npx -y cosmos-mcp@latest` " +
+  "(npx can keep an old copy cached), or to report it at https://github.com/mrmos/cosmos-mcp/issues.";
+
+/**
+ * Builds the user-facing message for a set of GraphQL errors. Signed out,
+ * "forbidden" means "sign in", not "this account lacks access".
+ */
+export function describe(kind: CosmosErrorKind, errors: CosmosGraphQLError[], operation: string, signedIn = true): string {
   const detail = errors.map((e) => e.message).join("; ") || "no error detail returned";
+  if (errors.some((e) => SCHEMA_DRIFT_CODES.has(String(e.extensions?.code ?? "")))) {
+    return `${operation}: ${detail}. ${SCHEMA_DRIFT_HINT}`;
+  }
   if (kind === "unauthenticated") return `${operation}: not signed in. ${AUTH_HINT}`;
+  if (kind === "forbidden" && !signedIn) {
+    return `${operation}: not signed in, and this is private or needs an account. ${detail}. ${AUTH_HINT}`;
+  }
   if (kind === "forbidden") return `${operation}: signed in, but this account cannot access that. ${detail}`;
   if (kind === "rate_limited") return `${operation}: rate limited by cosmos.so. Retry in a moment.`;
   return `${operation}: ${detail}`;

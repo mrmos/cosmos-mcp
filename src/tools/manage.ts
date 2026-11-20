@@ -6,7 +6,7 @@
  * gap that made moodboarding awkward, "save this image I found to my board".
  *
  * Every tool here calls `requireViewer()` first, so a signed-out caller gets the
- * actionable "set COSMOS_COOKIE" message instead of a raw GraphQL failure.
+ * actionable "run cosmos-mcp login" message instead of a raw GraphQL failure.
  *
  * Two schema facts drive most of the code below and are easy to get wrong:
  *
@@ -24,7 +24,7 @@ import { z } from "zod";
 import { CLUSTER_CORE } from "../graphql/fragments";
 import { CosmosError } from "../errors";
 import { normalizeCluster, type NormalizedCluster } from "../normalize";
-import { guard, ok, type ToolRegistrar } from "./kit";
+import { guard, ok, refuse, type ToolRegistrar } from "./kit";
 
 /* ------------------------------------------------------------------ *
  * Operations. Each one was POSTed unauthenticated to api.cosmos.so in
@@ -220,7 +220,7 @@ const clusterIdArg = z
   .number()
   .int()
   .positive()
-  .describe("Cosmos cluster (board) id. Get it from cosmos_list_my_clusters, cosmos_search or cosmos_get_cluster.");
+  .describe("Cosmos cluster (board) id. Get it from cosmos_list_my_clusters (your own boards), cosmos_search_clusters (public boards) or cosmos_get_cluster.");
 
 /* ------------------------------------------------------------------ *
  * Pure logic, kept out of the handlers so tests can hit it directly.
@@ -335,7 +335,7 @@ export const registerManageTools: ToolRegistrar = (server, ctx) => {
   server.registerTool(
     "cosmos_save_url",
     {
-      title: "Cosmos: save a URL into Cosmos",
+      title: "Save a URL into Cosmos",
       description: `Save an image, video or page URL from anywhere on the web into Cosmos, optionally straight onto a board. This is how "save this image I found to my board" works — everything else in this server can only move around elements that already exist in Cosmos.
 
 Pass \`url\` (the image or page you want saved) and, when you know where it belongs, \`clusterId\`. Omit \`clusterId\` and the element lands in the user's library unfiled, ready for cosmos_quick_connect_suggestion or cosmos_save_elements. \`sourceUrl\` is attribution only: the page the media came from, for credit.
@@ -399,7 +399,7 @@ Not exposed, but available in the API if a bulk path is ever needed: \`import.re
   server.registerTool(
     "cosmos_update_cluster",
     {
-      title: "Cosmos: rename or edit a cluster (board)",
+      title: "Rename or edit a cluster (board)",
       description: `Change a board's name, description, privacy or cover image. Every argument except \`clusterId\` is optional — pass only what you want changed.
 
 SAFE BY CONSTRUCTION: Cosmos' update mutation requires the name AND the privacy flag on every call, so this tool reads the board first and sends back the current values for whatever you left out. Passing only \`name\` renames the board and cannot flip it public by accident. That costs one extra read per call.
@@ -450,8 +450,7 @@ Returns \`changes\`, the list of what actually differed, so you can report back 
       }) => {
         const viewer = await client.requireViewer("cosmos_update_cluster");
         if (!hasClusterUpdates(args)) {
-          return ok("Nothing to do: no name, description, isPrivate or coverImageElementId was given.", {
-            success: false,
+          return refuse("Nothing to do: no name, description, isPrivate or coverImageElementId was given.", {
             clusterId: args.clusterId,
             changes: [],
           });
@@ -512,7 +511,7 @@ Returns \`changes\`, the list of what actually differed, so you can report back 
   server.registerTool(
     "cosmos_delete_cluster",
     {
-      title: "Cosmos: delete a cluster (board)",
+      title: "Delete a cluster (board)",
       description: `Permanently delete one board.
 
 THIS CANNOT BE UNDONE. There is no trash, no restore, and no undo through this server or through cosmos.so. Deleting a board the user cares about destroys their curation work.
@@ -539,9 +538,9 @@ Deletes one board per call, by design. Subclusters and the elements inside are C
     guard(async (args: { clusterId: number; confirm?: boolean }) => {
       const viewer = await client.requireViewer("cosmos_delete_cluster");
       if (args.confirm !== true) {
-        return ok(
+        return refuse(
           `Refused: deleting cluster ${args.clusterId} is permanent and cannot be undone. Confirm with the user, then call again with confirm: true.`,
-          { success: false, clusterId: args.clusterId, deleted: false, confirmationRequired: true },
+          { clusterId: args.clusterId, deleted: false, confirmationRequired: true },
         );
       }
       const data = await client.request<{ cluster: { deleteCluster: { success: boolean } | null } }>(
@@ -563,7 +562,7 @@ Deletes one board per call, by design. Subclusters and the elements inside are C
   server.registerTool(
     "cosmos_nest_cluster",
     {
-      title: "Cosmos: nest or un-nest a cluster",
+      title: "Nest or un-nest a cluster",
       description: `Move a board inside another board, or pull it back out to the top level. Cosmos calls a nested board a subcluster — it is how a big project gets split into "kitchen / bathroom / garden" without losing the parent.
 
 Pass \`parentClusterId\` to nest \`clusterId\` under it. Pass \`detach: true\` to lift it back to the top level. Exactly one of the two; passing both or neither is refused.
@@ -595,20 +594,17 @@ WRITES, but nothing is lost — no elements move and nothing is deleted, only wh
       const viewer = await client.requireViewer("cosmos_nest_cluster");
       const detach = args.detach === true;
       if (detach && args.parentClusterId !== undefined) {
-        return ok("Refused: pass either parentClusterId (to nest) or detach: true (to un-nest), not both.", {
-          success: false,
+        return refuse("Refused: pass either parentClusterId (to nest) or detach: true (to un-nest), not both.", {
           clusterId: args.clusterId,
         });
       }
       if (!detach && args.parentClusterId === undefined) {
-        return ok("Nothing to do: pass parentClusterId to nest this board, or detach: true to un-nest it.", {
-          success: false,
+        return refuse("Nothing to do: pass parentClusterId to nest this board, or detach: true to un-nest it.", {
           clusterId: args.clusterId,
         });
       }
       if (args.parentClusterId === args.clusterId) {
-        return ok(`Refused: cluster ${args.clusterId} cannot be its own parent.`, {
-          success: false,
+        return refuse(`Refused: cluster ${args.clusterId} cannot be its own parent.`, {
           clusterId: args.clusterId,
         });
       }
@@ -647,10 +643,10 @@ WRITES, but nothing is lost — no elements move and nothing is deleted, only wh
   server.registerTool(
     "cosmos_follow_cluster",
     {
-      title: "Cosmos: follow or unfollow a cluster",
+      title: "Follow or unfollow a cluster",
       description: `Follow someone else's board so its new saves show up in cosmos_following_feed, or unfollow with \`follow: false\`.
 
-Use it when the user likes a collection they found through cosmos_search or cosmos_get_cluster and wants to keep seeing it. Following is public on Cosmos — the board's owner can see their followers.
+Use it when the user likes a collection they found through cosmos_search_clusters or cosmos_get_cluster and wants to keep seeing it. Following is public on Cosmos — the board's owner can see their followers.
 
 WRITES, but harmlessly and reversibly: following twice is a no-op, and unfollowing restores the previous state exactly. It does NOT copy anything into the user's own boards; for that use cosmos_save_elements.`,
       inputSchema: {
@@ -688,10 +684,10 @@ WRITES, but harmlessly and reversibly: following twice is a no-op, and unfollowi
   server.registerTool(
     "cosmos_follow_user",
     {
-      title: "Cosmos: follow or unfollow a person",
+      title: "Follow or unfollow a person",
       description: `Follow a Cosmos user so their saves appear in cosmos_following_feed, or unfollow with \`follow: false\`.
 
-Identify them by \`userId\` or by \`username\` — exactly one. Usernames come from cosmos_search, cosmos_get_user or the \`suggestions\` list in cosmos_following_feed.
+Identify them by \`userId\` or by \`username\` — exactly one. Usernames come from cosmos_search_users, cosmos_get_user or the \`suggestions\` list in cosmos_following_feed.
 
 WRITES and is publicly visible: the other person is notified that they have a new follower. Reversible — unfollowing restores the previous state — but the notification cannot be taken back, so do not follow people speculatively. Following yourself is refused.`,
       inputSchema: {
@@ -709,11 +705,11 @@ WRITES and is publicly visible: the other person is notified that they have a ne
     guard(async (args: { userId?: number; username?: string; follow?: boolean }) => {
       const viewer = await client.requireViewer("cosmos_follow_user");
       if ((args.userId === undefined) === (args.username === undefined)) {
-        return ok("Refused: pass exactly one of userId or username.", { success: false });
+        return refuse("Refused: pass exactly one of userId or username.");
       }
       const followeeId = args.userId ?? (await client.userIdForUsername(args.username!));
       if (followeeId === viewer.id) {
-        return ok("Refused: you cannot follow yourself.", { success: false, userId: followeeId });
+        return refuse("Refused: you cannot follow yourself.", { userId: followeeId });
       }
       const follow = args.follow ?? true;
       const [op, query] = follow
@@ -738,7 +734,7 @@ WRITES and is publicly visible: the other person is notified that they have a ne
   server.registerTool(
     "cosmos_pin_cluster",
     {
-      title: "Cosmos: pin or unpin a cluster on your profile",
+      title: "Pin or unpin a cluster on your profile",
       description: `Pin one of the signed-in user's own boards to the top of their Cosmos profile, or unpin it with \`pin: false\`.
 
 Pinning is presentation only: it changes the order boards appear in on the profile page and nothing else. No elements move, nothing is shared, nothing is deleted.

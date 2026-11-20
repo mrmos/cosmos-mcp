@@ -1,14 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import pkg from "../package.json" with { type: "json" };
 import { loadConfig, type CosmosConfig } from "./config";
 import { CosmosClient } from "./graphql/client";
+import { configPath } from "./auth-store";
 import type { ToolContext } from "./tools/kit";
 import { registerAccountTools } from "./tools/account";
 import { registerBrowseTools } from "./tools/browse";
 import { registerCurateTools } from "./tools/curate";
 import { registerManageTools } from "./tools/manage";
+import { registerPrompts } from "./prompts";
 
 export const SERVER_NAME = "cosmos-mcp";
-export const SERVER_VERSION = "0.1.1";
+export const SERVER_VERSION: string = pkg.version;
 
 const INSTRUCTIONS = `Browse and curate cosmos.so, a visual discovery site, for moodboarding.
 
@@ -87,21 +90,29 @@ use cosmos_save_url. cosmos_update_cluster renames or re-describes a board and
 cosmos_nest_cluster arranges boards inside boards; cosmos_delete_cluster is
 permanent and needs explicit confirmation.
 
-Browsing, search and public profiles work signed out. Anything that writes, and
-anything touching private or personal data, needs COSMOS_COOKIE configured.`;
+SIGNED OUT IS THE DEFAULT. Call cosmos_whoami first. Browsing, search, similar
+images, cosmos_view_images and public profiles all work signed out, so you can
+still research a brief and present a shortlist as cosmos.so links. Anything that
+writes, and anything touching private or personal data, needs sign-in: when the
+user wants to save, ask them to run \`npx cosmos-mcp login\` in a terminal (never
+to paste a token into chat), then retry — no restart is needed.`;
 
-export function createServer(config: CosmosConfig = loadConfig()): McpServer {
+/** Without an explicit config, the server watches the `login` credential file. */
+export function createServer(config?: CosmosConfig): McpServer {
   const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     { instructions: INSTRUCTIONS },
   );
 
-  const ctx: ToolContext = { client: new CosmosClient(config) };
+  const ctx: ToolContext = {
+    client: config ? new CosmosClient(config) : new CosmosClient(loadConfig(), { path: configPath(), reload: loadConfig }),
+  };
 
   registerAccountTools(server, ctx);
   registerBrowseTools(server, ctx);
   registerCurateTools(server, ctx);
   registerManageTools(server, ctx);
+  registerPrompts(server);
 
   return server;
 }

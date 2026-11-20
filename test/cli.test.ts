@@ -41,3 +41,14 @@ test("empty or junk input is unknown", () => {
   expect(classifyCredential("hello there")).toEqual({ kind: "unknown" });
   expect(classifyCredential("{json:true}")).toEqual({ kind: "unknown" });
 });
+
+import { runCli } from "../src/cli";
+
+test("a bare run from a terminal shows help instead of hanging on stdin", async () => {
+  expect(await runCli([], true)).toBe(0);
+});
+
+test("a bare run from an MCP client, or `serve`, starts the server", async () => {
+  expect(await runCli([], false)).toBeNull();
+  expect(await runCli(["serve"], true)).toBeNull();
+});

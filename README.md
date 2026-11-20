@@ -4,295 +4,205 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-6E56CF)](https://modelcontextprotocol.io/)
 
-**Build moodboards with an AI agent.** cosmos-mcp is an unofficial [Model Context Protocol](https://modelcontextprotocol.io/) server for [cosmos.so](https://www.cosmos.so), the visual discovery site. It lets Claude, Cursor and any other MCP client search Cosmos, find similar images, and save collections to your account.
+cosmos-mcp lets an AI agent search [cosmos.so](https://www.cosmos.so) and build moodboards there. Cosmos is a site where people collect images. This is an unofficial [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server. MCP is the standard that lets apps such as Claude and Cursor use outside tools.
 
-Search and browsing need no setup. You add a token only when you want to save.
+Search and browsing work without an account. You sign in only to save.
 
-[![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
-[![Add to Claude Code](https://img.shields.io/badge/Add%20to-Claude%20Code-D97757?logo=anthropic&logoColor=white)](#install)
+![An agent searches Cosmos for "low-poly, chrome, chromatic fringe, melting glass", looks at the results, and builds a moodboard](docs/demo.gif)
 
-One command for Claude Code:
+## Before you install
 
-```bash
-claude mcp add cosmos -- npx -y cosmos-mcp
-```
-
-## Unofficial. Not affiliated with Cosmos.
-
-Read this before you install:
-
-- Cosmos publishes no API. This server calls the same private GraphQL endpoint the cosmos.so web app uses. Cosmos can change or remove that endpoint at any time, and this server will break when it does.
-- Write access reuses **your own browser session token** (the `Authorization` header). There is no OAuth and no scoping: the token can do everything your account can.
-- You are responsible for the [cosmos.so Terms of Service](https://www.cosmos.so/terms). Use your own account and your own data. Do not scrape.
-- Use at your own risk, including the risk of account restrictions. The [LICENSE](LICENSE) gives no warranty.
-
-## What it does
-
-On Cosmos, people save images, videos and products. Each saved item is an **element**. Elements are grouped into **collections**, which can nest. Cosmos calls a collection a *cluster* in its API, so the tool names use that word; this page says "collection".
-
-The server gives an agent tools for that model. In one turn, an agent can:
-
-1. Search Cosmos for "warm brutalist interiors".
-2. Find images that look like the best result.
-3. Look at each image and reject the weak ones.
-4. Create a collection and save the keepers.
-
-You describe what you want. The agent builds the moodboard.
-
-It suits three jobs:
-
-- **Research**: find reference for a brief without clicking through a site.
-- **Curation**: sort saved work into collections and move elements between them.
-- **Discovery**: start from one image you like and find more like it.
+- Cosmos publishes no API. This server uses the private API of the cosmos.so web app. If Cosmos changes that API, the server stops working until a new release fixes it.
+- To save, the server uses your own browser session token. The token can do everything that your account can do.
+- You must follow the [cosmos.so Terms of Service](https://www.cosmos.so/terms). Use your own account at a normal pace, and do not scrape.
+- You use this server at your own risk, including the risk that Cosmos restricts your account. This project is not affiliated with Cosmos.
 
 ## Install
 
-For Claude Code:
+[![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
+
+For Claude Code, run this command. The `-s user` flag adds the server to all of your projects.
 
 ```bash
-claude mcp add cosmos -- npx -y cosmos-mcp
+claude mcp add cosmos -s user -- npx -y cosmos-mcp
 ```
 
-Add `-e COSMOS_AUTHORIZATION="Bearer paste_your_token_here"` to enable the write tools, or run `npx cosmos-mcp login` later (see [Authentication](#authentication)).
+For Claude Desktop, download `cosmos-mcp-<version>.mcpb` from the latest [GitHub release](https://github.com/mrmos/cosmos-mcp/releases) and open it. You do not need Node.
 
-Every other client uses the same JSON config:
+Other MCP clients use this configuration:
 
 ```json
 {
   "mcpServers": {
     "cosmos": {
       "command": "npx",
-      "args": ["-y", "cosmos-mcp"],
-      "env": {
-        "COSMOS_AUTHORIZATION": "Bearer paste_your_token_here"
-      }
+      "args": ["-y", "cosmos-mcp"]
     }
   }
 }
 ```
 
-Where to put it:
+Put it in the configuration file of your client:
 
-- **Claude Code**: `.mcp.json` at your project root. This file is usually committed, so keep tokens out of it: use `claude mcp add -e`, `login`, or `.gitignore` it.
-- **Claude Desktop**: `claude_desktop_config.json`, at `~/Library/Application Support/Claude/` on macOS or `%APPDATA%\Claude\` on Windows. Restart the app afterwards.
-- **Cursor**: `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` for one.
+- Claude Desktop without the extension: `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `%APPDATA%\Claude\claude_desktop_config.json` on Windows. Restart the app after you edit the file.
+- Cursor: `~/.cursor/mcp.json` for all projects, or `.cursor/mcp.json` for one project.
+- Claude Code: `.mcp.json` at the project root. People often commit this file, so do not put a token in it.
 
-Leave out the `env` block if you only want search and browsing, or if you signed in with `login`.
+## Try it
 
-### From a local clone
+Ask your agent for something like this:
 
-Requires [Bun](https://bun.com):
+- "Show me 8 images of warm brutalist interiors from Cosmos."
+- "Search Cosmos for 90s Japanese book covers and show me the twelve best."
+- "Find images like this one on Cosmos and tell me what they have in common."
+- "Build a moodboard about warm brutalist interiors and save it to a new private collection."
+- "Take everything I saved this week and file it into the right collection."
+
+The last two need sign-in.
+
+The server also has a `moodboard` prompt. Claude Code shows it as `/mcp__cosmos__moodboard`. Give it a brief. If you also set `save` to `yes` and you are signed in, the agent saves the board to a new private collection.
+
+## Sign in to save
+
+You need to sign in only to save, or to read your own private collections. Cosmos has no API keys. The web app sends a bearer token (a secret string that proves who you are) in the `Authorization` header. This server uses your token in the same way.
+
+To get the token and save it:
+
+1. Sign in at [cosmos.so](https://www.cosmos.so) in your browser.
+2. Open DevTools. Press `Cmd+Option+I` on macOS or `F12` on Windows and Linux.
+3. Open the Network tab and reload the page.
+4. Click a request to `api.cosmos.so`.
+5. Under Request Headers, right-click `authorization` and choose Copy value. The value starts with `Bearer `.
+6. In a terminal, run `pbpaste | npx cosmos-mcp login`. On Windows or Linux, run `npx cosmos-mcp login` and paste the token when it asks.
+
+`login` makes sure that the token works, then saves it in `~/.config/cosmos-mcp/config.json`. Only your user account can read that file. A server that is already running uses the new token on its next tool call. You do not have to restart your client.
 
 ```bash
-git clone https://github.com/mrmos/cosmos-mcp.git
-cd cosmos-mcp
-bun install
-claude mcp add cosmos -- bun run /absolute/path/to/cosmos-mcp/index.ts
+npx cosmos-mcp status   # show which credential is in use, and test it
+npx cosmos-mcp logout   # remove the saved credential
 ```
 
-Use absolute paths: MCP clients do not reliably resolve relative ones. A local clone reads `.env`, so you can leave `env` out of the client config.
+If sign-in does not work:
 
-## Authentication
+- If `login` asks for the `Cookie` header, npx ran an old copy. Run `npx -y cosmos-mcp@latest login`.
+- Do not copy the `Cookie` header. Its `AWSALB` values do not sign you in.
+- Do not use a HAR file that you exported from DevTools. Chrome removes the token from it.
+- If the tools say "not signed in" after some time, the token expired. Run `login` again.
 
-Skip this until you want to save something. Every tool without an **A** in the [Tools](#tools) tables works right now.
+### Keep the token safe
 
-Cosmos has no API keys and no OAuth. The web app authenticates with a bearer token in the `Authorization` header, so this server reuses yours.
+The token works like a password. Anyone who has it can act as you on Cosmos.
 
-### Sign in
+- Do not paste the token into a chat with the agent. The chat transcript keeps it.
+- Do not commit the token to `.mcp.json` or to a dotfiles repository.
+- To cancel the token, sign out of that browser session on cosmos.so.
+
+The server sends the token only to `api.cosmos.so`. It has no telemetry.
+
+### Other ways to give the token
+
+The server takes the credential from the first of these places that has one:
+
+1. The `COSMOS_AUTHORIZATION` environment variable, for example in the `env` block of the client configuration.
+2. A `.env` file next to the package. This applies only to a local clone.
+3. `~/.config/cosmos-mcp/config.json`, which `login` writes.
+
+If you set `COSMOS_AUTHORIZATION`, a later `login` has no effect until you remove the variable. `login` warns you when this happens.
+
+To set the variable in Claude Code, put the `-e` flag before the `--`:
 
 ```bash
-npx cosmos-mcp login
+claude mcp add cosmos -s user -e COSMOS_AUTHORIZATION="Bearer <your token>" -- npx -y cosmos-mcp
 ```
 
-It walks you through copying the token, hides your input, verifies it against cosmos.so, and saves it only if it works. The credential goes in `~/.config/cosmos-mcp/config.json`, written owner-only, and is never printed back. You can also pipe it in from a password manager: `pbpaste | npx cosmos-mcp login`.
-
-```bash
-npx cosmos-mcp status    # which credential is in use, and whether it still works
-npx cosmos-mcp logout    # remove it
-```
-
-To copy the token (`login` prints these steps too):
-
-1. Sign in at [cosmos.so](https://www.cosmos.so), then open DevTools (`Cmd+Option+I` on macOS, `F12` elsewhere).
-2. In the **Network** tab, reload the page and click any request to `api.cosmos.so`.
-3. Under **Request Headers**, copy the whole `Authorization` value. It begins with `Bearer `.
-
-Do not copy the `Cookie` header: its `AWSALB` values are load-balancer routing and will not sign you in.
-
-The server reads a credential from three places; the first one wins:
-
-1. The `COSMOS_AUTHORIZATION` environment variable, set by an MCP client's `env` block.
-2. A `.env` file next to the package, for local clones.
-3. `~/.config/cosmos-mcp/config.json`, written by `login`.
-
-### Handling the token
-
-Treat it like a password: anyone holding it can act as you on Cosmos.
-
-- Never commit it, not to `.mcp.json`, a dotfile repo, or a screenshot.
-- Don't paste it into a chat message. That writes it into transcripts and sends it to a model provider. Use the `env` block, `.env`, or `login` instead.
-- It expires. When write tools report "not signed in", copy a fresh one.
-- Revoke it by signing out of that browser session on cosmos.so.
-
-The token is sent to `api.cosmos.so` and nowhere else. This server has no telemetry and writes nothing to disk beyond the credential file `login` saves.
-
-Why no password login? Cosmos has a login mutation, but using it would put your password through a third-party tool, and Cosmos rate-limits login attempts: scripted logins are exactly what its defences catch. A session token is narrower and revocable.
-
-### Environment variables
-
-Copy [`.env.example`](.env.example) to `.env` for a documented starting point. Nothing is required.
-
-| Variable | Default | What it does |
-| --- | --- | --- |
-| `COSMOS_AUTHORIZATION` | unset | The whole `Authorization` header value, `Bearer ` and all. The credential; unlocks every **A** tool. |
-| `COSMOS_COOKIE` | unset | A full session-bearing `Cookie` header, if you have one. The `AWSALB` cookies alone are not enough. |
-| `COSMOS_USER_ID` | unset | Your numeric Cosmos user id. Optional; skips the `me` lookup on first use. |
-| `COSMOS_ENDPOINT` | `https://api.cosmos.so/graphql` | GraphQL endpoint. Override only for a mock or proxy. |
-| `COSMOS_TIMEOUT_MS` | `30000` | Per-request timeout in milliseconds. |
-| `COSMOS_CLIENT_NAME` | `cosmos-web` | Sent as `x-client-name`. The API rejects unknown clients; leave it alone. |
-| `COSMOS_USER_AGENT` | a desktop Chrome string | Sent as `User-Agent`. |
+The Claude Desktop extension has a token field in its settings.
 
 ## Tools
 
-**A** means the tool needs a credential (`COSMOS_AUTHORIZATION`). Everything else works signed out. Without a credential, an **A** tool returns an error that explains the fix.
+18 of the 36 tools work signed out. The tools with "Yes" in the Sign-in column need a credential. If you call one of them signed out, it returns an error that tells you how to sign in.
+
+The Cosmos API calls a collection a "cluster", so the tool names use that word. An element is one saved image, video or product.
 
 ### Find things
 
-| Tool | What it does | |
+| Tool | What it does | Sign-in |
 | --- | --- | :-: |
-| `cosmos_search` | Search every public element by keyword. Filter by content type and colour. | |
-| `cosmos_search_clusters` | Search public collections. Someone has often already built the board you want. | |
-| `cosmos_search_users` | Find people by name or handle. | |
-| `cosmos_search_all` | Search collections, people and elements at once. | |
-| `cosmos_similar_elements` | Give it one image you like; it returns images that look like it. | |
-| `cosmos_element_saved_by` | Which public collections hold an image, and who saved it. Finds people with the taste you want. | |
-| `cosmos_browse_boards` | Browse 800+ curated collections, by category if you pass one. | |
-| `cosmos_conversational_search` | Describe a brief in a sentence; get images grouped into named directions. Experimental. | A |
-| `cosmos_explore` | The featured feed. Pass a category to narrow it. | |
-| `cosmos_spotlights` | Editorial collections, such as "Rooms Lit Only by Lamps". | |
-| `cosmos_categories` | The 17 subject areas, such as Fashion and Interiors. | |
-| `cosmos_suggested_searches` | Search phrases Cosmos promotes. Thin signed out. | |
-| `cosmos_cluster_recommendations` | What Cosmos thinks belongs in a collection you already started. | A |
+| `cosmos_search` | Searches public elements by keyword. Filters by content type and color. | |
+| `cosmos_search_clusters` | Searches public collections. | |
+| `cosmos_search_users` | Finds people by name or handle. | |
+| `cosmos_search_all` | Searches collections, people and elements in one call. | |
+| `cosmos_similar_elements` | Returns images that look like the images that you give it. | |
+| `cosmos_element_saved_by` | Shows which public collections hold an image, and who saved it. | |
+| `cosmos_browse_boards` | Browses about 800 curated collections, by category. | |
+| `cosmos_conversational_search` | Takes a one-sentence brief and returns images in named groups. Experimental. | Yes |
+| `cosmos_explore` | Returns the featured feed, by category. | |
+| `cosmos_spotlights` | Returns the collections that Cosmos features now, for example "Rooms Lit Only by Lamps". | |
+| `cosmos_categories` | Lists the 17 subject areas, for example Fashion and Interiors. | |
+| `cosmos_suggested_searches` | Lists search phrases that Cosmos promotes. Returns few results signed out. | |
+| `cosmos_cluster_recommendations` | Suggests elements for a collection. | Yes |
 
 ### Read things
 
-| Tool | What it does | |
+| Tool | What it does | Sign-in |
 | --- | --- | :-: |
-| `cosmos_get_element` | One element in full: media, caption, source URL and author. | |
-| `cosmos_get_cluster` | One collection: name, owner, size, cover and subcollections. | |
-| `cosmos_list_cluster_elements` | Page through the elements in a collection. | |
-| `cosmos_get_user` | A public profile: bio, links and top collections. | |
-| `cosmos_list_user_clusters` | The collections on a profile. Partial list when signed out. | |
-| `cosmos_view_images` | Return elements as real images so the model can look at them. Costs tokens; pass few ids. | |
+| `cosmos_get_element` | Returns one element: media, caption, source and author. Takes an id or a cosmos.so link. | |
+| `cosmos_get_cluster` | Returns one collection: name, owner, size and cover. Takes an id or a cosmos.so link. | |
+| `cosmos_list_cluster_elements` | Lists the elements in a collection. Private collections need sign-in. | |
+| `cosmos_get_user` | Returns a public profile. | |
+| `cosmos_list_user_clusters` | Lists the public collections on a profile. Returns only three when signed out. | |
+| `cosmos_view_images` | Shows elements to the model as images. Images use many tokens, so the agent passes few at a time. | |
 
 ### Build collections
 
-| Tool | What it does | |
+| Tool | What it does | Sign-in |
 | --- | --- | :-: |
-| `cosmos_create_cluster` | Create an empty collection. Private by default. | A |
-| `cosmos_save_elements` | Add elements to one collection. | A |
-| `cosmos_save_url` | Save an image or page from anywhere on the web. Returns the new element id. | A |
-| `cosmos_organize_elements` | Add and remove elements across collections in one call. | A |
-| `cosmos_update_cluster` | Rename a collection, or change its description, privacy or cover. | A |
-| `cosmos_nest_cluster` | Put a collection inside another, or pull it back out. | A |
-| `cosmos_delete_cluster` | Delete a collection. Permanent. Needs `confirm: true`. | A |
-| `cosmos_find_clusters_for_element` | Which of your collections an element can go in, and which already hold it. | A |
-| `cosmos_quick_connect_suggestion` | Ask Cosmos where an element belongs. | A |
+| `cosmos_create_cluster` | Creates an empty collection. Private by default. | Yes |
+| `cosmos_save_elements` | Adds elements to a collection. | Yes |
+| `cosmos_save_url` | Saves an image or page from any website. | Yes |
+| `cosmos_organize_elements` | Adds elements to collections and removes them, in one call. | Yes |
+| `cosmos_update_cluster` | Changes the name, description, privacy or cover of a collection. | Yes |
+| `cosmos_nest_cluster` | Puts a collection inside another collection, or takes it out. | Yes |
+| `cosmos_delete_cluster` | Deletes a collection permanently. The agent must pass `confirm: true`. | Yes |
+| `cosmos_find_clusters_for_element` | Shows which of your collections already hold an element. | Yes |
+| `cosmos_quick_connect_suggestion` | Asks Cosmos which collection an element belongs in. | Yes |
 
 ### Your account
 
-| Tool | What it does | |
+| Tool | What it does | Sign-in |
 | --- | --- | :-: |
-| `cosmos_whoami` | Report what the server can do now. Works signed out. Call it first. | |
-| `cosmos_my_library` | Everything you have saved. | A |
-| `cosmos_list_my_clusters` | Your collections, private ones included. | A |
-| `cosmos_following_feed` | Recent saves by the people you follow. | A |
-| `cosmos_activity` | Your notifications. | A |
-| `cosmos_follow_user` | Follow or unfollow a person. | A |
-| `cosmos_follow_cluster` | Follow or unfollow a collection. | A |
-| `cosmos_pin_cluster` | Pin one of your collections to your profile, or unpin it. | A |
+| `cosmos_whoami` | Tells the agent whether it is signed in. | |
+| `cosmos_my_library` | Returns everything that you saved. | Yes |
+| `cosmos_list_my_clusters` | Lists your collections, including private ones. | Yes |
+| `cosmos_following_feed` | Returns recent saves by the people that you follow. | Yes |
+| `cosmos_activity` | Returns your notifications. | Yes |
+| `cosmos_follow_user` | Follows or unfollows a person. | Yes |
+| `cosmos_follow_cluster` | Follows or unfollows a collection. | Yes |
+| `cosmos_pin_cluster` | Pins one of your collections to your profile, or unpins it. | Yes |
 
-Tools return JSON and fill `structuredContent` for clients that read it. Paging works the same everywhere: pass the `nextCursor` from one call as the `cursor` of the next.
+## Configuration
 
-## Example prompts
+You do not need any environment variables. These are optional:
 
-- "Build me a moodboard about warm brutalist interiors and save it to a new private collection."
-- "Search Cosmos for 90s Japanese book covers, show me the twelve best as images, and save the ones I pick to a collection called Type Refs."
-- "Find this element on Cosmos, then pull twenty visually similar ones and tell me the common thread."
-- "What's in my Colour Studies collection? Group it by dominant colour."
-- "Look at this user's public collections and summarise their taste in three sentences."
-- "Take everything I saved this week and file it into the right existing collection."
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `COSMOS_AUTHORIZATION` | unset | Your token. The server adds `Bearer ` if it is missing. |
+| `COSMOS_COOKIE` | unset | A full `Cookie` header that holds a session. You almost never need it. |
+| `COSMOS_USER_ID` | unset | Your numeric user id. It saves one lookup request. The server uses it only when it is set in the same place as the token. |
+| `COSMOS_TIMEOUT_MS` | `30000` | The time limit for each request, in milliseconds. |
 
-## Development
-
-Requires [Bun](https://bun.com).
-
-```bash
-bun install          # install dependencies
-bun run dev          # run the server from source, restarting on change
-bun test             # run tests
-bun run typecheck    # tsc --noEmit
-bun run build        # bundle to dist/index.js for Node
-```
-
-The server speaks MCP over stdio. Anything on stdout that is not a JSON-RPC frame corrupts the protocol, so log to stderr.
-
-To smoke-test the built artifact:
-
-```bash
-bun run build
-printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}\n' \
-  | node dist/index.js
-```
-
-You should see `cosmos-mcp ready on stdio` on stderr and a JSON-RPC result containing `serverInfo` on stdout.
-
-### Project layout
-
-```
-index.ts                 entrypoint: stdio transport
-src/
-  config.ts              environment variables to CosmosConfig
-  errors.ts              CosmosError, and the mapping from GraphQL codes to kinds
-  normalize.ts           API shapes to the flatter shapes tools return
-  server.ts              McpServer construction and tool registration
-  graphql/
-    client.ts            HTTP client, auth headers, viewer resolution
-    fragments.ts         shared GraphQL fragments
-  tools/
-    kit.ts               shared helpers: ok/fail/guard, common arguments
-    account.ts           whoami, library, feed, activity
-    browse.ts            search, explore, elements, users, clusters
-    curate.ts            create, save, organise
-scripts/
-  probe-schema.ts        schema discovery against the live API
-docs/
-  har-ops/               reverse-engineered GraphQL operation reference
-test/
-```
-
-See [docs/README.md](docs/README.md) for where the operation reference came from.
+[`.env.example`](.env.example) lists all variables, including the ones for testing.
 
 ## Questions
 
-**Does cosmos.so have an API?** No. Cosmos publishes no public API, issues no API keys, and turns off GraphQL introspection. This server calls the same private endpoint the website calls.
-
-**Do I need an API key?** No, there are none to get. Search and browsing need nothing. To save, copy your own session token from the browser: see [Authentication](#authentication).
-
-**Does it work without signing in?** Yes. 18 of the 36 tools work signed out: search, collections, public profiles, images.
-
-**Which MCP clients does it support?** Any client that speaks MCP over stdio.
-
-**Can this get my account banned?** There is some risk; Cosmos promises this endpoint to no one. Use your own account at a normal pace, and read the [disclaimer](#unofficial-not-affiliated-with-cosmos).
-
-**Will it break?** Probably, one day, when Cosmos changes the endpoint. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to check an operation against the live API and send a fix.
+- Does Cosmos have an API? No. Cosmos publishes no API and gives out no API keys. This server uses the same private API as the website.
+- Does it work without signing in? Yes. Search, browsing, public profiles and image views work signed out. See [Tools](#tools).
+- Which clients does it support? Any MCP client that starts servers as a local command.
+- Will it break? Yes, when Cosmos changes its private API. Run `npx -y cosmos-mcp@latest` to get the newest release, or [open an issue](https://github.com/mrmos/cosmos-mcp/issues).
 
 ## Contributing
 
-Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), especially the part about verifying a GraphQL operation against the live API before adding one.
+Bug reports and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to run the server from source and how to test a change against the live API.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
-
-Not affiliated with or endorsed by Cosmos.
+MIT. See [LICENSE](LICENSE). Not affiliated with or endorsed by Cosmos.
