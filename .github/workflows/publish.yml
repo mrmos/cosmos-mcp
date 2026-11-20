@@ -15,9 +15,11 @@ name: Publish
 # Then release with:
 #   npm version patch && git push --follow-tags
 #
-# A tag run also attaches the Claude Desktop extension (.mcpb) to a GitHub
-# release and publishes server.json to the official MCP registry. The registry
+# The run also publishes server.json to the official MCP registry, which
 # authenticates this workflow through the same OIDC token, as io.github.mrmos.
+# A tag run also attaches the Claude Desktop extension (.mcpb) to a GitHub
+# release. If a release fails after npm, run this workflow by hand on main: it
+# skips the npm publish and finishes the registry step.
 
 on:
   push:
@@ -70,8 +72,16 @@ jobs:
       - name: Update npm
         run: npm install -g npm@latest
 
+      # Skipped when the version is already on npm, so a manual run can finish
+      # a release whose later steps failed.
       - name: Publish
-        run: npm publish --provenance --access public
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if curl -sf "https://registry.npmjs.org/cosmos-mcp/$VERSION" > /dev/null; then
+            echo "cosmos-mcp@$VERSION is already on npm."
+          else
+            npm publish --provenance --access public
+          fi
 
       # package.json is the version source of truth; copy it into server.json.
       - name: Sync server.json version
@@ -109,8 +119,18 @@ jobs:
           tar xzf "$archive" mcp-publisher
           rm -f "$archive" "$archive.sigstore.json"
 
+      # The registry checks that npm serves the version, and npm can take a few
+      # minutes to process a new release.
+      - name: Wait for npm to serve the version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          for i in $(seq 1 40); do
+            curl -sf "https://registry.npmjs.org/cosmos-mcp/$VERSION" > /dev/null && exit 0
+            sleep 15
+          done
+          echo "npm did not serve cosmos-mcp@$VERSION within 10 minutes." && exit 1
+
       - name: Publish to the MCP registry
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
           ./mcp-publisher login github-oidc
           ./mcp-publisher publish
