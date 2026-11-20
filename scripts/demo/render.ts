@@ -5,6 +5,10 @@
  *
  *   bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
  *
+ * For the second demo, pass the capture file and the output path:
+ *
+ *   bun run scripts/demo/render.ts scripts/demo/capture-similar.json docs/demo-similar.gif
+ *
  * Needs Google Chrome (headless) and ffmpeg; nothing is downloaded. Writes
  * capture.js from capture.json, drives one headless Chrome over the DevTools
  * protocol to screenshot every frame at a fixed 800x500 viewport, then runs
@@ -20,15 +24,16 @@ import { pathToFileURL } from "node:url";
 
 const ROOT = resolve(import.meta.dir, "../..");
 const DEMO = join(ROOT, "scripts/demo");
-const OUT = join(ROOT, "docs/demo.gif");
+// Optional arguments: the capture file and the GIF to write, relative to the repo root.
+const capturePath = resolve(ROOT, process.argv[2] ?? "scripts/demo/capture.json");
+const OUT = resolve(ROOT, process.argv[3] ?? "docs/demo.gif");
 const W = 800, H = 500;
 const FPS = Number(process.env.DEMO_FPS ?? 12);
 const COLORS = Number(process.env.DEMO_COLORS ?? 128);
 const CHROME = process.env.CHROME_PATH ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const FFMPEG = process.env.FFMPEG_PATH ?? Bun.which("ffmpeg") ?? "/opt/homebrew/bin/ffmpeg";
 
-const capturePath = join(DEMO, "capture.json");
-if (!existsSync(capturePath)) throw new Error("scripts/demo/capture.json missing: run capture.ts first");
+if (!existsSync(capturePath)) throw new Error(`${capturePath} missing: run the capture script first`);
 const capture = JSON.parse(readFileSync(capturePath, "utf8"));
 await Bun.write(
   join(DEMO, "capture.js"),
@@ -131,7 +136,7 @@ try {
   await Bun.$`mkdir -p ${join(ROOT, "docs")}`;
   await Bun.$`${FFMPEG} -loglevel error -y ${input} -i ${palette} -lavfi ${"paletteuse=dither=sierra2_4a:diff_mode=rectangle"} -loop 0 ${OUT}`;
   const kb = statSync(OUT).size / 1024;
-  console.error(`wrote docs/demo.gif (${kb.toFixed(0)} KB, ${count} frames)`);
+  console.error(`wrote ${OUT} (${kb.toFixed(0)} KB, ${count} frames)`);
   if (process.env.DEMO_KEEP_FRAMES) console.error(`frames kept in ${frames}`);
 } finally {
   chrome.kill();

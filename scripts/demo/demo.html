@@ -53,6 +53,9 @@
   #board .empty { position: absolute; inset: 0; display: grid; place-items: center; font: 12px var(--mono); color: #b9b7b0; }
   .tile { position: absolute; border-radius: 4px; overflow: hidden; background: #e9e7e1; }
   .tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #bhead { position: absolute; left: 12px; top: 12px; right: 12px; font: 600 13px/1.2 var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bhead .meta { font-weight: 400; color: var(--muted); }
+  .blabel { position: absolute; left: 12px; font: 600 9px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
   #caption {
     position: absolute; left: 348px; top: 460px; width: 432px; height: 18px;
@@ -90,7 +93,7 @@
     <h1>cosmos-mcp</h1>
     <p>Search and build cosmos.so moodboards from any MCP client</p>
     <code>npx -y cosmos-mcp</code>
-    <p class="small">Unofficial. Replay of real tool output · public-domain images</p>
+    <p class="small" id="cardnote">Unofficial. Replay of real tool output</p>
   </div></div>
 
 <script src="capture.js"></script>
@@ -102,13 +105,27 @@
   const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
+  // ---- tool calls ----
+  // Each capture lists its calls; `reveal` says what appears on the right when one returns.
+  const calls = C.calls.map((c) => ({ ...c, argsHtml: esc(c.args) }));
+  const seeds = C.seeds ?? [];
+
   // ---- timeline (seconds) ----
-  const PROMPT = C.prompt ?? `Build me a moodboard: "${C.brief}"`;
+  const PROMPT = C.prompt;
   const TYPE_START = 0.4, TYPE_CPS = 24;
   const TYPE_END = TYPE_START + PROMPT.length / TYPE_CPS;
-  const SEARCH_AT = TYPE_END + 0.35, SEARCH_RES = SEARCH_AT + 0.6;
-  const VIEW_AT = SEARCH_RES + 0.45, VIEW_RES = VIEW_AT + 0.6;
-  const TILES_AT = VIEW_RES + 0.2, TILE_STEP = 0.28, TILE_FADE = 0.35;
+  const CALL_RUN = 0.6, CALL_GAP = 0.45;
+  let cursor = TYPE_END + 0.35;
+  const revealAt = {};
+  calls.forEach((c) => {
+    c.at = cursor;
+    c.res = cursor + CALL_RUN;
+    cursor = c.res + CALL_GAP;
+    if (c.reveal) revealAt[c.reveal] = c.res;
+  });
+  const lastRes = calls[calls.length - 1].res;
+  const SEED_STEP = 0.12, SEED_FADE = 0.3;
+  const TILES_AT = (revealAt.tiles ?? lastRes) + 0.2, TILE_STEP = 0.28, TILE_FADE = 0.35;
   const n = C.tiles.length;
   const TILES_END = TILES_AT + (n - 1) * TILE_STEP + TILE_FADE;
   const DONE_AT = TILES_END + 0.1;
@@ -118,8 +135,42 @@
   const DURATION = CARD_AT + CARD_FADE + HOLD;
   window.DURATION = DURATION;
 
-  // ---- masonry layout, computed once ----
-  const BW = 432 - 2, BH = 434 - 2, PAD = 10, GAP = 6, COLS = 3;
+  // ---- board panel: optional header and seed strip, then masonry ----
+  const board = $("board");
+  const BW = 432 - 2, BH = 434 - 2, PAD = 10, GAP = 6;
+  let AREA_TOP = 0, AREA_H = BH;
+  let headEl = null, seedEls = [], labelEls = [];
+  if (C.board) {
+    headEl = document.createElement("div");
+    headEl.id = "bhead";
+    headEl.innerHTML = `${esc(C.board.name)} <span class="meta">· ${C.board.isPrivate ? "private" : "public"} · ${C.board.elementCount} elements</span>`;
+    board.appendChild(headEl);
+  }
+  if (seeds.length) {
+    const label = (text, top) => {
+      const el = document.createElement("div");
+      el.className = "blabel";
+      el.style.top = `${top}px`;
+      el.textContent = text;
+      board.appendChild(el);
+      return el;
+    };
+    labelEls.push(label(C.seedsLabel ?? "Board", 36));
+    const SEED = 64;
+    seedEls = seeds.map((t, i) => {
+      const el = document.createElement("div");
+      el.className = "tile";
+      Object.assign(el.style, { left: `${12 + i * (SEED + GAP)}px`, top: "50px", width: `${SEED}px`, height: `${SEED}px` });
+      el.innerHTML = `<img src="${esc(t.asset)}" alt="">`;
+      board.appendChild(el);
+      return el;
+    });
+    labelEls.push(label(C.tilesLabel ?? "Results", 130));
+    AREA_TOP = 136;
+    AREA_H = BH - AREA_TOP;
+  }
+
+  const COLS = seeds.length ? 4 : 3;
   let colW = (BW - 2 * PAD - (COLS - 1) * GAP) / COLS;
   const place = (w) => {
     const heights = new Array(COLS).fill(0);
@@ -132,12 +183,12 @@
     }), maxH: Math.max(...heights) - GAP };
   };
   let lay = place(colW);
-  const availH = BH - 2 * PAD;
+  const availH = AREA_H - 2 * PAD;
   if (lay.maxH > availH) { colW *= availH / lay.maxH; lay = place(colW); }
-  const offX = (BW - (COLS * colW + (COLS - 1) * GAP)) / 2;
-  const offY = (BH - lay.maxH) / 2;
+  // Under a seed strip, line the grid up with it on the left; otherwise center it.
+  const offX = seeds.length ? 12 : (BW - (COLS * colW + (COLS - 1) * GAP)) / 2;
+  const offY = AREA_TOP + (seeds.length ? PAD : (AREA_H - lay.maxH) / 2);
 
-  const board = $("board");
   const tileEls = C.tiles.map((t, i) => {
     const b = lay.boxes[i];
     const el = document.createElement("div");
@@ -151,15 +202,15 @@
     return el;
   });
 
-  const shortIds = (ids) => ids.length <= 2 ? ids.join(", ") : `${ids[0]}, ${ids[1]}, …${ids.length - 2} more`;
-  const s = C.search, v = C.view;
-  const searchArgs = `"${esc(s.arguments.query)}"<br>${esc(s.arguments.contentType)} · limit ${s.arguments.limit}`;
-  const searchRes = `→ ${s.returned} of ${s.totalCount} · ${s.publicDomain} public domain`;
-  const viewArgs = `[${shortIds(v.arguments.elementIds)}]`;
-  const viewRes = `→ ${esc(v.summary.replace(/\.$/, ""))}`;
   const spinner = (t) => "running" + ".".repeat(1 + (Math.floor(t * 6) % 3));
+  $("footer").textContent = C.footer ?? "Replay of real tool output";
+  if (C.cardNote) $("cardnote").textContent = C.cardNote;
+  const doneText = C.done ?? `Done. ${n} images.`;
 
-  $("footer").textContent = "Replay of real tool output · public-domain images";
+  const fadeIn = (el, p) => {
+    el.style.opacity = p;
+    el.style.transform = `translateY(${(1 - p) * 10}px) scale(${0.96 + 0.04 * p})`;
+  };
 
   function render(t) {
     // prompt typing
@@ -170,31 +221,39 @@
 
     // tool calls
     let html = "";
-    if (t >= SEARCH_AT) {
-      html += `<div class="call"><div class="name">${esc(s.tool)}</div><div class="args">${searchArgs}</div>` +
-        (t >= SEARCH_RES ? `<div class="res">${esc(searchRes)}</div>` : `<div class="args spin">${spinner(t)}</div>`) + "</div>";
-    }
-    if (t >= VIEW_AT) {
-      html += `<div class="call"><div class="name">${esc(v.tool)}</div><div class="args">${viewArgs}</div>` +
-        (t >= VIEW_RES ? `<div class="res">${viewRes}</div>` : `<div class="args spin">${spinner(t)}</div>`) + "</div>";
+    for (const c of calls) {
+      if (t < c.at) break;
+      html += `<div class="call"><div class="name">${esc(c.tool)}</div><div class="args">${c.argsHtml}</div>` +
+        (t >= c.res ? `<div class="res">${esc(c.result)}</div>` : `<div class="args spin">${spinner(t)}</div>`) + "</div>";
     }
     if (t >= DONE_AT) {
       const o = ease((t - DONE_AT) / 0.3);
-      html += `<div id="done" style="opacity:${o}">Done. ${n} public-domain images on the board.</div>`;
+      html += `<div id="done" style="opacity:${o}">${esc(doneText)}</div>`;
     }
     $("calls").innerHTML = html;
+
+    // board header and seed strip
+    let shown = false;
+    if (headEl) {
+      const p = ease((t - (revealAt.header ?? Infinity)) / 0.3);
+      headEl.style.opacity = p;
+      shown = shown || p > 0;
+    }
+    const seedsAt = revealAt.seeds ?? Infinity;
+    seedEls.forEach((el, i) => fadeIn(el, ease((t - (seedsAt + i * SEED_STEP)) / SEED_FADE)));
+    if (labelEls[0]) labelEls[0].style.opacity = ease((t - seedsAt) / 0.3);
+    if (labelEls[1]) labelEls[1].style.opacity = ease((t - TILES_AT) / 0.3);
 
     // tiles
     let latest = -1;
     tileEls.forEach((el, i) => {
       const p = ease((t - (TILES_AT + i * TILE_STEP)) / TILE_FADE);
-      el.style.opacity = p;
-      el.style.transform = `translateY(${(1 - p) * 10}px) scale(${0.96 + 0.04 * p})`;
+      fadeIn(el, p);
       if (p > 0) latest = i;
     });
-    board.querySelector(".empty").style.opacity = latest >= 0 ? 0 : 1;
+    board.querySelector(".empty").style.opacity = latest >= 0 || shown ? 0 : 1;
     const tile = C.tiles[latest];
-    $("caption").textContent = tile ? `${tile.id} · @${tile.owner} · ${tile.caption ?? ""}` : "";
+    $("caption").textContent = tile ? [tile.id, `@${tile.owner}`, tile.caption].filter(Boolean).join(" · ") : "";
 
     // title card
     const c = ease((t - CARD_AT) / CARD_FADE);

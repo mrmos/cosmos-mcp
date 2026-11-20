@@ -8,7 +8,7 @@ cosmos-mcp lets an AI agent build moodboards on [cosmos.so](https://www.cosmos.s
 
 Search and browsing work without an account. You sign in only when you want to save.
 
-![An agent turns a textile brief into a search for Ernst Haeckel, looks at the plates, and builds a jellyfish moodboard](docs/demo.gif)
+![An agent splits a site-hero brief into three searches, chrome pointing hand, glitch CRT and chromatic aberration glass, looks at the results, and builds a moodboard](docs/demo.gif)
 
 [![Add to Cursor](https://img.shields.io/badge/Add%20to-Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=cosmos&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvc21vcy1tY3AiXX0%3D)
 [![Add to Claude Code](https://img.shields.io/badge/Add%20to-Claude%20Code-D97757?logo=anthropic&logoColor=white)](#install)
@@ -46,6 +46,10 @@ You describe what you want, and the agent builds the moodboard. Use it for these
 - Research: find reference images for a brief without clicking through a site.
 - Curation: sort saved work into collections and move elements between them.
 - Discovery: start from one image that you like and find more like it.
+
+Discovery also works on a whole collection. Here the agent reads a private collection and asks Cosmos for images like it:
+
+![An agent reads the private collection glove & haunted glass, asks Cosmos for recommendations, and shows eight chrome and glitch images like it](docs/demo-similar.gif)
 
 ## Install
 
@@ -109,6 +113,8 @@ claude mcp add cosmos -- bun run /absolute/path/to/cosmos-mcp/index.ts
 
 Use absolute paths, because MCP clients do not always resolve relative paths. A local clone reads `.env`, so you can leave `env` out of the client configuration.
 
+Inside the clone, `npx cosmos-mcp` fails with `command not found`, because npx finds the unbuilt local package. Run the commands with Bun instead, for example `bun run index.ts login`.
+
 ## Authentication
 
 You need this section only when you want to save. Every tool that does not need sign-in in the [Tools](#tools) tables works now.
@@ -138,9 +144,12 @@ To copy the token (`login` prints these steps too):
 2. Open DevTools (`Cmd+Option+I` on macOS, `F12` on other systems).
 3. In the Network tab, reload the page.
 4. Click a request to `api.cosmos.so`.
-5. Under Request Headers, copy the full `Authorization` value. It starts with `Bearer `.
+5. Under Request Headers, right-click `authorization` and choose Copy value. The value starts with `Bearer `.
+6. Run `pbpaste | npx cosmos-mcp login`. The token goes from the clipboard to `login`, and it never shows on screen.
 
-Do not copy the `Cookie` header. Its `AWSALB` values only route traffic between servers, and they do not sign you in.
+Do not copy the `Cookie` header. Its `AWSALB` values only route traffic between servers, and they do not sign you in. If `login` asks for the `Cookie` header, npx ran an old copy: run `npx -y cosmos-mcp@latest login`.
+
+A HAR file that you export from DevTools does not contain the token. Chrome removes the `Authorization` header from exported HAR files.
 
 The server looks for a credential in three places, in this order:
 
@@ -171,7 +180,7 @@ Nothing is required. For a starting file with comments, copy [`.env.example`](.e
 | --- | --- | --- |
 | `COSMOS_AUTHORIZATION` | unset | The `Authorization` header value. With it, every tool works. The server adds `Bearer ` to a bare token. |
 | `COSMOS_COOKIE` | unset | A full `Cookie` header that carries a session. You rarely need it. The `AWSALB` cookies on a normal request do not sign you in. |
-| `COSMOS_USER_ID` | unset | Your numeric Cosmos user id. Optional. With it, the server skips the `me` lookup on first use. |
+| `COSMOS_USER_ID` | unset | Your numeric Cosmos user id. Optional. With it, the server skips the `me` lookup on first use. It counts only when set in the same place as `COSMOS_AUTHORIZATION` or `COSMOS_COOKIE`; a `cosmos-mcp login` credential uses the id saved with it. |
 | `COSMOS_ENDPOINT` | `https://api.cosmos.so/graphql` | The GraphQL endpoint. Change it only for a mock or a proxy. |
 | `COSMOS_TIMEOUT_MS` | `30000` | The timeout for each request, in milliseconds. The server ignores a value that is not valid and prints a warning. |
 | `COSMOS_CLIENT_NAME` | `cosmos-web` | Sent as `x-client-name`. The API rejects unknown clients, so do not change it. |
@@ -306,7 +315,7 @@ src/
 scripts/
   probe-schema.ts        schema discovery against the live API
   build-mcpb.ts          builds the Claude Desktop extension
-  demo/                  records docs/demo.gif
+  demo/                  records docs/demo.gif and docs/demo-similar.gif
 mcpb/manifest.json       Claude Desktop extension manifest
 server.json              MCP registry entry
 docs/
@@ -318,14 +327,26 @@ test/
 
 ### Demo GIF
 
-`docs/demo.gif` replays real tool output. To record it again, run:
+`docs/demo.gif` replays real tool output. To record it again, sign in with `bun run index.ts login`, then run:
 
 ```bash
 bun run build
 bun run scripts/demo/capture.ts && bun run scripts/demo/render.ts
 ```
 
-`capture.ts` runs the built server signed out and keeps only images that Cosmos marks as public domain, because the GIF is in a public repository. `render.ts` needs Google Chrome and ffmpeg.
+`capture.ts` runs the built server signed in, because Cosmos personalizes search results. It runs three searches for a site-hero brief and shows eight results that a person picked. The images are not public domain. To try other searches, pass the queries as arguments, for example `bun run scripts/demo/capture.ts "warm brutalist interiors"`. `render.ts` needs Google Chrome and ffmpeg.
+
+`docs/demo-similar.gif` shows recommendations for a private collection, so it needs a saved login (`bun run index.ts login`). Its images are not public domain. To record it again, run:
+
+```bash
+bun run build
+DEMO_SEEDS=41914221,461120264,395489947,353929386 \
+DEMO_PICK=1746300072,562874937,1671375502,1900819247,776507632,440162643,412657390,1599835804 \
+  bun run scripts/demo/capture-similar.ts
+bun run scripts/demo/render.ts scripts/demo/capture-similar.json docs/demo-similar.gif
+```
+
+`DEMO_SEEDS` picks the collection images in the top strip, and `DEMO_PICK` picks the eight recommendations. Without them, the script takes the first images in each list. Pass a different collection link as the first argument to `capture-similar.ts`.
 
 ## Questions
 
