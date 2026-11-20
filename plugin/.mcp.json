@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "cosmos-mcp@0.1.1"
+        "cosmos-mcp@0.2.0"
       ]
     }
   }
