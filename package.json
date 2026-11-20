@@ -47,7 +47,8 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "bun run typecheck && bun run build",
-    "build:mcpb": "bun run build && bun run scripts/build-mcpb.ts"
+    "build:mcpb": "bun run build && bun run scripts/build-mcpb.ts",
+    "version": "bun run scripts/sync-version.ts && git add server.json plugin/.claude-plugin/plugin.json plugin/.mcp.json"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

@@ -83,12 +83,9 @@ jobs:
             npm publish --provenance --access public
           fi
 
-      # package.json is the version source of truth; copy it into server.json.
-      - name: Sync server.json version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          jq --arg v "$VERSION" '.version = $v | .packages[0].version = $v' server.json > server.tmp
-          mv server.tmp server.json
+      # `npm version` already ran this; running it again makes a manual dispatch safe.
+      - name: Sync versions from package.json
+        run: bun run scripts/sync-version.ts
 
       - name: Build the Claude Desktop extension
         run: bun run scripts/build-mcpb.ts

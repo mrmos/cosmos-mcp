@@ -27,6 +27,13 @@ For Claude Code, run this command. The `-s user` flag adds the server to all of 
 claude mcp add cosmos -s user -- npx -y cosmos-mcp
 ```
 
+You can also install the Claude Code plugin instead. It adds the server and a `moodboard` skill, and it runs a pinned version of the npm package. [plugin/README.md](plugin/README.md) lists what the plugin runs, sends and fetches. In Claude Code, run:
+
+```
+/plugin marketplace add mrmos/cosmos-mcp
+/plugin install cosmos@cosmos-mcp
+```
+
 For Claude Desktop, download `cosmos-mcp-<version>.mcpb` from the latest [GitHub release](https://github.com/mrmos/cosmos-mcp/releases) and open it. You do not need Node.
 
 Other MCP clients use this configuration:
@@ -191,6 +198,17 @@ You do not need any environment variables. These are optional:
 | `COSMOS_TIMEOUT_MS` | `30000` | The time limit for each request, in milliseconds. |
 
 [`.env.example`](.env.example) lists all variables, including the ones for testing.
+
+## Privacy policy
+
+This policy covers the npm package, the Claude Code plugin and the Claude Desktop extension.
+
+- Collection: the author collects no data. The server has no telemetry, no analytics and no server of its own.
+- Sending: the server sends your searches, ids and the changes that you ask for to `api.cosmos.so`. It fetches image thumbnails from `cdn.cosmos.so`. If you sign in, it sends your token to `api.cosmos.so` and to no other host.
+- Storage: `login` saves your token, user id and username in `~/.config/cosmos-mcp/config.json`. Only your user account can read that file. The server stores nothing else.
+- Retention: the file stays until you run `npx cosmos-mcp logout` or delete it. The token stops working when it expires or when you sign out of that browser session.
+- Third parties: cosmos.so handles your requests under the [cosmos.so privacy policy](https://www.cosmos.so/privacy). Your MCP client and its model provider see the tool results under their own policies. npm serves the package when npx installs it.
+- Contact: [open an issue](https://github.com/mrmos/cosmos-mcp/issues).
 
 ## Questions
 

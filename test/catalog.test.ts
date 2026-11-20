@@ -80,3 +80,37 @@ test("the server registers the moodboard prompt", async () => {
   expect(prompts.map((p) => p.name)).toEqual(["moodboard"]);
   expect(JSON.stringify(got.messages)).toContain("sleep");
 });
+
+test("every tool meets the Anthropic directory annotation rules", async () => {
+  const server = createServer({ ...loadConfig({}), cookie: undefined, authorization: undefined });
+  const client = new Client({ name: "annotation-test", version: "0" });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+  const { tools } = await client.listTools();
+  await client.close();
+
+  const problems = tools.flatMap((t) => {
+    const a = t.annotations ?? {};
+    const out: string[] = [];
+    if (!t.title && !a.title) out.push(`${t.name}: no title`);
+    if (typeof a.readOnlyHint !== "boolean") out.push(`${t.name}: no readOnlyHint`);
+    if (a.readOnlyHint === false && typeof a.destructiveHint !== "boolean") out.push(`${t.name}: no destructiveHint`);
+    if (t.name.length > 64) out.push(`${t.name}: name over 64 characters`);
+    return out;
+  });
+  expect(problems).toEqual([]);
+});
+
+test("every file that repeats the version matches package.json", async () => {
+  const read = (path: string) => Bun.file(new URL(`../${path}`, import.meta.url)).json();
+  const pkg = await read("package.json");
+  const server = await read("server.json");
+  const plugin = await read("plugin/.claude-plugin/plugin.json");
+  const mcp = await read("plugin/.mcp.json");
+
+  expect(server.version).toBe(pkg.version);
+  expect(server.packages[0].version).toBe(pkg.version);
+  expect(plugin.version).toBe(pkg.version);
+  // The plugin directory blocks an unpinned launcher, so the pin must be exact.
+  expect(mcp.mcpServers.cosmos.args).toEqual(["-y", `${pkg.name}@${pkg.version}`]);
+});

@@ -67,8 +67,11 @@ src/
 scripts/
   probe-schema.ts        schema discovery against the live API
   build-mcpb.ts          builds the Claude Desktop extension
+  sync-version.ts        copies the package version into server.json and the plugin
 mcpb/manifest.json       Claude Desktop extension manifest
 server.json              MCP registry entry
+plugin/                  Claude Code plugin: .mcp.json and the moodboard skill
+.claude-plugin/          marketplace.json, so this repository is its own plugin marketplace
 docs/
   har-ops/               reverse-engineered GraphQL operation reference
 test/
@@ -173,11 +176,13 @@ a probe running in a loop.
 
 ## Releasing
 
-Run `npm version patch && git push --follow-tags`. The publish workflow then:
+Run `npm version patch && git push --follow-tags`. `npm version` runs
+`scripts/sync-version.ts`, which copies the new version into `server.json`, the plugin
+manifest and the npx pin in `plugin/.mcp.json`. The publish workflow then:
 
 1. Publishes the package to npm.
 2. Builds `cosmos-mcp-<version>.mcpb` and attaches it to a GitHub release.
-3. Copies the version into `server.json` and publishes it to the MCP registry.
+3. Publishes `server.json` to the MCP registry.
 
 ## Style
 

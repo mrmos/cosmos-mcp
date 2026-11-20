@@ -17,7 +17,7 @@
   "support": "https://github.com/mrmos/cosmos-mcp/issues",
   "license": "MIT",
   "keywords": ["cosmos", "moodboard", "design", "inspiration", "images"],
-  "privacy_policies": ["https://www.cosmos.so/privacy"],
+  "privacy_policies": ["https://github.com/mrmos/cosmos-mcp#privacy-policy", "https://www.cosmos.so/privacy"],
   "server": {
     "type": "node",
     "entry_point": "server/index.js",
