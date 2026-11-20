@@ -16,25 +16,14 @@
   "homepage": "https://github.com/mrmos/cosmos-mcp#readme",
   "support": "https://github.com/mrmos/cosmos-mcp/issues",
   "license": "MIT",
-  "keywords": [
-    "cosmos",
-    "moodboard",
-    "design",
-    "inspiration",
-    "images"
-  ],
-  "privacy_policies": [
-    "https://github.com/mrmos/cosmos-mcp#privacy-policy",
-    "https://www.cosmos.so/privacy"
-  ],
+  "keywords": ["cosmos", "moodboard", "design", "inspiration", "images"],
+  "privacy_policies": ["https://github.com/mrmos/cosmos-mcp#privacy-policy", "https://www.cosmos.so/privacy"],
   "server": {
     "type": "node",
     "entry_point": "server/index.js",
     "mcp_config": {
       "command": "node",
-      "args": [
-        "${__dirname}/server/index.js"
-      ],
+      "args": ["${__dirname}/server/index.js"],
       "env": {
         "COSMOS_AUTHORIZATION": "${user_config.cosmos_authorization}"
       }
@@ -44,19 +33,13 @@
     {
       "name": "moodboard",
       "description": "Research a brief on cosmos.so and build a moodboard.",
-      "arguments": [
-        "brief"
-      ],
+      "arguments": ["brief"],
       "text": "Build a moodboard on cosmos.so for this brief: ${arguments.brief}. Call cosmos_whoami first. Seed with cosmos_search, look at candidates with cosmos_view_images, and save to a new private collection only if you are signed in."
     }
   ],
   "tools_generated": true,
   "compatibility": {
-    "platforms": [
-      "darwin",
-      "win32",
-      "linux"
-    ],
+    "platforms": ["darwin", "win32", "linux"],
     "runtimes": {
       "node": ">=18.17.0"
     }

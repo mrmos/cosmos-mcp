@@ -1,9 +1,6 @@
 /**
- * Copies the package.json version into every file that repeats it:
- * server.json (MCP registry), the plugin manifest, and the npx pin the plugin
- * runs. `npm version` calls this through the `version` script, so a release
- * commit always carries matching versions. test/catalog.test.ts fails if they
- * drift.
+ * Copies the package.json version into every file that repeats it. `npm version`
+ * runs this, and test/catalog.test.ts fails if the files drift.
  */
 
 import { join } from "node:path";
@@ -21,7 +18,7 @@ async function edit(path: string, change: (json: any) => void) {
 
 await edit("server.json", (s) => {
   s.version = v;
-  for (const p of s.packages ?? []) p.version = v;
+  for (const p of s.packages) p.version = v;
 });
 await edit("plugin/.claude-plugin/plugin.json", (p) => {
   p.version = v;
